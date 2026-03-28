@@ -1,0 +1,1168 @@
+﻿@using System.Reflection
+@inject IStringLocalizerFactory LocalizerFactory
+
+@{
+    var Localizer = LocalizerFactory.Create("SharedResource", Assembly.GetExecutingAssembly().GetName().Name);
+    ViewData["Title"] = @Localizer["Clinical"];
+}
+
+<style>
+    .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+        color: #333 !important;
+        border-color: #fff #fff #fff;
+        border-bottom-color: rgb(255, 255, 255);
+        border-bottom: 2px solid #537EC5 !important;
+    }
+
+</style>
+@* <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.14.1/themes/base/jquery-ui.min.css" rel="stylesheet" /> *@
+@using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+{
+    @Html.AntiForgeryToken()
+}
+<div class="kt-subheader kt-grid__item" id="kt_subheader">
+    <div class="kt-subheader__main">
+        <span class="kt-subheader__separator kt-hidden"></span>
+        <div class="kt-subheader__breadcrumbs">
+            <a asp-controller="Clinical" asp-action="Index" class="kt-subheader__breadcrumbs-home"><i class="flaticon2-shelter"></i></a>
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+            <a href="@Url.Action("Index","Clinical")"
+               class="kt-subheader__breadcrumbs-link cursor-pointer">
+                @Localizer["Clinical"]
+            </a>
+        </div>
+    </div>
+    <div class="kt-subheader__toolbar">
+        <div class="kt-subheader__wrapper">
+        </div>
+    </div>
+</div>
+
+<div id="divGrid">
+    <form id="frm_Clinical">
+        <div class="kt-portlet kt-portlet--mobile p-2 mb-1">
+            <div class="form-group row">
+                <div class="col-xs-12 col-md-12 col-lg-12" style="display: inline-flex;">
+                    <div class="col-xs-12 col-md-3 col-lg-3">
+                        <label>@Localizer["Reg_No"]:</label>
+                        <input type="text" id="txtRegno" class="form-control" placeholder="@Localizer["Enter_Reg_No"]">
+                    </div>
+                    <div class="col-xs-12 col-md-3 col-lg-3">
+                        <label>@Localizer["First_Name"]:</label>
+                        <input type="text" id="txtFirstName" class="form-control" placeholder="@Localizer["Enter_First_Name"]">
+                    </div>
+                    <div class="col-xs-12 col-md-3 col-lg-3">
+                        <label>@Localizer["Last_Name"]:</label>
+                        <input type="text" id="txtLastName" class="form-control" placeholder="@Localizer["Enter_Last_Name"]">
+                    </div>
+                    <div class="col-xs-12 col-md-3 col-lg-3">
+                        <label>@Localizer["Mobile_No"]:</label>
+                        <input type="text" id="txtMobile" class="form-control" placeholder="@Localizer["Enter_Mobile_No"]">
+                    </div>
+
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-xs-12 col-md-12 col-lg-12" style="display: inline-flex;">
+                    <div class="col-xs-12 col-md-3 col-lg-3">
+                        <label>@Localizer["Gender"]:</label>
+                        <select id="ddlGender" class="form-control">
+                            <option value="">@Localizer["All"]</option>
+                            <option value="M">@Localizer["Male"]</option>
+                            <option value="F">@Localizer["Female"]</option>
+                            <option value="O">@Localizer["Other"]</option>
+                        </select>
+                    </div>
+
+                    @* <div class="col-xs-12 col-md-3 col-lg-3">
+                        <label>@Localizer["Doctor"]:</label>
+                        <select id="ddlDoctor" class="form-control">
+                            <option value="">@Localizer["All_Doctors"]</option>
+                            <option>Dr Mehta</option>
+                            <option>Dr Shah</option>
+                        </select>
+                    </div> *@
+
+                    <div class="col-xs-12 col-md-3 col-lg-3">
+                        <label>@Localizer["Status"]:</label>
+                        <select id="ddlStatus" class="form-control">
+                            <option value="">@Localizer["All_Status"]</option>
+                            <option value="1">@Localizer["Active"]</option>
+                            <option value="0">@Localizer["Inactive"]</option>
+                        </select>
+                    </div>
+                    <div class="col-xs-12 col-md-3 col-lg-3">
+                        <label>@Localizer["Date"]:</label>
+                        <div class="input-daterange input-group">
+                            <input type="text" id="txtDate" class="form-control date-picker" name="startMonth" placeholder="@Localizer["Date"]" autocomplete="off" />
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label"></div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="kt-portlet__head-actions">
+                            <div class="dropdown dropdown-inline">
+                                <button id="divExport"
+                                        type="button"
+                                        class="btn btn-default btn-icon-sm"
+                                        onclick="clinical.ExportToExcelGrid1('#tblPatientList','excel')">
+                                    <i class="la la-download"></i> Export
+                                </button>
+                            </div>
+                            &nbsp;
+                            &nbsp;
+                            <button type="button" class="btn btn-success" id="btnSearch" title="@Localizer["Search"]" onclick="clinical.SetForSearch()">@Localizer["Search"]</button>
+                            <button type="button" class="btn btn-danger" id="btnReset" title="@Localizer["Reset"]" onclick="clinical.ResetFilterData();">@Localizer["Reset"]</button>
+                            <span id="divAdd">
+                                <a href="javascript:;" class="btn btn-brand btn-elevate btn-icon-sm" title="@Localizer["Add_Patient"]" onclick="Building.SetForAdd();">
+                                    <i class="fas fa-plus-circle"></i>
+                                    @Localizer["Add_Patient"]
+                                </a>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body table-responsive" id="divIDViewPatientLists" style="display:none;">
+                <!--begin: Datatable -->
+                <table class="table table-striped table-hover table-checkable" id="tblPatientList">
+                    <template>
+                        Patient List
+                    </template>
+                    <thead>
+                        <tr>
+                            <th>@Localizer["Registration_No"]</th>
+                            <th>@Localizer["Full_Name"]</th>
+                            @*  <th>@Localizer["Address"]</th> *@
+                            <th>@Localizer["DOB"]</th>
+                            <th>@Localizer["Gender"]</th>
+                            <th>@Localizer["MobileNo"]</th>
+                            @*  <th>@Localizer["TelePhoneNo"]</th> *@
+                            @* <th>@Localizer["Email"]</th> *@
+                            <th>@Localizer["Category"]</th>
+                            <th>@Localizer["Status"]</th>
+                            <th>@Localizer["Occupation"]</th>
+                            @*  <th>@Localizer["Remarks"]</th> *@
+                            <th>@Localizer["Active"]</th>
+                            <th>@Localizer["Assessment"]</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+
+        </div>
+    </form>
+</div>
+<div id="divStartAssetment"></div>
+<script src="~/Scripts/Clinical.js" asp-append-version="true"></script>
+<script id="Grid_Data_Template_tblPatientList" type="text/x-jquery-tmpl">
+     <tr data-id="${patientID}">
+     <td>${regNo}</td>
+     <td>${fullName}</td>
+    @*  <td title="${address}"> {{if address && address.length > 25}} ${address.substring(0,25)}... {{else}} ${address} {{/if}}</td> *@
+     <td>${dobCustom}</td>
+     <td>${gender}</td>
+     <td>${mobileNo}</td>
+    @*  <td>${telePhoneNo}</td> *@
+    @* <td>${emailID}</td> *@
+     <td>${categoryName}</td>
+     <td>${statusName}</td>
+     <td>${occupationName}</td>
+    @*  <td title="${remarks}">{{if remarks && remarks.length > 25}} ${remarks.substring(0,25)}... {{else}} ${remarks} {{/if}}</td> *@
+     <td> {{if aFlagName == "Active"}} <span class="badge badge-success">Active</span> {{else}} <span class="badge badge-danger">Inactive</span> {{/if}}
+     </td>
+      <!-- ✅ ACTION COLUMN -->
+      <td class="text-center">
+           <a href="javascript:void(0);" title="Start Assessment" onclick="event.stopPropagation(); clinical.Assessment('${patientID}')">
+               <i class="fa fa-clipboard text-primary  mr-2" style="font-size: 20px;"></i>
+          </a>
+      </td>
+     </tr>
+</script>
+
+<script>
+
+
+    $(document).on("click", ".nav-pills .nav-link", function (e) {
+
+        var target = $(this).attr("href");
+
+        if (!target || target === "#") return;
+
+        e.preventDefault();
+
+        $(".nav-pills .nav-link").removeClass("active");
+        $(this).addClass("active");
+
+        clinical.switchMenu(target);
+    });
+    $(document).on("click", ".dropdown-item", function (e) {
+
+            e.preventDefault();
+
+            var target = $(this).attr("href");
+
+            if (!target) return;
+
+            // activate parent tab
+            $(".nav-pills .nav-link").removeClass("active");
+            $(this).closest(".dropdown").find(".nav-link").addClass("active");
+
+            // switch menu immediately
+            clinical.switchMenu(target);
+
+        });
+    // ===============================
+    // 🔹 LEFT MENU CLICK
+    // ===============================
+    $(document).on("click", "#leftMenu a", function (e) {
+
+        e.preventDefault();
+
+        var target = $(this).attr("href");
+
+        $(".tab-pane").removeClass("active show");
+        $(target).addClass("active show");
+
+        $("#leftMenu a").removeClass("active");
+        $(this).addClass("active");
+    });
+
+    
+
+    // ===============================
+    // 🔹 YOUR EXISTING CODE (UNCHANGED)
+    // ===============================
+
+    // DataTables
+    var kinTable = $("#kinTable").DataTable({
+        pageLength: 5,
+        lengthMenu: [5, 10, 25, 50],
+        searching: true,
+        ordering: true,
+        autoWidth: false
+    });
+
+    var profTable = $("#profTable").DataTable({
+        pageLength: 5,
+        lengthMenu: [5, 10, 25, 50],
+        searching: true,
+        ordering: true,
+        autoWidth: false
+    });
+
+
+    $("#btnAddKin").click(function () {
+
+        var name = $("#kinName").val().trim();
+        var relation = $("#kinRelation").val().trim();
+        var tele = $("#kinTele").val().trim();
+        var mobile = $("#kinMobile").val().trim();
+        var email = $("#kinEmail").val().trim();
+        var address = $("#kinAddress").val().trim();
+        var remarks = $("#kinRemarks").val().trim();
+
+        if (name === "" || relation === "" || mobile === "") {
+            alert("Please fill required fields");
+            return;
+        }
+
+        kinTable.row.add([
+            name,
+            relation,
+            address,
+            tele,
+            mobile,
+            email,
+            remarks,
+            '<button class="btn btn-xs btn-primary btnEdit"><i class="fa fa-edit"></i></button>'
+        ]).draw(false);
+
+        // Clear form
+        $("#nextOfKin input, #nextOfKin textarea").val("");
+
+    });
+
+
+    // ==============================
+    // OTHER PROFESSIONALS
+    // ==============================
+
+    $("#btnAddProf").click(function () {
+
+        var name = $("#profName").val().trim();
+        var profession = $("#profType").val();
+        var tele = $("#profTele").val().trim();
+        var mobile = $("#profMobile").val().trim();
+        var email = $("#profEmail").val().trim();
+        var address = $("#profAddress").val().trim();
+        var remarks = $("#profRemarks").val().trim();
+
+        if (name === "" || profession === "Select" || mobile === "" || email === "") {
+            alert("Please fill required fields");
+            return;
+        }
+
+        profTable.row.add([
+            name,
+            profession,
+            address,
+            tele,
+            mobile,
+            email,
+            remarks,
+            '<button class="btn btn-xs btn-primary btnEdit"><i class="fa fa-edit"></i></button>'
+        ]).draw(false);
+
+        // Clear form
+        $("#otherProfessionals input, #otherProfessionals textarea").val("");
+        $("#profType").val("Select");
+
+    });
+
+    //// DATE PICKER
+    if ($(".date-picker").length > 0) {
+        $('.date-picker').datepicker({
+            autoclose: true,
+            todayHighlight: true,
+            format: DateTimeDataFormat.ddMMyyyy
+        });
+
+
+    }
+
+
+
+    // =====================================
+    // COMMON ADD SYSTEM
+    // =====================================
+
+    // OPEN PANEL
+    $(document).on("click", ".btnAddCommon", function () {
+
+        let section = $(this).closest(".assessment-section");
+
+        section.find(".addPanel").slideDown();
+
+    });
+
+    // CLOSE PANEL
+    $(document).on("click", ".btnCloseCommon", function () {
+
+        let section = $(this).closest(".assessment-section");
+
+        section.find(".addPanel").slideUp();
+        section.find(".newText").val("");
+
+    });
+
+    // SAVE NOTE
+    $(document).on("click", ".btnSaveCommon", function () {
+
+        let section = $(this).closest(".assessment-section");
+        let text = section.find(".newText").val().trim();
+
+        if (text === "") {
+            alert("Please enter details.");
+            return;
+        }
+
+        let now = new Date();
+
+        let date = now.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+
+        let time = now.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        let html = `
+    <div class="timelineItem">
+
+        <div class="timelineLeft">
+            <div class="timelineDate">${date}</div>
+            <div class="timelineTime">${time}</div>
+        </div>
+
+        <div class="timelineMiddle"></div>
+
+        <div class="timelineRight">
+            ${text}
+        </div>
+
+    </div>
+    `;
+
+        section.find(".timelineContainer").prepend(html);
+
+        section.find(".newText").val("");
+        section.find(".addPanel").slideUp();
+    });
+
+
+
+
+
+    const presenting = $("#presenting");
+
+    /* QUICK INFO PANEL */
+
+    presenting.find("#btnQuickInfo").click(function () {
+        presenting.find("#quickInfoPanel").slideToggle();
+    });
+
+    presenting.find("#btnCloseQuickInfo").click(function () {
+        presenting.find("#quickInfoPanel").slideUp();
+    });
+
+    presenting.find("#btnSaveQuickInfo").click(function () {
+
+        let selected = [];
+
+        presenting.find(".quickChk:checked").each(function () {
+            selected.push($(this).val());
+        });
+
+        if (selected.length === 0) {
+            alert("Please select at least one option.");
+            return;
+        }
+
+        let textarea = presenting.find("#presentingTextarea");
+        textarea.val(selected.join(", "));
+
+        presenting.find(".quickChk").prop("checked", false);
+        presenting.find("#quickInfoPanel").slideUp();
+    });
+
+
+    /* ADD BUTTON → TIMELINE */
+
+    presenting.find("#btnAddPresenting").click(function () {
+
+        let textarea = presenting.find("#presentingTextarea");
+        let text = textarea.val().trim();
+
+        if (text === "") {
+            alert("Please enter details.");
+            return;
+        }
+
+        let now = new Date();
+
+        let date = now.toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+
+        let time = now.toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+
+        let html = `
+    <div class="timelineItem">
+
+        <div class="timelineLeft">
+            <div class="timelineDate">${date}</div>
+            <div class="timelineTime">${time}</div>
+        </div>
+
+        <div class="timelineMiddle"></div>
+
+        <div class="timelineRight">
+            ${text}
+        </div>
+
+    </div>
+    `;
+
+        presenting.find(".timelineContainer").prepend(html);
+
+        textarea.val("");
+
+    });
+
+    $(document).on("click", ".assessment-section .btnSaveCommon", function (e) {
+
+        e.preventDefault();
+
+        let section = $(this).closest(".assessment-section");
+
+        let text = section.find(".newText").val().trim();
+        let date = $(".txnDate").val();
+
+        if (text === "") {
+            alert("Please enter details.");
+            return;
+        }
+
+        // ====================================
+        // PROGRESS NOTES → TIMELINE
+        // ====================================
+        if (section.attr("id") === "progress") {
+
+            let timelineHTML = `
+        <div class="timelineItem">
+
+            <div class="timelineDate">${date}</div>
+
+            <div class="timelineCircle"></div>
+
+            <div class="timelineCard">
+                ${text}
+            </div>
+
+        </div>
+        `;
+
+            section.find(".timelineContainer").prepend(timelineHTML);
+        }
+
+        // ====================================
+        // OTHER SECTIONS → TABLE
+        // ====================================
+        else {
+
+            let tableBody = section.find(".commonTable tbody");
+
+            let row = `
+            <tr>
+                <td style="text-align:center;">${date}</td>
+                <td>${text}</td>
+            </tr>
+        `;
+
+            tableBody.append(row);
+        }
+
+        // Clear input
+        section.find(".newText").val("");
+        section.find(".addPanel").slideUp();
+
+    });
+
+
+    // =====================================
+    // PRESCRIPTION SYSTEM
+    // =====================================
+
+    // Open Panel
+    $("#btnOpenPrescription").click(function () {
+        $("#prescriptionPanel").slideDown();
+    });
+
+    // Close Panel
+    $("#btnClosePrescription").click(function () {
+        $("#prescriptionPanel").slideUp();
+    });
+
+    // Add New Row
+    $("#btnAddRow").click(function () {
+
+        let rowCount = $("#prescriptionTable tbody tr").length + 1;
+
+        let newRow = `
+        <tr>
+            <td class="srno">${rowCount}</td>
+            <td><input type="text" class="form-control" /></td>
+            <td><input type="text" class="form-control" /></td>
+            <td><input type="text" class="form-control" /></td>
+            <td><input type="text" class="form-control" /></td>
+            <td><input type="text" class="form-control" /></td>
+            <td><input type="text" class="form-control" /></td>
+        </tr>
+    `;
+
+        $("#prescriptionTable tbody").append(newRow);
+    });
+
+    // Delete Last Row
+    $("#btnDeleteRow").click(function () {
+
+        let rowCount = $("#prescriptionTable tbody tr").length;
+
+        if (rowCount > 1) {
+            $("#prescriptionTable tbody tr:last").remove();
+        } else {
+            alert("At least one row must remain.");
+        }
+    });
+
+    // Save & Print
+    $("#btnSavePrint").click(function () {
+
+
+
+        let printContents = document.getElementById("prescriptionPanel").innerHTML;
+        let originalContents = document.body.innerHTML;
+
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+
+        location.reload();
+    });
+
+
+
+    // =========================================
+    // OPEN RISK PANEL (Add click)
+    // =========================================
+    $(document).on("click", "#riskIndicators .btnAddCommon", function (e) {
+
+        e.preventDefault();
+
+        // Hide normal buttons
+        $("#riskIndicators .btnQuickInfo, #riskIndicators .btnAddCommon").hide();
+
+        // Show all risk panels
+        $("#riskIndicators .riskFullPanel").slideDown();
+
+        // Show Save / Close buttons
+        $("#riskActionButtons").slideDown();
+    });
+
+    // =========================================
+    // CLOSE RISK PANEL
+    // =========================================
+    $("#btnCloseRisk").click(function () {
+
+        $("#riskIndicators .riskFullPanel").slideUp();
+        $("#riskActionButtons").slideUp();
+
+        $("#riskIndicators .btnQuickInfo, #riskIndicators .btnAddCommon").show();
+    });
+
+
+    // =========================================
+    // SINGLE SELECT PER ROW
+    // =========================================
+    $(document).on("change", "#riskIndicators .risk-table input[type='checkbox']", function () {
+
+        let row = $(this).closest("tr");
+
+        row.find("input[type='checkbox']").not(this).prop("checked", false);
+    });
+
+
+    // =========================================
+    // SAVE RISK DATA
+    // =========================================
+    $("#btnSaveRisk").click(function () {
+
+        let riskData = [];
+
+        $("#riskIndicators .risk-table tbody tr").each(function () {
+
+            let description = $(this).find("td:first").text().trim();
+            let selectedValue = "";
+
+            $(this).find("input[type='checkbox']").each(function (index) {
+
+                if ($(this).is(":checked")) {
+
+                    if (index === 0)
+                        selectedValue = "Yes";
+                    else if (index === 1)
+                        selectedValue = "No";
+                    else
+                        selectedValue = "Don't Know";
+                }
+            });
+
+            riskData.push({
+                description: description,
+                value: selectedValue
+            });
+        });
+
+        console.log(riskData);
+
+        alert("Risk Indicators Saved Successfully!");
+
+        // Hide everything after save
+        $("#riskIndicators .riskFullPanel").slideUp();
+        $("#riskActionButtons").slideUp();
+
+        $("#riskIndicators .btnQuickInfo, #riskIndicators .btnAddCommon").show();
+    });
+    // OPEN PANEL
+    $("#btnAddICDOpen").click(function () {
+
+        $("#icd10 .btnQuickInfo, #btnAddICDOpen").hide();
+        $("#icd10Panel").slideDown();
+
+    });
+
+    // CLOSE PANEL
+    $("#btnCloseICD").click(function () {
+
+        $("#icd10Panel").slideUp();
+        $("#icd10 .btnQuickInfo, #btnAddICDOpen").show();
+
+    });
+
+    // DROPDOWN TOGGLE
+    $("#dropdownBtn").click(function (e) {
+
+        e.stopPropagation();
+        $("#checkboxDropdown").toggle();
+
+    });
+
+    // CLOSE DROPDOWN
+    $(document).click(function () {
+
+        $("#checkboxDropdown").hide();
+
+    });
+
+    // ADD ICD
+    $("#btnAddICD").click(function () {
+
+        $("#checkboxDropdown input:checked").each(function () {
+
+            let value = $(this).val();
+            let text = $(this).parent().text().trim();
+
+            if ($("#selectedICD option[value='" + value + "']").length === 0) {
+
+                $("#selectedICD").append(
+                    $("<option>").val(value).text(text)
+                );
+
+            }
+
+            $(this).prop("checked", false);
+
+        });
+
+    });
+
+    // REMOVE ICD
+    $("#btnRemoveICD").click(function () {
+
+        $("#selectedICD option:selected").remove();
+
+    });
+
+    // SAVE ICD
+    $("#btnSaveICD").click(function () {
+
+        let codes = [];
+
+        $("#selectedICD option").each(function () {
+
+            codes.push($(this).val());
+
+        });
+
+        console.log("Saved ICD:", codes);
+
+        alert("ICD Codes Saved Successfully");
+
+        $("#icd10Panel").slideUp();
+        $("#icd10 .btnQuickInfo, #btnAddICDOpen").show();
+
+    });
+    //------------------------------------------------------------------------------------------------
+    //// OPEN DSM PANEL
+
+    $("#btnAddDSMOpen").click(function () {
+        $("#dsm5Panel").slideDown();
+    });
+
+    // CLOSE DSM PANEL
+
+    $("#btnCloseDSM").click(function () {
+        $("#dsm5Panel").slideUp();
+    });
+
+
+    // TOGGLE DROPDOWN
+
+    $("#dropdownBtnDSM").click(function () {
+        $("#checkboxDropdownDSM").toggle();
+    });
+
+    // Close dropdown if clicked outside
+    $(document).click(function (e) {
+        if (!$(e.target).closest("#dropdownBtnDSM, #checkboxDropdownDSM").length) {
+            $("#checkboxDropdownDSM").hide();
+        }
+    });
+
+    // ADD SELECTED CHECKBOX ITEMS
+
+    $("#btnAddDSM").click(function () {
+
+        $("#checkboxDropdownDSM input[type='checkbox']:checked").each(function () {
+
+            var value = $(this).val();
+            var text = $(this).parent().text().trim();
+
+            // Prevent duplicate
+            if ($("#selectedDSM option[value='" + value + "']").length === 0) {
+                $("#selectedDSM").append(
+                    $("<option></option>").val(value).text(text)
+                );
+            }
+
+            $(this).prop("checked", false);
+        });
+
+    });
+
+    // ===============================
+    // REMOVE SELECTED ITEMS
+    // ===============================
+    $("#btnRemoveDSM").click(function () {
+        $("#selectedDSM option:selected").remove();
+    });
+
+    //// SAVE FUNCTION
+
+    $("#btnSaveDSM").click(function () {
+
+        var selectedValues = [];
+
+        $("#selectedDSM option").each(function () {
+            selectedValues.push($(this).text());
+        });
+
+        console.log("Saved DSM Data:", selectedValues);
+
+        alert("DSM-5 Data Saved Successfully!");
+
+        $("#dsm5Panel").slideUp();
+    });
+
+    //-----------physical------------
+
+    let columnCount = 0;
+    // ADD COLUMN
+
+    $(document).on("click", ".btnAddColumn", function () {
+
+        let table = $("#physicalTable");
+
+        let today = new Date();
+        let formattedDate =
+            ("0" + today.getDate()).slice(-2) + "/" +
+            ("0" + (today.getMonth() + 1)).slice(-2) + "/" +
+            today.getFullYear();
+
+        columnCount++;
+
+        // Add header
+        table.find("thead tr").append(
+            `<th class="text-center">${formattedDate}</th>`
+        );
+
+        // Add editable cells
+        table.find("tbody tr").each(function () {
+            $(this).append(
+                `<td contenteditable="true" class="text-center valueCell"></td>`
+            );
+        });
+
+    });
+
+    //// SAVE DATA
+
+    $(document).on("click", ".btnSavePhysical", function () {
+
+        let data = [];
+
+        $("#physicalTable tbody tr").each(function () {
+
+            let parameter = $(this).find("td:first").text().trim();
+            let values = [];
+
+            $(this).find("td:not(:first)").each(function () {
+                values.push($(this).text().trim());
+            });
+
+            data.push({
+                Parameter: parameter,
+                Values: values
+            });
+        });
+
+        console.log("Physical Monitoring Data:", data);
+
+        alert("Physical Monitoring data collected. Check console.");
+
+    });
+
+    // CLEAR BUTTON (FULL RESET)
+
+    $(document).on("click", ".btnClearSection", function () {
+
+        if (!confirm("Are you sure you want to clear Physical Monitoring section?"))
+            return;
+
+        let table = $("#physicalTable");
+
+        // Remove all header columns except first
+        table.find("thead tr th:not(:first)").remove();
+
+        // Remove all extra cells except first column
+        table.find("tbody tr").each(function () {
+            $(this).find("td:not(:first)").remove();
+        });
+
+        columnCount = 0;
+
+    });
+
+
+    // ==============================
+    // PRESCRIPTION MODULE
+    // ==============================
+
+    // Open Prescription Panel
+    $("#btnOpenPrescription").click(function () {
+        $("#prescriptionPanel").slideDown();
+    });
+
+    // Close Prescription Panel
+    $("#btnClosePrescription").click(function () {
+        $("#prescriptionPanel").slideUp();
+    });
+
+    // Add New Row (Only One Extra Row Allowed)
+    $("#btnAddRow").click(function () {
+
+        let rows = $("#prescriptionTable tbody tr").length;
+
+        if (rows >= 2) {
+            alert("Only one additional row allowed.");
+            return;
+        }
+
+        let newRow = `
+    <tr>
+        <td class="srno">2</td>
+        <td><input type="text" class="form-control"></td>
+        <td><input type="text" class="form-control"></td>
+        <td><input type="text" class="form-control"></td>
+        <td><input type="text" class="form-control"></td>
+        <td><input type="text" class="form-control"></td>
+        <td><input type="text" class="form-control"></td>
+    </tr>
+    `;
+
+        $("#prescriptionTable tbody").append(newRow);
+
+    });
+
+
+    // Delete Row (Keep Minimum One Row)
+    $("#btnDeleteRow").click(function () {
+
+        let rows = $("#prescriptionTable tbody tr");
+
+        if (rows.length > 1) {
+            rows.last().remove();
+        } else {
+            alert("One row must remain.");
+        }
+
+    });
+
+    // Save Prescription
+    $("#btnSavePrescription").click(function () {
+
+        let data = [];
+
+        $("#prescriptionTable tbody tr").each(function () {
+
+            let row = {
+                formulation: $(this).find("td:eq(1) input").val(),
+                medicine: $(this).find("td:eq(2) input").val(),
+                dosage: $(this).find("td:eq(3) input").val(),
+                route: $(this).find("td:eq(4) input").val(),
+                frequency: $(this).find("td:eq(5) input").val(),
+                others: $(this).find("td:eq(6) input").val()
+            };
+
+            data.push(row);
+        });
+
+        console.log("Prescription Data:", data);
+
+        alert("Prescription Saved Successfully!");
+
+    });
+
+    // Save & Print
+    $("#btnSavePrint").click(function () {
+
+        let printContent = document.getElementById("prescriptionPanel").innerHTML;
+
+        let originalContent = document.body.innerHTML;
+
+        document.body.innerHTML = printContent;
+
+        window.print();
+
+        document.body.innerHTML = originalContent;
+
+        location.reload();
+
+    });
+    /*    ------------------Attachment------------------------*/
+    // OPEN PANEL
+    $("#btnOpenAttachment").click(function () {
+
+        $("#attachments .attachmentPanel").slideDown();
+
+    });
+
+    // CLOSE PANEL
+    $("#btnCloseAttachment").click(function () {
+
+        $("#attachments .attachmentPanel").slideUp();
+
+    });
+    /*  medical certificate */
+    // ADD BUTTON → OPEN FORM
+    // ADD BUTTON → OPEN FORM
+    $(".btnAddCommon").click(function () {
+
+        $(".topButtons").hide();      // hide buttons
+        $(".medicalPanel").slideDown();  // show form
+
+    });
+
+
+    // CLOSE BUTTON → HIDE FORM
+    $("#btnCloseMC").click(function () {
+
+        $("#medicalcert textarea").val("");
+        $("#medicalcert input").val("");
+
+        $(".medicalPanel").slideUp(); // hide form
+        $(".topButtons").show();      // show buttons again
+
+    });
+
+
+    $("#btnCloseIP").click(function () {
+
+        $("#ipAdmissionDate").val("");
+        $("#ipDischargeDate").val("");
+        $("#txtDiagnosis").val("");
+        $("#txtNotes").val("");
+
+    });
+
+
+    $("#btnProceedOldCertificate").click(function () {
+
+        let selectedDate = $("#ddlOldMedicalDate").val();
+
+        if (selectedDate === "") {
+
+            alert("Please select a date");
+            return;
+
+        }
+
+        // Example action
+        console.log("Selected Medical Certificate Date:", selectedDate);
+
+        alert("Opening Medical Certificate for " + selectedDate);
+
+    });
+
+    /* INPATIENT MODULE*/
+    // ADD BUTTON → OPEN FORM
+    $("#btnAddIP").click(function () {
+
+        $(".ipTopButtons").hide();
+        $(".ipPanel").slideDown();
+
+    });
+
+
+    // CLOSE BUTTON → HIDE FORM
+    $("#btnCloseIP").click(function () {
+
+        $("#ipAdmissionDate").val("");
+        $("#ipDischargeDate").val("");
+        $("#txtDiagnosis").val("");
+        $("#txtNotes").val("");
+
+        $(".ipPanel").slideUp();
+        $(".ipTopButtons").show();
+
+    });
+
+
+    // SAVE BUTTON
+    $("#btnSaveIP").click(function () {
+
+        let admissionDate = $("#ipAdmissionDate").val();
+        let dischargeDate = $("#ipDischargeDate").val();
+        let diagnosis = $("#txtDiagnosis").val();
+        let notes = $("#txtNotes").val();
+
+        if (admissionDate === "") {
+            alert("Please enter admission date");
+            return;
+        }
+
+        if (diagnosis === "") {
+            alert("Please enter diagnosis");
+            return;
+        }
+
+        let data = {
+            admissionDate,
+            dischargeDate,
+            diagnosis,
+            notes
+        };
+
+        console.log("Inpatient Data:", data);
+
+        alert("Inpatient record saved successfully");
+
+    });
+    /* OLD PRESCRIPTION*/
+    $("#btnProceedOldPrescription").click(function () {
+
+        let selectedDate = $("#ddlOldPrescriptionDate").val();
+
+        if (selectedDate === "") {
+
+            alert("Please select a date");
+            return;
+
+        }
+
+        console.log("Selected Prescription Date:", selectedDate);
+
+        alert("Opening Prescription for " + selectedDate);
+
+    });
+
+</script>

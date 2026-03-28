@@ -1,0 +1,169 @@
+﻿@* _partialAddDoctor.cshtml *@
+
+<div class="kt-portlet kt-portlet--mobile" id="addDoctorPanel">
+
+   
+    <!-- Header -->
+    <div class="kt-portlet__head kt-portlet__head--lg">
+        <div class="kt-portlet__head-label">
+            <h3 class="kt-portlet__head-title">
+                Doctor Details
+            </h3>
+        </div>
+
+        <div class="kt-portlet__head-toolbar">
+            <div class="kt-portlet__head-wrapper">
+                <div class="kt-portlet__head-actions">
+                    <a href="javascript:;" class="btn btn-secondary btn-sm"
+                       onclick="doctorMaster.CloseAddPanel();">
+                        <i class="fa fa-times"></i> Close
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Body -->
+    <div class="kt-portlet__body">
+
+        <form id="frm_Doctor" autocomplete="off">
+
+            <!-- Row 1 -->
+            <div class="form-group row">
+
+                <div class="col-md-2">
+                    <label>Shortcode <asterisk></asterisk></label>
+                    <input type="text"
+                           id="shortcode"
+                           class="form-control"
+                           maxlength="10"
+                           placeholder="Shortcode">
+                </div>
+
+                <div class="col-md-4">
+                    <label>Name <asterisk></asterisk></label>
+                    <input type="text"
+                           id="name"
+                           class="form-control"
+                           maxlength="100"
+                           placeholder="Doctor Name">
+                </div>
+
+                <div class="col-md-6">
+                    <label>Address <asterisk></asterisk></label>
+                    <input type="text"
+                           id="address"
+                           class="form-control"
+                           maxlength="200"
+                           placeholder="Address">
+                </div>
+
+            </div>
+
+
+            <!-- Row 2 -->
+            <div class="form-group row">
+
+                <div class="col-md-3">
+                    <label>Telephone No</label>
+                    <input type="text"
+                           id="tele"
+                           class="form-control"
+                           maxlength="15"
+                           placeholder="Telephone Number">
+                </div>
+
+                <div class="col-md-3">
+                    <label>Mobile</label>
+                    <input type="text"
+                           id="mobile"
+                           class="form-control"
+                           maxlength="15"
+                           placeholder="Mobile Number">
+                </div>
+
+                <div class="col-md-6">
+                    <label>Email</label>
+                    <input type="text"
+                           id="email"
+                           class="form-control"
+                           maxlength="100"
+                           placeholder="Email">
+                </div>
+
+            </div>
+
+
+            <!-- Row 3 -->
+            <div class="form-group row">
+
+                <div class="col-md-9">
+                    <label>Remarks</label>
+                    <textarea id="remarks"
+                              class="form-control"
+                              rows="3"
+                              placeholder="Remarks"></textarea>
+                </div>
+
+                <div class="col-md-3">
+                    <label>Status</label>
+
+                    <div style="margin-top:8px;">
+
+                        <label style="margin-right:15px;">
+                            <input type="radio" name="docStatus" value="All" checked> All
+                        </label>
+
+                        <label style="margin-right:15px;">
+                            <input type="radio" name="docStatus" value="Active"> Active
+                        </label>
+
+                        <label>
+                            <input type="radio" name="docStatus" value="Inactive"> Inactive
+                        </label>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <input type="hidden" id="hf_DoctorID" value="" />
+
+        </form>
+
+    </div>
+
+
+    <!-- Footer -->
+    <div class="kt-portlet__foot">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-6">
+                <button type="button"
+                        class="btn btn-primary"
+                        onclick="doctorMaster.SaveDoctor();">
+                    <i class="fa fa-save"></i> Save
+                </button>
+
+                <button type="button"
+                        class="btn btn-warning"
+                        onclick="doctorMaster.ResetForm();">
+                    <i class="fa fa-history"></i> Reset
+                </button>
+            </div>
+
+            <div class="col-lg-6 text-right">
+                <button type="button"
+                        class="btn btn-secondary"
+                        onclick="doctorMaster.CloseAddPanel();">
+                    <i class="fa fa-times"></i> Cancel
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>

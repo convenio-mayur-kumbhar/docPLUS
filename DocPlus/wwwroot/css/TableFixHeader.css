@@ -1,0 +1,78 @@
+﻿table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+/*th, td {
+        background: #fff;
+        padding: 8px 16px;
+    }*/
+
+.tableFixHead {
+    overflow: auto;
+    height: 470px;
+}
+
+.tableFixHeadGroup {
+    overflow: auto;
+    height: 120px;
+}
+
+    .tableFixHeadGroup thead th {
+        position: sticky;
+        top: 0;
+    }
+
+.tableFixHead thead th {
+    position: sticky;
+    top: 0;
+}
+
+.table-sticky > thead > tr > th,
+.table-sticky > thead > tr > td {
+    background: #9d9c9c;
+    /*color: #6d6c6c;*/
+    color: #fff;
+    top: 0px;
+    position: sticky;
+    border-color: #ddd !important;
+    border: 1px solid #f1f1f1 !important;
+}
+
+.table-height {
+    height: 320px;
+    display: block;
+    overflow: scroll;
+    width: 100%;
+}
+
+/*table {
+        border-collapse: collapse;
+        border-spacing: 0;
+    }*/
+
+.table-bordered > thead > tr > th,
+.table-bordered > tbody > tr > th,
+.table-bordered > thead > tr > td,
+.table-bordered > tbody > tr > td {
+    border: 1px solid #ddd;
+}
+
+.table-sticky thead th:first-child {
+    left: 0;
+    z-index: 1;
+}
+
+.table-sticky tbody td:first-child {
+    position: -webkit-sticky; /* for Safari */
+    position: sticky;
+    left: 0;
+    background: #9d9c9c;
+    border-right: 1px solid #CCC;
+    border-color: #ddd;
+    color: white;
+}
+
+thead {
+    background-color: #9d9c9c !important;
+}

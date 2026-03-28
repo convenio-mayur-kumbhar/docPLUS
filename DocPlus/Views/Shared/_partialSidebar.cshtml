@@ -1,0 +1,486 @@
+﻿@using DocPlus.Entities.ViewModels;
+@using Microsoft.Extensions.Caching.Memory;
+@using Newtonsoft.Json;
+@using System.Collections;
+@using Microsoft.AspNetCore.Http;
+@using DocPlus.Utilities;
+
+@inject IMemoryCache Cache;
+
+@{
+    Hashtable? User_LoginInfo = null;
+    List<MenuScreen_VM>? objMenuList = null;
+    List<ScreenAction_VM>? objActionList = null;
+
+    string globalScreenAuth = "";
+    string globalScreenActionAuth = "";
+
+    var sessionData = Context.Session.GetString("UserData");
+
+    if (string.IsNullOrEmpty(sessionData))
+    {
+        Context.Response.Redirect("/Login");
+    }
+    else
+    {
+        User_LoginInfo = JsonConvert.DeserializeObject<Hashtable>(sessionData);
+
+        if (User_LoginInfo != null)
+        {
+            string? UserRoleID = User_LoginInfo["UserRoleID"]?.ToString();
+
+            string objectMenuKey = "objMenu" + UserRoleID;
+            string objectActionKey = "objAction" + UserRoleID;
+
+            if (Cache.TryGetValue(objectMenuKey, out List<MenuScreen_VM>? menuList))
+            {
+                objMenuList = menuList;
+                globalScreenAuth = JsonConvert.SerializeObject(menuList);
+            }
+
+            if (Cache.TryGetValue(objectActionKey, out List<ScreenAction_VM>? actionList))
+            {
+                objActionList = actionList;
+                globalScreenActionAuth = JsonConvert.SerializeObject(actionList);
+            }
+        }
+        else
+        {
+            Context.Response.Redirect("/Login");
+        }
+    }
+}
+
+<!-- begin:: Aside -->
+<button class="kt-aside-close " id="kt_aside_close_btn"><i class="la la-close"></i></button>
+<div class="kt-aside  kt-aside--fixed  kt-grid__item kt-grid kt-grid--desktop kt-grid--hor-desktop" id="kt_aside">
+    <!-- begin:: Aside -->
+    <div class="kt-aside__brand kt-grid__item " id="kt_aside_brand">
+        <div class="kt-aside__brand-logo">
+            <a href="javascript:;">
+                @*<img style="height:30px;" src="https://www.a2aenergy.com/images/logo.png">*@
+                <img style="height:60px;" src="~/assets/images/Docplus.png" />
+            </a>
+        </div>
+        <div class="kt-aside__brand-tools">
+            <button class="kt-aside__brand-aside-toggler" id="kt_aside_toggler">
+                <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <polygon id="Shape" points="0 0 24 0 24 24 0 24" />
+                            <path d="M5.29288961,6.70710318 C4.90236532,6.31657888 4.90236532,5.68341391 5.29288961,5.29288961 C5.68341391,4.90236532 6.31657888,4.90236532 6.70710318,5.29288961 L12.7071032,11.2928896 C13.0856821,11.6714686 13.0989277,12.281055 12.7371505,12.675721 L7.23715054,18.675721 C6.86395813,19.08284 6.23139076,19.1103429 5.82427177,18.7371505 C5.41715278,18.3639581 5.38964985,17.7313908 5.76284226,17.3242718 L10.6158586,12.0300721 L5.29288961,6.70710318 Z" id="Path-94" fill="#000000" fill-rule="nonzero" transform="translate(8.999997, 11.999999) scale(-1, 1) translate(-8.999997, -11.999999) " />
+                            <path d="M10.7071009,15.7071068 C10.3165766,16.0976311 9.68341162,16.0976311 9.29288733,15.7071068 C8.90236304,15.3165825 8.90236304,14.6834175 9.29288733,14.2928932 L15.2928873,8.29289322 C15.6714663,7.91431428 16.2810527,7.90106866 16.6757187,8.26284586 L22.6757187,13.7628459 C23.0828377,14.1360383 23.1103407,14.7686056 22.7371482,15.1757246 C22.3639558,15.5828436 21.7313885,15.6103465 21.3242695,15.2371541 L16.0300699,10.3841378 L10.7071009,15.7071068 Z" id="Path-94" fill="#000000" fill-rule="nonzero" opacity="0.3" transform="translate(15.999997, 11.999999) scale(-1, 1) rotate(-270.000000) translate(-15.999997, -11.999999) " />
+                        </g>
+                    </svg>
+                </span>
+                <span>
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24px" height="24px" viewBox="0 0 24 24" version="1.1" class="kt-svg-icon">
+                        <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                            <polygon id="Shape" points="0 0 24 0 24 24 0 24" />
+                            <path d="M12.2928955,6.70710318 C11.9023712,6.31657888 11.9023712,5.68341391 12.2928955,5.29288961 C12.6834198,4.90236532 13.3165848,4.90236532 13.7071091,5.29288961 L19.7071091,11.2928896 C20.085688,11.6714686 20.0989336,12.281055 19.7371564,12.675721 L14.2371564,18.675721 C13.863964,19.08284 13.2313966,19.1103429 12.8242777,18.7371505 C12.4171587,18.3639581 12.3896557,17.7313908 12.7628481,17.3242718 L17.6158645,12.0300721 L12.2928955,6.70710318 Z" id="Path-94" fill="#000000" fill-rule="nonzero" />
+                            <path d="M3.70710678,15.7071068 C3.31658249,16.0976311 2.68341751,16.0976311 2.29289322,15.7071068 C1.90236893,15.3165825 1.90236893,14.6834175 2.29289322,14.2928932 L8.29289322,8.29289322 C8.67147216,7.91431428 9.28105859,7.90106866 9.67572463,8.26284586 L15.6757246,13.7628459 C16.0828436,14.1360383 16.1103465,14.7686056 15.7371541,15.1757246 C15.3639617,15.5828436 14.7313944,15.6103465 14.3242754,15.2371541 L9.03007575,10.3841378 L3.70710678,15.7071068 Z" id="Path-94" fill="#000000" fill-rule="nonzero" opacity="0.3" transform="translate(9.000003, 11.999999) rotate(-270.000000) translate(-9.000003, -11.999999) " />
+                        </g>
+                    </svg>
+                </span>
+            </button>
+        </div>
+    </div>
+    <!-- end:: Aside -->
+    <!-- begin:: Aside Menu -->
+    <div class="kt-aside-menu-wrapper kt-grid__item kt-grid__item--fluid" id="kt_aside_menu_wrapper">
+        <div id="kt_aside_menu" class="kt-aside-menu " data-ktmenu-vertical="1" data-ktmenu-scroll="1" data-ktmenu-dropdown-timeout="500">
+            <ul class="kt-menu__nav ">
+                @{
+                    try
+                    {
+                        if (objMenuList != null && objMenuList.Count > 0)
+                        {
+                            foreach (MenuScreen_VM Menu in objMenuList)
+                            {
+                                switch (Menu.ObjectName)
+                                {
+                                    case Screen.Dashboard:
+                                        {
+                                            <li class="kt-menu__item @Html.IsActive(Screen.Dashboard, "Index")">
+                                                <input id="hf_GlobalDashboardScreenID" type="hidden" value="@Menu.EncryptScreenID" />
+
+                                                <a href="@Url.Action("Index", "Dashboard", new { id = Menu.EncryptScreenID })" class="kt-menu__link">
+                                                    <span class="kt-menu__link-icon">
+                                                        <i class="far fa-chart-bar"></i>
+                                                    </span>
+                                                    <span class="kt-menu__link-text">@Screen.Dashboard</span>
+                                                </a>
+                                            </li>
+                                            break;
+                                        }
+
+                                    case Screen.Clinical:
+                                        {
+                                            <li class="kt-menu__item @Html.IsActive(Screen.Clinical.Replace(" ", ""), "Index")">
+                                                <input id="hf_Clinical" type="hidden" value="@Menu.EncryptScreenID" />
+
+                                                <a href="@Url.Action("Index", "Clinical", new { id = Menu.EncryptScreenID })" class="kt-menu__link">
+                                                    <span class="kt-menu__link-icon">
+                                                        <i class="fas fa-clinic-medical"></i>
+                                                    </span>
+                                                    <span class="kt-menu__link-text">@ScreenMenuName.Clinical</span>
+                                                </a>
+                                            </li>
+                                            break;
+                                        }
+
+                                    case ScreenMenuName.BasicSettings:
+                                        {
+                                            <li class="kt-menu__item kt-menu__item--submenu MainMenu">
+                                                <a href="javascript:;" class="kt-menu__link kt-menu__toggle">
+                                                    <span class="kt-menu__link-icon">
+                                                        <i class="fa fa-cogs"></i>
+                                                    </span>
+                                                    <span class="kt-menu__link-text">@ScreenMenuName.BasicSettings</span><i class="kt-menu__ver-arrow la la-angle-right"></i>
+                                                </a>
+
+                                                <div class="kt-menu__submenu">
+                                                    <ul class="kt-menu__subnav">
+                                                        @{
+                                                            var ChildMenus = objMenuList
+                                                            .Where(x => x.MenuCode == ScreenMenuCode.BasicSettings);
+
+                                                            foreach (var ChildMenu in ChildMenus)
+                                                            {
+                                                                switch (ChildMenu.ObjectName)
+                                                                {
+                                                                    case Screen.DoctorMaster:
+                                                                        {
+                                                                            <li class="kt-menu__item @Html.IsActive(Screen.DoctorMaster, "Index")">
+                                                                                <input id="hf_DoctorMaster" type="hidden" value="@ChildMenu.EncryptScreenID" />
+
+                                                                                <a href="@Url.Action("Index", "DoctorMaster", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
+                                                                                    <span class="kt-menu__link-text">@Screen.DoctorMaster</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            break;
+                                                                        }
+
+                                                                    case Screen.User:
+                                                                        {
+                                                                            <li class="kt-menu__item @Html.IsActive(Screen.User, "Index")">
+                                                                                <input id="hf_User" type="hidden" value="@ChildMenu.EncryptScreenID" />
+
+                                                                                <a href="@Url.Action("Index", "User", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
+                                                                                    <span class="kt-menu__link-text">@Screen.User</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            break;
+                                                                        }
+
+                                                                    case Screen.StatusMaster:
+                                                                        {
+                                                                            <li class="kt-menu__item @Html.IsActive(Screen.StatusMaster.Replace(" ", ""), "Index")">
+                                                                                <input id="hf_StatusMaster" type="hidden" value="@ChildMenu.EncryptScreenID" />
+
+                                                                                <a href="@Url.Action("Index", "StatusMaster", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
+                                                                                    <span class="kt-menu__link-text">@Screen.StatusMaster</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            break;
+                                                                        }
+
+                                                                    case Screen.ProfessionMaster:
+                                                                        {
+                                                                            <li class="kt-menu__item @Html.IsActive(Screen.ProfessionMaster.Replace(" ", ""), "Index")">
+                                                                                <input id="hf_ProfessionMaster" type="hidden" value="@ChildMenu.EncryptScreenID" />
+
+                                                                                <a href="@Url.Action("Index", "ProfessionMaster", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
+                                                                                    <span class="kt-menu__link-text">@Screen.ProfessionMaster</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            break;
+                                                                        }
+
+                                                                    case Screen.CategoryMaster:
+                                                                        {
+                                                                            <li class="kt-menu__item @Html.IsActive(Screen.CategoryMaster.Replace(" ", ""), "Index")">
+                                                                                <input id="hf_CategoryMaster" type="hidden" value="@ChildMenu.EncryptScreenID" />
+
+                                                                                <a href="@Url.Action("Index", "CategoryMaster", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
+                                                                                    <span class="kt-menu__link-text">@Screen.CategoryMaster</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            break;
+                                                                        }
+
+                                                                    case Screen.ICD10Master:
+                                                                        {
+                                                                            <li class="kt-menu__item @Html.IsActive(Screen.ICD10Master.Replace(" ", ""), "Index")">
+                                                                                <input id="hf_ICD10Master" type="hidden" value="@ChildMenu.EncryptScreenID" />
+
+                                                                                <a href="@Url.Action("Index", "ICD10Master", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
+                                                                                    <span class="kt-menu__link-text">@Screen.ICD10Master</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            break;
+                                                                        }
+
+                                                                    case Screen.DSM4Master:
+                                                                        {
+                                                                            <li class="kt-menu__item @Html.IsActive(Screen.DSM4Master.Replace(" ", ""), "Index")">
+                                                                                <input id="hf_DSM4Master" type="hidden" value="@ChildMenu.EncryptScreenID" />
+
+                                                                                <a href="@Url.Action("Index", "DSM4Master", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
+                                                                                    <span class="kt-menu__link-text">@Screen.DSM4Master</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            break;
+                                                                        }
+
+                                                                    case Screen.OccupationMaster:
+                                                                        {
+                                                                            <li class="kt-menu__item @Html.IsActive(Screen.OccupationMaster.Replace(" ", ""), "Index")">
+                                                                                <input id="hf_OccupationMaster" type="hidden" value="@ChildMenu.EncryptScreenID" />
+
+                                                                                <a href="@Url.Action("Index", "OccupationMaster", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
+                                                                                    <span class="kt-menu__link-text">@Screen.OccupationMaster</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            break;
+                                                                        }
+
+                                                                    default: break;
+                                                                }
+                                                            }
+
+                                                        }
+
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                            break;
+                                        }
+                                    case ScreenMenuName.AdminSettings:
+                                        {
+                                            <li class="kt-menu__item kt-menu__item--submenu MainMenu">
+                                                <a href="javascript:;" class="kt-menu__link kt-menu__toggle">
+                                                    <span class="kt-menu__link-icon">
+                                                        <i class="fa fa-cog"></i>
+                                                    </span>
+                                                    <span class="kt-menu__link-text">@ScreenMenuName.AdminSettings</span><i class="kt-menu__ver-arrow la la-angle-right"></i>
+                                                </a>
+
+                                                <div class="kt-menu__submenu">
+                                                    <ul class="kt-menu__subnav">
+                                                        @{
+                                                            var ChildMenus = objMenuList
+                                                            .Where(x => x.MenuCode == ScreenMenuCode.AdminSettings);
+
+                                                            foreach (var ChildMenu in ChildMenus)
+                                                            {
+                                                                switch (ChildMenu.ObjectName)
+                                                                {
+                                                                    case Screen.Appointments:
+                                                                        {
+                                                                            <li class="kt-menu__item @Html.IsActive(Screen.Appointments, "Index")">
+                                                                                <input type="hidden" id="hf_Appointments" value="@ChildMenu.EncryptScreenID" />
+
+                                                                                <a href="@Url.Action("Index", "Appointments", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
+                                                                                    <span class="kt-menu__link-text">@Screen.Appointments</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            break;
+                                                                        }
+
+                                                                    case Screen.PatientRegistrations:
+                                                                        {
+                                                                            <li class="kt-menu__item @Html.IsActive(Screen.PatientRegistrations.Replace(" ", ""), "Index")">
+                                                                                <input type="hidden" id="hf_PatientRegistrations" value="@ChildMenu.EncryptScreenID" />
+
+                                                                                <a href="@Url.Action("Index", "PatientRegistrations", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
+                                                                                    <span class="kt-menu__link-text">@Screen.PatientRegistrations</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            break;
+                                                                        }
+
+                                                                    case Screen.Payments:
+                                                                        {
+                                                                            <li class="kt-menu__item @Html.IsActive(Screen.Payments, "Index")">
+                                                                                <input type="hidden" id="hf_Payments" value="@ChildMenu.EncryptScreenID" />
+
+                                                                                <a href="@Url.Action("Index", "Payments", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
+                                                                                    <span class="kt-menu__link-text">@Screen.Payments</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            break;
+                                                                        }
+
+                                                                    case Screen.Billing:
+                                                                        {
+                                                                            <li class="kt-menu__item @Html.IsActive(Screen.Billing, "Index")">
+                                                                                <input type="hidden" id="hf_Billing" value="@ChildMenu.EncryptScreenID" />
+
+                                                                                <a href="@Url.Action("Index", "Billing", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
+                                                                                    <span class="kt-menu__link-text">@Screen.Billing</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            break;
+                                                                        }
+                                                                }
+                                                            }
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                            break;
+                                        }
+
+                                    case ScreenMenuName.Reports:
+                                        {
+                                            <li class="kt-menu__item kt-menu__item--submenu MainMenu">
+                                                <a href="javascript:;" class="kt-menu__link kt-menu__toggle">
+                                                    <span class="kt-menu__link-icon">
+                                                        <i class="fas fa-file-excel"></i>
+                                                    </span>
+                                                    <span class="kt-menu__link-text">@ScreenMenuName.Reports</span><i class="kt-menu__ver-arrow la la-angle-right"></i>
+                                                </a>
+
+                                                <div class="kt-menu__submenu">
+                                                    <ul class="kt-menu__subnav">
+                                                        @{
+                                                            var ChildMenus = objMenuList
+                                                            .Where(x => x.MenuCode == ScreenMenuCode.Reports);
+
+                                                            foreach (var ChildMenu in ChildMenus)
+                                                            {
+                                                                switch (ChildMenu.ObjectName)
+                                                                {
+                                                                    case Screen.PatientReports:
+                                                                        {
+                                                                            <li class="kt-menu__item @Html.IsActive(Screen.PatientReports.Replace(" ", ""), "Index")">
+                                                                                <input type="hidden" id="hf_PatientReports" value="@ChildMenu.EncryptScreenID" />
+
+                                                                                <a href="@Url.Action("Index", "PatientReports", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
+                                                                                    <span class="kt-menu__link-text">@Screen.PatientReports</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            break;
+                                                                        }
+
+                                                                    case Screen.FinancialReports:
+                                                                        {
+                                                                            <li class="kt-menu__item @Html.IsActive(Screen.FinancialReports.Replace(" ", ""), "Index")">
+                                                                                <input type="hidden" id="hf_FinancialReports" value="@ChildMenu.EncryptScreenID" />
+
+                                                                                <a href="@Url.Action("Index", "FinancialReports", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
+                                                                                    <span class="kt-menu__link-text">@Screen.FinancialReports</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            break;
+                                                                        }
+
+                                                                    case Screen.AppointmentReports:
+                                                                        {
+                                                                            <li class="kt-menu__item @Html.IsActive(Screen.AppointmentReports.Replace(" ", ""), "Index")">
+                                                                                <input type="hidden" id="hf_AppointmentReports" value="@ChildMenu.EncryptScreenID" />
+
+                                                                                <a href="@Url.Action("Index", "AppointmentReports", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
+                                                                                    <span class="kt-menu__link-text">@Screen.AppointmentReports</span>
+                                                                                </a>
+                                                                            </li>
+                                                                            break;
+                                                                        }
+                                                                }
+                                                            }
+                                                        }
+                                                    </ul>
+                                                </div>
+                                            </li>
+                                            break;
+                                        }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        Context.Response.Redirect("Login");
+                    }
+                }
+                @* <li class="kt-menu__item Clinical @Html.IsActive("Clinical", "Index")" aria-haspopup="true">
+                    <a asp-controller="Clinical" asp-action="Index" asp-route-id="" class="kt-menu__link">
+                        <span class="kt-menu__link-icon">
+                            <i class="fas fa-clinic-medical"></i>
+                        </span><span class="kt-menu__link-text">Clinical</span>
+                    </a>
+                </li> *@
+
+            </ul>
+        </div>
+    </div>
+
+    <!-- end:: Aside Menu -->
+</div>
+<!-- end:: Aside -->
+
+<script type="text/javascript">
+        $(function () {
+        if ($('li[menuname="' + $(location).attr('href').split('/')[3] + '"]').hasClass("kt-menu__item--active"))
+                $('li[menuname="' + $(location).attr('href').split('/')[3] + '"]').closest('li.MainMenu').addClass("kt-menu__item--open");
+
+            if ($(location).attr('href').split('/')[3] == 'BuildingDetails') {
+                $('li[menuname="MeterReading"]').addClass("kt-menu__item--active");
+            }
+
+            if ($(location).attr('href').split('/')[3] == 'MeterApproval') {
+                $('li[menuname="MeterApproval"]').addClass("kt-menu__item--active");
+            }
+
+            if ($(location).attr('href').split('/')[3] == 'UnitofMeasurement') {
+                $('li[menuname="UOM"]').addClass("kt-menu__item--active");
+                $('li[menuname="UOM"]').closest('li.MainMenu').addClass("kt-menu__item--open");
+            }
+
+            if ($(location).attr('href').split('/')[3] == 'MeterDetails') {
+                $('li[menuname="MeterReading"]').addClass("kt-menu__item--active");
+            }
+            //if ($(location).attr('href').split('/')[3] == 'Analytics') {
+            //    $('.Analytics').addClass("kt-menu__item--active");
+            //}
+            if ($(location).attr('href').split('/')[3] == 'UsageAndDollerReport') {
+                $('.UsageAndDollerReport').addClass("kt-menu__item--active");
+            }
+
+            //if ($(location).attr('href').split('/')[3] == 'UsageAndEmissionReport') {
+            //    $('.UsageAndEmissionReport').addClass("kt-menu__item--active");
+            //}
+    });
+        var userScreenInfo = null, userScreenActionInfo = null;
+
+        $(document).ready(function () {
+            userScreenInfo = '@Html.Raw(globalScreenAuth)';/*used in common js*/
+            userScreenActionInfo = '@Html.Raw(globalScreenActionAuth)';/*used in common js*/
+            SetScreenInfo(userScreenInfo);
+            ScreenActionInfo(userScreenActionInfo);
+            /*Screen search*/
+            MenuScreenSearch();
+        });
+        var CurrentScreenID = '@ViewBag.screenID'
+        var CurrentEncryptScreenID = '@ViewBag.EncryptScreenID'
+        var globalScreenID = {
+            Dashboard: $("#hf_GlobalDashboardScreenID").val(),
+            Clinical: $("#hf_Clinical").val(),
+            DoctorMaster: $("#hf_DoctorMaster").val(),
+            User: $("#hf_User").val(),
+            StatusMaster: $("#hf_StatusMaster").val(),
+            ProfessionMaster: $("#hf_ProfessionMaster").val(),
+            CategoryMaster: $("#hf_CategoryMaster").val(),
+            ICD10Master: $("#hf_ICD10Master").val(),
+            DSM4Master: $("#hf_DSM4Master").val(),
+            OccupationMaster: $("#hf_OccupationMaster").val(),
+            Appointments: $("#hf_Appointments").val(),
+            PatientRegistrations: $("#hf_PatientRegistrations").val(),
+            Payments: $("#hf_Payments").val(),
+            Billing: $("#hf_Billing").val(),
+            PatientReports: $("#hf_PatientReports").val(),
+            FinancialReports: $("#hf_FinancialReports").val(),
+            AppointmentReports: $("#hf_AppointmentReports").val()
+    };
+</script>

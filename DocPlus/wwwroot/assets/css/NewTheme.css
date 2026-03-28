@@ -1,0 +1,151 @@
+﻿.btn-primary, .btn-primary:disabled {
+    background-color: #d5970b;
+    border-color: #d5970b;
+}
+
+    .btn-primary:hover {
+        background-color: #ddb864;
+        border-color: #ddb864;
+    }
+
+    .btn-primary:not(:disabled):not(.disabled):active, .show > .btn-primary.dropdown-toggle {
+        color: #fff;
+        background-color: #fff;
+        border-color: #fff;
+    }
+
+.kt-aside {
+    background-color: #adafb3;
+}
+
+.kt-aside-menu .kt-menu__nav > .kt-menu__item .kt-menu__submenu .kt-menu__item.kt-menu__item--active > .kt-menu__link {
+    background-color: #555;
+}
+
+.btn.btn-label-brand {
+    color: #fff;
+}
+
+.kt-badge.kt-badge--unified-brand {
+    color: #fff;
+    background: rgba(163, 186, 195, 0.35);
+}
+
+.kt-aside-menu {
+    background-color: #adafb3;
+}
+
+.btn.btn-label-brand {
+    background-color: rgba(204 204 212);
+}
+
+a.btn.btn-label-brand:hover {
+    background-color: #fff;
+}
+
+.kt-login.kt-login--v1 .kt-login__aside .kt-login__title {
+    color: #fff;
+}
+
+.kt-login.kt-login--v1 .kt-login__aside .kt-login__subtitle {
+    color: #fff;
+}
+
+.kt-login.kt-login--v1 .kt-login__aside .kt-login__info .kt-login__copyright {
+    color: #001371;
+}
+
+.kt-login.kt-login--v1 .kt-login__aside .kt-login__info .kt-login__menu > a {
+    color: #001371;
+}
+
+kt-aside-menu .kt-menu__nav > .kt-menu__item.kt-menu__item--active > .kt-menu__link {
+    background-color: #16a54a;
+}
+
+.kt-aside-menu .kt-menu__nav > .kt-menu__item.kt-menu__item--active > .kt-menu__link .kt-menu__link-icon {
+    color: #ffffff;
+}
+
+.kt-aside-menu .kt-menu__nav > .kt-menu__item.kt-menu__item--active > .kt-menu__link {
+    background-color: #555555;
+    font-weight: bold;
+}
+
+.kt-aside-menu .kt-menu__nav > .kt-menu__item > .kt-menu__link .kt-menu__link-text {
+    color: #ffffff;
+}
+
+.kt-aside-menu .kt-menu__nav > .kt-menu__item.kt-menu__item--open > .kt-menu__link {
+    background-color: #ddd;
+}
+
+.kt-aside-menu .kt-menu__nav > .kt-menu__item .kt-menu__submenu .kt-menu__item > .kt-menu__link .kt-menu__link-text {
+    color: #fff;
+}
+
+.kt-aside-menu .kt-menu__nav > .kt-menu__item .kt-menu__submenu .kt-menu__item:not(.kt-menu__item--parent):not(.kt-menu__item--open):not(.kt-menu__item--here):not(.kt-menu__item--active):hover > .kt-menu__link {
+    background-color: #ddd;
+    
+}
+
+.kt-aside-menu .kt-menu__nav > .kt-menu__item.kt-menu__item--open > .kt-menu__link .kt-menu__link-icon {
+    color: #fff;
+}
+
+.kt-aside-menu .kt-menu__nav > .kt-menu__item:not(.kt-menu__item--parent):not(.kt-menu__item--open):not(.kt-menu__item--here):not(.kt-menu__item--active):hover > .kt-menu__link {
+    background-color: #ddd;
+}
+
+    .kt-aside-menu .kt-menu__nav > .kt-menu__item:not(.kt-menu__item--parent):not(.kt-menu__item--open):not(.kt-menu__item--here):not(.kt-menu__item--active):hover > .kt-menu__link .kt-menu__link-icon {
+        color: #fff;
+    }
+
+.kt-aside-menu .kt-menu__nav > .kt-menu__item > .kt-menu__link .kt-menu__link-icon {
+    color: #ffffff;
+}
+
+    .kt-aside-menu .kt-menu__nav > .kt-menu__item > .kt-menu__link .kt-menu__link-icon svg g [fill] {
+        fill: #fff;
+    }
+
+.kt-aside-menu .kt-menu__nav > .kt-menu__item:not(.kt-menu__item--parent):not(.kt-menu__item--open):not(.kt-menu__item--here):not(.kt-menu__item--active):hover > .kt-menu__link .kt-menu__link-icon svg g [fill] {
+    fill: #fff;
+}
+
+.btn.btn-clean i:hover {
+    color: #16a54a;
+}
+
+.btn.btn-clean i {
+    color: #16a54a;
+}
+
+.kt-aside-menu .kt-menu__nav > .kt-menu__item:not(.kt-menu__item--parent):not(.kt-menu__item--open):not(.kt-menu__item--here):not(.kt-menu__item--active):hover > .kt-menu__link .kt-menu__link-icon svg g [fill] {
+    color: #fff;
+}
+
+.kt-aside-menu .kt-menu__nav > .kt-menu__item > .kt-menu__link .kt-menu__link-icon svg g [fill] {
+    color: #fff;
+}
+
+.kt-aside-menu .kt-menu__nav > .kt-menu__item > .kt-menu__link .kt-menu__link-icon svg g [fill] {
+    color: #fff;
+}
+
+@media (min-width: 1025px) {
+    .kt-aside__brand {
+        background-color: #adafb3;
+        -webkit-box-shadow: none;
+        box-shadow: none;
+    }
+
+    .kt-header {
+        background-color: #eaebed;
+        border-bottom: 1px solid #eaebed;
+    }
+
+    .kt-header--fixed.kt-subheader--fixed .kt-subheader {
+        background-color: #eaebed;
+    }
+}

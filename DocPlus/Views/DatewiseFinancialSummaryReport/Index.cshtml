@@ -1,0 +1,715 @@
+﻿@* @{
+    ViewData["Title"] = "Datewise Financial Summary Report";
+}
+
+<link href="~/css/TableFixHeader.css" rel="stylesheet" />
+<link href="~/assets/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+
+<style>
+
+    .tableFixHead {
+        height: 400px;
+        overflow-y: auto;
+    }
+
+    .reportHeader {
+        background: blue;
+        color: white;
+    }
+
+</style>
+
+
+<!-- SUBHEADER -->
+
+<div class="kt-subheader kt-grid__item" id="kt_subheader" style="height:40px;">
+
+    <div class="kt-subheader__main">
+
+        <span class="kt-subheader__separator kt-hidden"></span>
+
+        <div class="kt-subheader__breadcrumbs">
+
+            <a asp-controller="Home" asp-action="Index" class="kt-subheader__breadcrumbs-home">
+                <i class="flaticon2-shelter"></i>
+            </a>
+
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+
+            <a href="#" class="kt-subheader__breadcrumbs-link">
+                Report
+            </a>
+
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+
+            <a href="#" class="kt-subheader__breadcrumbs-link">
+                Datewise Financial Summary Report
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<div class="kt-portlet kt-portlet--mobile">
+
+    <div class="kt-portlet__head">
+
+        <div class="kt-portlet__head-label">
+
+            <h3 class="kt-portlet__head-title">
+                Datewise Financial Summary Report
+            </h3>
+
+        </div>
+
+
+        <div class="kt-portlet__head-toolbar">
+
+            <a href="javascript:;" id="btnExportToExcel"
+               onclick="FinancialReport.ExportExcel();"
+               class="btn btn-success btn-icon-sm"
+               style="display:none;">
+
+                <i class="fa fa-file-excel"></i>
+                Export Excel
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="kt-portlet__body">
+
+
+        <!-- FILTER -->
+
+        <div class="row mb-3">
+
+            <div class="col-md-3">
+
+                <label>From Date</label>
+
+                <div class="input-group date">
+
+                    <input type="text"
+                           id="txtFromDate"
+                           class="form-control date-picker"
+                           placeholder="DD-MMM-YYYY"
+                           maxlength="11" />
+
+                    <div class="input-group-append">
+
+                        <span class="input-group-text">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="col-md-3">
+
+                <label>To Date</label>
+
+                <div class="input-group date">
+
+                    <input type="text"
+                           id="txtToDate"
+                           class="form-control date-picker"
+                           placeholder="DD-MMM-YYYY"
+                           maxlength="11" />
+
+                    <div class="input-group-append">
+
+                        <span class="input-group-text">
+                            <i class="fa fa-calendar"></i>
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="col-md-4" style="padding-top:25px">
+
+                <button type="button"
+                        onclick="FinancialReport.Search();"
+                        class="btn btn-primary">
+
+                    <i class="fa fa-search"></i>
+                    Search
+
+                </button>
+
+
+                <button type="button"
+                        class="btn btn-warning"
+                        onclick="FinancialReport.Reset();">
+
+                    <i class="fa fa-history"></i>
+                    Reset
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- GRID -->
+
+        <div class="table-responsive tableFixHead"
+             id="divFinancialGrid"
+             style="display:none">
+
+            <table id="tblFinancialReport"
+                   class="table table-striped table-bordered table-hover">
+
+                <thead class="reportHeader">
+
+                    <tr>
+
+                        <th>Patient Code</th>
+                        <th>Patient Name</th>
+                        <th>Appt. Code</th>
+                        <th>Appt. Date, Time</th>
+                        <th>Total Amt</th>
+                        <th>Paid Amt</th>
+                        <th>Balance Amt</th>
+                        <th>Paid Date</th>
+                        <th>Payment Details</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- GRID TEMPLATE -->
+
+<script id="Grid_Template_tblFinancialReport" type="text/x-jquery-tmpl">
+
+    <tr>
+
+    <td>${PatientCode}</td>
+    <td>${PatientName}</td>
+    <td>${ApptCode}</td>
+    <td>${ApptDateTime}</td>
+    <td>${TotalAmt}</td>
+    <td>${PaidAmt}</td>
+    <td>${BalanceAmt}</td>
+    <td>${PaidDate}</td>
+    <td>${PaymentDetails}</td>
+
+    </tr>
+
+</script>
+
+
+
+@section Scripts {
+
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+    <script src="~/assets/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/assets/js/jquery.dataTables.min.js"></script>
+    <script src="~/assets/js/dataTables.bootstrap.min.js"></script>
+
+
+    <script>
+
+        var FinancialReport = {
+
+        Search: function () {
+
+        var fromDate = $("#txtFromDate").val();
+        var toDate = $("#txtToDate").val();
+
+        if(fromDate=="" || toDate==""){
+
+        alert("Please select From Date and To Date");
+        return;
+
+        }
+
+
+        var data=[
+
+        {
+        PatientCode:"P001",
+        PatientName:"Rahul Sharma",
+        ApptCode:"A101",
+        ApptDateTime:"12-Mar-2026 10:30 AM",
+        TotalAmt:"1500",
+        PaidAmt:"1000",
+        BalanceAmt:"500",
+        PaidDate:"12-Mar-2026",
+        PaymentDetails:"Cash"
+        },
+
+        {
+        PatientCode:"P002",
+        PatientName:"Sneha Patil",
+        ApptCode:"A102",
+        ApptDateTime:"12-Mar-2026 11:00 AM",
+        TotalAmt:"2000",
+        PaidAmt:"2000",
+        BalanceAmt:"0",
+        PaidDate:"12-Mar-2026",
+        PaymentDetails:"Card"
+        }
+
+        ];
+
+
+        $("#tblFinancialReport tbody").empty();
+
+        $("#Grid_Template_tblFinancialReport")
+        .tmpl(data)
+        .appendTo("#tblFinancialReport tbody");
+
+        $("#divFinancialGrid").show();
+        $("#btnExportToExcel").show();
+
+
+        $("#tblFinancialReport").DataTable({
+
+        destroy:true,
+        pageLength:5,
+        lengthMenu:[[5,10,25,50,-1],[5,10,25,50,"All"]],
+        searching:true,
+        paging:true,
+        info:true,
+        ordering:true
+
+        });
+
+        },
+
+
+        Reset:function(){
+
+        $("#txtFromDate").val("");
+        $("#txtToDate").val("");
+
+        $("#tblFinancialReport tbody").empty();
+
+        $("#divFinancialGrid").hide();
+        $("#btnExportToExcel").hide();
+
+        },
+
+
+        ExportExcel:function(){
+
+        var table=document.getElementById("tblFinancialReport");
+
+        var html=table.outerHTML;
+
+        var url='data:application/vnd.ms-excel,'+escape(html);
+
+        var link=document.createElement("a");
+
+        link.href=url;
+        link.download="DatewiseFinancialSummaryReport.xls";
+
+        link.click();
+
+        }
+
+        };
+
+
+
+        $(document).ready(function(){
+
+        $('.date-picker').datepicker({
+
+        autoclose:true,
+        todayHighlight:true,
+        format:"dd-M-yyyy"
+
+        });
+
+        });
+
+    </script>
+
+} *@
+@{
+    ViewData["Title"] = "Datewise Financial Summary Report";
+  
+}
+
+<style>
+
+    .nav-tabs .nav-link.active {
+        color: #333 !important;
+        border-bottom: 2px solid #537EC5 !important;
+    }
+
+    .tableFixHead {
+        overflow-y: auto;
+        height: 400px;
+        margin-top: 25px;
+        padding: 0px !important;
+    }
+
+        .tableFixHead thead th {
+            position: sticky;
+            top: 0;
+            text-align: center;
+            background: #537EC5;
+            color: white;
+        }
+
+        .tableFixHead table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+    .one-line {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+</style>
+
+
+<!-- SUBHEADER -->
+
+<div class="kt-subheader kt-grid__item" id="kt_subheader">
+
+    <div class="kt-subheader__main">
+
+        <span class="kt-subheader__separator kt-hidden"></span>
+
+        <div class="kt-subheader__breadcrumbs">
+
+            <a asp-controller="Home" asp-action="Index"
+               class="kt-subheader__breadcrumbs-home">
+
+                <i class="flaticon2-shelter"></i>
+
+            </a>
+
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+
+            <a href="#" class="kt-subheader__breadcrumbs-link">
+                Reports
+            </a>
+
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+
+            <a href="#" class="kt-subheader__breadcrumbs-link">
+                Datewise Financial Summary Report
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div>
+
+    <form id="frmFinancialReport">
+
+        <div class="kt-portlet kt-portlet--mobile p-2 mb-1">
+
+
+            <!-- FILTER SECTION -->
+
+            <div class="form-group row">
+
+                <div class="col-md-3">
+
+                    <label>From Date</label>
+
+                    <div class="input-group date">
+
+                        <input type="text"
+                               id="txtFromDate"
+                               class="form-control date-picker"
+                               placeholder="DD-MMM-YYYY" />
+
+                        <div class="input-group-append">
+
+                            <span class="input-group-text">
+                                <i class="fa fa-calendar"></i>
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-3">
+
+                    <label>To Date</label>
+
+                    <div class="input-group date">
+
+                        <input type="text"
+                               id="txtToDate"
+                               class="form-control date-picker"
+                               placeholder="DD-MMM-YYYY" />
+
+                        <div class="input-group-append">
+
+                            <span class="input-group-text">
+                                <i class="fa fa-calendar"></i>
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="col-md-4" style="padding-top:25px">
+
+                    <button type="button"
+                            class="btn btn-brand"
+                            onclick="FinancialReport.BindData();">
+
+                        <i class="fa fa-search"></i>
+                        Go
+
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            onclick="FinancialReport.ResetData();">
+
+                        Reset
+
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-default btn-icon-sm"
+                            onclick="FinancialReport.ExportExcel();">
+
+                        <i class="la la-download"></i>
+                        Export
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- TABLE -->
+
+            <div class="kt-portlet__body table-responsive tableFixHead"
+                 id="divFinancialGrid">
+
+                <table id="tblFinancialReport"
+                       class="table table-striped table-bordered table-hover">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Patient Code</th>
+                            <th>Patient Name</th>
+                            <th>Appt Code</th>
+                            <th>Appt Date Time</th>
+                            <th>Total Amt</th>
+                            <th>Paid Amt</th>
+                            <th>Balance Amt</th>
+                            <th>Paid Date</th>
+                            <th>Payment Details</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody></tbody>
+
+                </table>
+
+            </div>
+
+
+        </div>
+
+    </form>
+
+</div>
+
+
+
+@section Scripts {
+
+    <script src="~/assets/js/jquery.dataTables.min.js"></script>
+    <script src="~/assets/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/assets/js/bootstrap-datepicker.min.js"></script>
+
+
+    <script>
+
+        var FinancialReport={
+
+        BindData:function(){
+
+        var from=$("#txtFromDate").val();
+        var to=$("#txtToDate").val();
+
+        if(from=="" || to==""){
+
+        alert("Select From and To Date");
+        return;
+
+        }
+
+
+        var data=[
+
+        {
+        PatientCode:"P001",
+        PatientName:"Rahul Sharma",
+        ApptCode:"A101",
+        ApptDateTime:"12-Mar-2026 10:30 AM",
+        TotalAmt:"1500",
+        PaidAmt:"1000",
+        BalanceAmt:"500",
+        PaidDate:"12-Mar-2026",
+        PaymentDetails:"Cash"
+        },
+
+        {
+        PatientCode:"P002",
+        PatientName:"Sneha Patil",
+        ApptCode:"A102",
+        ApptDateTime:"12-Mar-2026 11:00 AM",
+        TotalAmt:"2000",
+        PaidAmt:"2000",
+        BalanceAmt:"0",
+        PaidDate:"12-Mar-2026",
+        PaymentDetails:"Card"
+        }
+
+        ];
+
+
+        var tbody=$("#tblFinancialReport tbody");
+
+        tbody.empty();
+
+
+        $.each(data,function(i,item){
+
+        var row="<tr>"+
+
+        "<td>"+item.PatientCode+"</td>"+
+        "<td>"+item.PatientName+"</td>"+
+        "<td>"+item.ApptCode+"</td>"+
+        "<td>"+item.ApptDateTime+"</td>"+
+        "<td>"+item.TotalAmt+"</td>"+
+        "<td>"+item.PaidAmt+"</td>"+
+        "<td>"+item.BalanceAmt+"</td>"+
+        "<td>"+item.PaidDate+"</td>"+
+        "<td>"+item.PaymentDetails+"</td>"+
+
+        "</tr>";
+
+        tbody.append(row);
+
+        });
+
+
+        $("#tblFinancialReport").DataTable({
+
+        destroy:true,
+        pageLength:10,
+        searching:true,
+        paging:true,
+        info:true,
+        ordering:true
+
+        });
+
+        },
+
+
+
+        ResetData:function(){
+
+        $("#txtFromDate").val("");
+        $("#txtToDate").val("");
+
+        $("#tblFinancialReport tbody").empty();
+
+        },
+
+
+
+        ExportExcel:function(){
+
+        var table=document.getElementById("tblFinancialReport");
+
+        var html=table.outerHTML;
+
+        var url='data:application/vnd.ms-excel,'+escape(html);
+
+        var link=document.createElement("a");
+
+        link.href=url;
+
+        link.download="FinancialSummaryReport.xls";
+
+        link.click();
+
+        }
+
+        };
+
+
+
+        $(document).ready(function(){
+
+        $('.date-picker').datepicker({
+
+        autoclose:true,
+        todayHighlight:true,
+        format:"dd-M-yyyy"
+
+        });
+
+        });
+
+    </script>
+
+}

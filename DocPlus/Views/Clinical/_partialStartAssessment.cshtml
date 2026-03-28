@@ -1,0 +1,2223 @@
+﻿@using System.Reflection
+@inject IStringLocalizerFactory LocalizerFactory
+
+@{
+    var Localizer = LocalizerFactory.Create("SharedResource", Assembly.GetExecutingAssembly().GetName().Name);
+}
+
+<style>
+    #leftMenu a {
+        display: block;
+        padding: 8px 10px;
+        color: #333;
+        text-decoration: none;
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+        #leftMenu a:hover {
+            background: #f5f5f5;
+        }
+        /* Active left menu item */
+        #leftMenu a.active {
+            background: #555;
+            color: #fff !important;
+            border-left: 4px solid #fd397a;
+        }
+
+    /* Normal tab */
+    .nav-pills .nav-link {
+        color: #4a4a4a;
+        background: transparent;
+        padding: 8px 16px;
+        margin-right: 6px;
+        border-radius: 4px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+        /* Hover tab */
+        .nav-pills .nav-link:hover {
+            background: #e9f2f5;
+            color: #333;
+        }
+
+        /* Active tab (blue button like Analytics) */
+        .nav-pills .nav-link.active {
+            background: #1f7a8c;
+            color: #fff !important;
+        }
+
+    .nav-pills .dropdown-menu {
+        border-radius: 4px;
+        border: 1px solid #e5e5e5;
+    }
+
+    .nav-pills .dropdown-item {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+
+        .nav-pills .dropdown-item:hover {
+            background: #f1f1f1;
+        }
+
+    .tabs-left {
+        border: 1px solid #e5e5e5;
+    }
+
+        .tabs-left li {
+            float: none;
+        }
+
+            .tabs-left li a {
+                display: block;
+                padding: 6px 8px;
+                color: #333 !important;
+                border-bottom: 1px solid #e5e5e5;
+            }
+
+            .tabs-left li:last-child a {
+                border-bottom: none;
+            }
+
+    .tab-pane .row {
+        margin-bottom: 8px;
+    }
+
+
+
+    /* ================= RISK TITLE STYLE ================= */
+    .risk-title {
+        font-weight: bold;
+        font-size: 15px; /* optional */
+    }
+
+    /* ================= PROGRESS TIMELINE ================= */
+
+    .progressGroup {
+        margin-bottom: 15px;
+    }
+
+    .progressHeader {
+        font-weight: 600;
+        font-size: 13px;
+        background: #eef2f7;
+        padding: 4px 10px;
+        border-radius: 20px;
+        display: inline-block;
+        margin-bottom: 10px;
+    }
+
+    .progressNote {
+        display: flex;
+        align-items: flex-start;
+        position: relative;
+        margin-bottom: 12px;
+    }
+
+        .progressNote::before {
+            content: "";
+            position: absolute;
+            left: 25px;
+            top: 0;
+            bottom: -12px;
+            width: 2px;
+            background: #e0e0e0;
+        }
+
+    .progressTime {
+        min-width: 50px;
+        height: 30px;
+        background: #007bff;
+        color: white;
+        font-size: 11px;
+        border-radius: 20px;
+        text-align: center;
+        line-height: 30px;
+        margin-right: 10px;
+        z-index: 1;
+    }
+
+    .progressText {
+        background: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+        flex: 1;
+        font-size: 13px;
+    }
+
+    /* ================= TIMELINE COMPONENT ================= */
+
+    .timelineContainer {
+        margin-top: 20px;
+        position: relative;
+    }
+
+    .timelineItem {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        position: relative;
+    }
+
+    .timelineLeft {
+        padding-right: 15px;
+    }
+
+    .timelineDate {
+        font-weight: 600;
+        color: #333;
+        font-size: 14px;
+    }
+
+    .timelineTime {
+        font-size: 12px;
+        color: #888;
+        margin-top: 2px;
+    }
+
+    .timelineMiddle {
+        width: 3px;
+        background: #4CAF50;
+        margin-right: 15px;
+        border-radius: 2px;
+        min-height: 60px;
+    }
+
+    .timelineRight {
+        flex: 1;
+        background: linear-gradient(135deg, #f8fafc, #eef2f7);
+        border-radius: 10px;
+        padding: 14px 16px;
+        border: 1px solid #e2e6ea;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        font-size: 14px;
+        line-height: 1.5;
+        transition: all 0.2s;
+    }
+
+        .timelineRight:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+
+    /* ================= UTILITY CLASSES ================= */
+
+    .note-actions {
+        margin-bottom: 10px;
+    }
+
+    .addPanel {
+        /*  display: none; */
+        background: #f9f9f9;
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        margin-bottom: 10px;
+    }
+
+    .note-buttons {
+        margin-top: 8px;
+    }
+
+    /* Optional to fine-tune Date label spacing */
+    label.mb-0 {
+        line-height: 1;
+        margin-bottom: 2px; /* or 0 */
+    }
+
+    .menu-group {
+        display: none;
+    }
+
+        .menu-group.demographics {
+            display: block;
+        }
+</style>
+<div class="kt-subheader kt-grid__item" id="kt_subheader">
+    <div class="kt-subheader__main">
+        <span class="kt-subheader__separator kt-hidden"></span>
+        <div class="kt-subheader__breadcrumbs">
+            <a asp-controller="Clinical" asp-action="Index" class="kt-subheader__breadcrumbs-home"><i class="flaticon2-shelter"></i></a>
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+            <a href="@Url.Action("Index","Clinical")"
+               class="kt-subheader__breadcrumbs-link cursor-pointer">
+                @Localizer["Clinical"]
+            </a>
+        </div>
+    </div>
+    <div class="kt-subheader__toolbar">
+        <div class="kt-subheader__wrapper">
+        </div>
+    </div>
+</div>
+<div class="kt-portlet kt-portlet--mobile p-2 mb-1">
+    <form id="frm_StartAssessment">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:10px 5px;">
+
+            <!-- LEFT SIDE: Patient Details -->
+            <div style="font-weight:600; font-size:16px;">
+                <strong>Patient Details:</strong>
+            </div>
+
+            <!-- RIGHT SIDE: Close Button -->
+            <div>
+                <i class="fa fa-times"
+                   style="cursor:pointer;font-size:18px; color: #555555; "
+                   onclick="clinical.SetForClose();">
+                </i>
+            </div>
+
+        </div>
+        <!-- ================= PATIENT DETAILS ================= -->
+        <div class="kt-portlet__body p-3 mb-2 border">
+            <!-- CLOSE -->
+            <!-- TOP ROW -->
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div class="d-flex align-items-center">
+                    <i class="fa fa-user-circle text-primary ml-1 mr-1" style="font-size: 40px;"></i>
+                    <strong style="font-size: 25px;">@ViewBag.Name</strong>
+                </div>
+
+                <div class="d-flex align-items-center">
+
+                    <!-- DATE -->
+                    <div class="mr-2 d-flex flex-column" style="justify-content:center;">
+                        <label class="mb-2" style="line-height:1;">Date:</label>
+                        <div class="input-group input-group-sm" style="width:150px;">
+                            <input type="text"
+                                   class="form-control date-picker"
+                                   placeholder="DD-MMM-YYYY" />
+                            <div class="input-group-append">
+                                <span class="input-group-text">
+                                    <i class="fa fa-calendar"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- INFO ROW -->
+            <div class="d-flex flex-wrap mt-2 ml-2">
+
+                <div class="mr-4">
+                    <i class="fa fa-id-card" style="font-size: 15px;"></i>
+                    <span style="font-size:14px;">Reg No: @ViewBag.RegNo</span>
+                </div>
+
+                <div class="mr-4">
+                    <i class="fa @(ViewBag.Gender == "Male" ? "fa-mars" : "fa-venus")" style="font-size: 15px;"></i>
+                    <span style="font-size:14px;">@ViewBag.Gender</span>
+                </div>
+
+                <div class="mr-4">
+                    <i class="fa fa-user" style="font-size: 15px;"></i>
+                    <span style="font-size:14px;">Age: <span id="lblAge"></span></span>
+                </div>
+
+                <div class="mr-4">
+                    <i class="fa fa-phone" style="font-size: 15px;"></i>
+                    <span style="font-size:14px;"> @ViewBag.Contact</span>
+                </div>
+
+                <div class="mr-4">
+                    <i class="fa fa-envelope" style="font-size: 15px;"></i>
+                    <span style="font-size:14px;">@ViewBag.Email</span>
+                </div>
+
+            </div>
+
+        </div>
+        <!-- ================= TABS ================= -->
+        <div class="card card-custom gutter-b" style="margin-bottom:.5rem;">
+
+            <div class="card-header card-header-tabs-line">
+                <div class="card-toolbar">
+
+                    <ul class="nav nav-light-success nav-bold nav-pills" style="margin: 0 !important;">
+
+                        <!-- DEMOGRAPHICS -->
+                        <li class="nav-item">
+                            <a class="nav-link active"
+                               href="#general"
+                               onclick="clinical.showLeftMenu('demographics', '#general')">
+                                <span class="nav-text">Demographics</span>
+                            </a>
+                        </li>
+
+                        <!-- INITIAL ASSESSMENT -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               data-toggle="dropdown"
+                               href="javascript:void(0);"
+                               role="button">
+                                <span class="nav-text">Initial Assessment</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#presenting" onclick="clinical.showLeftMenu('assessment','#presenting')">Presenting Complaints</a>
+                                <a class="dropdown-item" href="#history" onclick="clinical.showLeftMenu('assessment','#history')">History of Presenting Complaints</a>
+                                <a class="dropdown-item" href="#past" onclick="clinical.showLeftMenu('assessment','#past')">Past Psychiatric History</a>
+                                <a class="dropdown-item" href="#medical" onclick="clinical.showLeftMenu('assessment','#medical')">Medical History</a>
+                                <a class="dropdown-item" href="#family" onclick="clinical.showLeftMenu('assessment','#family')">Family History</a>
+                                <a class="dropdown-item" href="#personal" onclick="clinical.showLeftMenu('assessment','#personal')">Personal History</a>
+                                <a class="dropdown-item" href="#drug" onclick="clinical.showLeftMenu('assessment','#drug')">Drug & Alcohol History</a>
+                                <a class="dropdown-item" href="#forensic" onclick="clinical.showLeftMenu('assessment','#forensic')">Forensic History</a>
+                                <a class="dropdown-item" href="#premorbid" onclick="clinical.showLeftMenu('assessment','#premorbid')">Premorbid Personality</a>
+                                <a class="dropdown-item" href="#mental" onclick="clinical.showLeftMenu('assessment','#mental')">Mental State Examination</a>
+                            </div>
+                        </li>
+
+                        <!-- PROGRESS NOTES -->
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="#progressmenu"
+                               onclick="clinical.showLeftMenu('progressmenu','#progressmenu')">
+                                <span class="nav-text">Progress Notes</span>
+                            </a>
+                        </li>
+
+                        <!-- INVESTIGATIONS -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               data-toggle="dropdown"
+                               href="javascript:void(0);"
+                               role="button">
+                                <span class="nav-text">Investigations</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#physicalMonitoring" onclick="clinical.showLeftMenu('investigations','#physicalMonitoring')">Physical Monitoring</a>
+                                <a class="dropdown-item" href="#scans" onclick="clinical.showLeftMenu('investigations','#scans')">Scans</a>
+                                <a class="dropdown-item" href="#eeg" onclick="clinical.showLeftMenu('investigations','#eeg')">EEG</a>
+                                <a class="dropdown-item" href="#otherInvestigations" onclick="clinical.showLeftMenu('investigations','#otherInvestigations')">Other Investigations</a>
+                            </div>
+                        </li>
+
+                        <!-- DIAGNOSIS -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               data-toggle="dropdown"
+                               href="javascript:void(0);"
+                               role="button">
+                                <span class="nav-text">Diagnosis</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#icd10" onclick="clinical.showLeftMenu('diagnosis','#icd10')">ICD-10</a>
+                                <a class="dropdown-item" href="#dsm5" onclick="clinical.showLeftMenu('diagnosis','#dsm5')">DSM-5</a>
+                                <a class="dropdown-item" href="#differential" onclick="clinical.showLeftMenu('diagnosis','#differential')">Differential Diagnosis</a>
+                                <a class="dropdown-item" href="#medicalDiagnosis" onclick="clinical.showLeftMenu('diagnosis','#medicalDiagnosis')">Medical Diagnosis</a>
+                            </div>
+                        </li>
+
+                        <!-- RISK -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle"
+                               data-toggle="dropdown"
+                               href="javascript:void(0);"
+                               role="button">
+                                <span class="nav-text">Risk Assessment</span>
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="#riskSummary" onclick="clinical.showLeftMenu('risk','#riskSummary')">Risk Summary</a>
+                                <a class="dropdown-item" href="#riskPlan" onclick="clinical.showLeftMenu('risk','#riskPlan')">Risk Management Plan</a>
+                                <a class="dropdown-item" href="#riskIndicators" onclick="clinical.showLeftMenu('risk','#riskIndicators')">Risk Indicators</a>
+                            </div>
+                        </li>
+
+                        <!-- SINGLE TABS -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="#prescriptions" onclick="clinical.showLeftMenu('prescriptions','#prescriptions')">
+                                <span class="nav-text">Prescriptions</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#oldprescriptions" onclick="clinical.showLeftMenu('oldprescriptions','#oldprescriptions')">
+                                <span class="nav-text">Old Prescriptions</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#inpatients" onclick="clinical.showLeftMenu('inpatients','#inpatients')">
+                                <span class="nav-text">Inpatients</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#attachments" onclick="clinical.showLeftMenu('attachments','#attachments')">
+                                <span class="nav-text">Attachments</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#medicalcert" onclick="clinical.showLeftMenu('medicalcert','#medicalcert')">
+                                <span class="nav-text">Medical Certificate</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#oldmedicert" onclick="clinical.showLeftMenu('oldmedicert','#oldmedicert')">
+                                <span class="nav-text">Old Certificates</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="#psyreport" onclick="clinical.showLeftMenu('psyreport','#psyreport')">
+                                <span class="nav-text">Psychiatric Report</span>
+                            </a>
+                        </li>
+
+                    </ul>
+
+                </div>
+            </div>
+            <div class="card-body" style="padding: 0.5rem !important;">
+
+                <div class="row">
+                    <div class="col-md-2" id="leftMenu" style="padding-right:0;">
+                        <ul class="nav nav-tabs tabs-left left-menu" style="display:inline-grid !important;width: 100%;">
+
+                            <!-- DEMOGRAPHICS -->
+                            <li class="menu-group demographics active"><a data-toggle="tab" href="#general">General Information</a></li>
+                            <li class="menu-group demographics"><a data-toggle="tab" href="#nextOfKin">Next of Kin</a></li>
+                            <li class="menu-group demographics"><a data-toggle="tab" href="#otherProfessionals">Other Professionals</a></li>
+                            <!-- INITIAL ASSESSMENT -->
+                            <li class="menu-group assessment"><a data-toggle="tab" href="#presenting">Presenting Complaints</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" href="#history">History of Presenting Complaints</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" href="#past">Past Psychiatric History</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" href="#medical">Medical History</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" href="#family">Family History</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" href="#personal">Personal History</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" href="#drug">Drug & Alcohol History</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" href="#forensic">Forensic History</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" href="#premorbid">Premorbid Personality</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" href="#mental">Mental State Examination</a></li>
+                            <!-- PROGRESS -->
+                            <li class="menu-group progressmenu"><a data-toggle="tab" href="#progressmenu">Progress Notes</a></li>
+
+                            <!-- INVESTIGATIONS -->
+                            <li class="menu-group investigations"><a data-toggle="tab" href="#physicalMonitoring">Physical Health Monitoring</a></li>
+                            <li class="menu-group investigations"><a data-toggle="tab" href="#scans">Scans</a></li>
+                            <li class="menu-group investigations"><a data-toggle="tab" href="#eeg">EEG</a></li>
+                            <li class="menu-group investigations"><a data-toggle="tab" href="#otherInvestigations">Other Investigations</a></li>
+
+                            <!-- DIAGNOSIS -->
+                            <li class="menu-group diagnosis"><a data-toggle="tab" href="#icd10">ICD-10 Diagnosis</a></li>
+                            <li class="menu-group diagnosis"><a data-toggle="tab" href="#dsm5">DSM-5 Diagnosis</a></li>
+                            <li class="menu-group diagnosis"><a data-toggle="tab" href="#differential">Differential Diagnosis</a></li>
+                            <li class="menu-group diagnosis"><a data-toggle="tab" href="#medicalDiagnosis">Medical Diagnosis</a></li>
+
+                            <!-- RISK -->
+                            <li class="menu-group risk"><a data-toggle="tab" href="#riskSummary">Risk Summary</a></li>
+                            <li class="menu-group risk"><a data-toggle="tab" href="#riskPlan">Risk Management Plan</a></li>
+                            <li class="menu-group risk"><a data-toggle="tab" href="#riskIndicators">Risk Indicators</a></li>
+
+                            <!-- SINGLE TABS -->
+                            <li class="menu-group prescriptions"><a data-toggle="tab" href="#prescriptions">Prescriptions</a></li>
+                            <li class="menu-group oldprescriptions"><a data-toggle="tab" href="#oldprescriptions">Old Prescriptions</a></li>
+                            <li class="menu-group inpatients"><a data-toggle="tab" href="#inpatients">Inpatients</a></li>
+                            <li class="menu-group attachments"><a data-toggle="tab" href="#attachments">Attachments</a></li>
+                            <li class="menu-group medicalcert"><a data-toggle="tab" href="#medicalcert">Medical Certificate</a></li>
+                            <li class="menu-group oldmedicert"><a data-toggle="tab" href="#oldmedicert">Old Certificates</a></li>
+                            <li class="menu-group psyreport"><a data-toggle="tab" href="#psyreport">Psychiatric Report</a></li>
+
+                        </ul>
+                    </div>
+                    <!-- RIGHT SIDE CONTENT -->
+                    <div class="col-md-10">
+                        <div class="tab-content">
+
+                            <div id="general" class="tab-pane fade show active" style="border:1px solid #ddd;padding:12px;background:#f9f9f9;">
+
+                                <!-- Row 1 -->
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>First Name *</label>
+                                        <input type="text" class="form-control" value="@ViewBag.FirstName" />
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Middle Name</label>
+                                        <input type="text" class="form-control" />
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Last Name *</label>
+                                        <input type="text" class="form-control" value="@ViewBag.LastName" />
+                                    </div>
+                                </div>
+
+                                <!-- Row 3 -->
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>DOB *</label>
+                                        <input type="date" class="form-control" value="@ViewBag.DOB" />
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Marital Status</label>
+                                        <select class="form-control">
+                                            <option>Single</option>
+                                            <option>Married</option>
+                                            <option>Divorced</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Occupation</label>
+                                        <select class="form-control">
+                                            <option>Student</option>
+                                            <option>Employed</option>
+                                            <option>Unemployed</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Row 4 -->
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Tele. No.</label>
+                                        <input type="text" class="form-control" />
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Mobile No. *</label>
+                                        <input type="text" class="form-control" value="@ViewBag.Mobile" />
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Email</label>
+                                        <input type="text" class="form-control" value="@ViewBag.Email" />
+                                    </div>
+                                </div>
+
+                                <!-- Row 5 -->
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Category</label>
+                                        <select class="form-control">
+                                            <option>Adult</option>
+                                            <option>Child</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Status</label>
+                                        <select class="form-control">
+                                            <option>Private</option>
+                                            <option>General</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label>Gender *</label>
+                                        <div style="margin-top:6px;">
+                                            <label class="radio-inline">
+                                                <input type="radio" name="Gender"> Male
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" name="Gender"> Female
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" name="Gender"> Other
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Row 2 : Address + Referred -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Address</label>
+                                        <input type="text" class="form-control" />
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label>Referred By</label>
+                                        <input type="text" class="form-control" />
+                                    </div>
+                                </div>
+                                <!-- Row 6 : Remarks Full Width -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <label>Remarks</label>
+                                        <textarea class="form-control small-box"></textarea>
+                                    </div>
+                                </div>
+
+                                <button class="btn btn-success btn-sm">Save</button>
+
+                            </div>
+
+                            <div id="nextOfKin" class="tab-pane fade">
+
+                                <!-- Form Section -->
+                                @*  <div style="border:1px solid #ddd;padding:12px;background:#f9f9f9;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Name *</label>
+                                        <input type="text" class="form-control" id="kinName">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label>Relation *</label>
+                                        <input type="text" class="form-control" id="kinRelation">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Tele. No.</label>
+                                        <input type="text" class="form-control" id="kinTele">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Mobile No. *</label>
+                                        <input type="text" class="form-control" id="kinMobile">
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Email</label>
+                                        <input type="text" class="form-control" id="kinEmail">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Address *</label>
+                                        <textarea class="form-control" id="kinAddress"></textarea>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label>Remarks</label>
+                                        <textarea class="form-control" id="kinRemarks"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- ADD BUTTON -->
+                                <button id="btnAddKin" class="btn btn-success btn-xs">
+                                    <i class="fa fa-plus"></i> Add
+                                </button>
+                            </div> *@
+
+
+                                <!-- TABLE SECTION -->
+                                <div style="overflow-x:auto;margin-top:12px;">
+                                    <table id="kinTable" class="table table-bordered table-condensed" style="width:100%;">
+
+                                        <thead style="background:#f9f9f9;">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Relation</th>
+                                                <th>Address</th>
+                                                <th>Tele. No.</th>
+                                                <th>Mobile No.</th>
+                                                <th>Email</th>
+                                                <th>Remarks</th>
+                                                <th width="80">Edit</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody id="kinTableBody"></tbody>
+
+                                    </table>
+                                </div>
+
+                            </div>
+                            <!-- ===== Other Professionals ===== -->
+                            <div id="otherProfessionals" class="tab-pane fade">
+
+                                <!-- FORM -->
+                                @*   <div style="border:1px solid #ddd;padding:12px;background:#f9f9f9;">
+
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <label>Name *</label>
+                                        <input type="text" class="form-control" id="profName" />
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Profession *</label>
+                                        <select class="form-control" id="profType">
+                                            <option>Select</option>
+                                            <option>Doctor</option>
+                                            <option>Psychologist</option>
+                                            <option>Therapist</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label>Tele. No.</label>
+                                        <input type="text" class="form-control" id="profTele" />
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Mobile No. *</label>
+                                        <input type="text" class="form-control" id="profMobile" />
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label>Email *</label>
+                                        <input type="email" class="form-control" id="profEmail" />
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Address *</label>
+                                        <textarea class="form-control" id="profAddress"></textarea>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label>Remarks</label>
+                                        <textarea class="form-control" id="profRemarks"></textarea>
+                                    </div>
+                                </div>
+
+                                <!-- BUTTON -->
+                                <button id="btnAddProf" class="btn btn-success btn-xs" style="margin-top:8px;">
+                                    <i class="fa fa-plus"></i> Add
+                                </button>
+
+                            </div> *@
+
+
+                                <!-- TABLE -->
+                                <div style="overflow-x:auto;margin-top:12px;">
+                                    <table id="profTable" class="table table-bordered table-condensed" style="width:100%;">
+
+                                        <thead style="background:#f9f9f9;">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Profession</th>
+                                                <th>Address</th>
+                                                <th>Tele. No.</th>
+                                                <th>Mobile No.</th>
+                                                <th>Email</th>
+                                                <th>Remarks</th>
+                                                <th width="80">Edit</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody id="profTableBody"></tbody>
+
+                                    </table>
+                                </div>
+
+                            </div>
+
+                            <div id="presenting" class="tab-pane fade assessment-section">
+
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+
+                                    <!-- LEFT -->
+                                    <div style="font-weight:600;">
+                                        <button id="btnQuickInfo" type="button" class="btn btn-primary btn-sm">
+                                            Quick Information
+                                        </button>
+                                    </div>
+
+
+                                </div>
+                                <!-- QUICK INFO PANEL -->
+                                <div id="quickInfoPanel"
+                                     style="display:none; margin-top:10px; border:1px solid #ccc; padding:15px;">
+
+                                    <div class="row">
+
+                                        <div class="col-md-3">
+                                            <b>Dementia</b><br>
+                                            <label><input type="checkbox" class="quickChk" value="Amnesia"> Amnesia</label><br>
+                                            <label><input type="checkbox" class="quickChk" value="Aphasia"> Aphasia</label><br>
+                                            <label><input type="checkbox" class="quickChk" value="Apraxia"> Apraxia</label><br>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <b>Organic</b><br>
+                                            <label><input type="checkbox" class="quickChk" value="Fever"> Fever</label><br>
+                                            <label><input type="checkbox" class="quickChk" value="Head Injury"> Head Injury</label><br>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <b>Substance Use</b><br>
+                                            <label><input type="checkbox" class="quickChk" value="Present-Alcohol"> Present-Alcohol</label><br>
+                                            <label><input type="checkbox" class="quickChk" value="Present-Tobacco"> Present-Tobacco</label><br>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <b>Dependence Criteria</b><br>
+                                            <label><input type="checkbox" class="quickChk" value="Craving"> Craving</label><br>
+                                            <label><input type="checkbox" class="quickChk" value="Withdrawal"> Withdrawal</label><br>
+                                        </div>
+
+                                    </div>
+
+                                    <!-- SAVE & CLOSE BUTTONS -->
+                                    <div style="margin-top:15px;">
+                                        <button type="button" id="btnSaveQuickInfo" class="btn btn-success btn-sm">
+                                            Save
+                                        </button>
+
+                                        <button type="button" id="btnCloseQuickInfo" class="btn btn-danger btn-sm">
+                                            Close
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                <!-- TEXTAREA -->
+                                <textarea id="presentingTextarea"
+                                          class="form-control"
+                                          style="margin-top:10px;height:150px;"></textarea>
+
+                                <button id="btnAddPresenting"
+                                        class="btn btn-secondary btn-sm"
+                                        style="margin-top:8px;">
+                                    Add
+                                </button>
+                                <!-- Table -->
+                                <div class="timelineContainer"></div>
+                            </div>
+
+                            <div id="history" class="tab-pane fade assessment-section">
+
+                                <!-- Top Row -->
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+
+
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+
+                                    <textarea class="form-control newText"></textarea>
+
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <div class="timelineContainer"></div>
+
+                            </div>
+
+                            <div id="past" class="tab-pane fade assessment-section">
+                                <!-- Top Row -->
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+
+                                    <textarea class="form-control newText"></textarea>
+
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <div class="timelineContainer"></div>
+                            </div>
+
+                            <div id="medical" class="tab-pane fade assessment-section">
+
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+
+                                    <textarea class="form-control newText"></textarea>
+
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <div class="timelineContainer"></div>
+                            </div>
+
+                            <div id="family" class="tab-pane fade assessment-section">
+
+                                <!-- Top Row -->
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+
+                                    <textarea class="form-control newText"></textarea>
+
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+
+                                <div class="timelineContainer"></div>
+                            </div>
+
+                            <div id="personal" class="tab-pane fade assessment-section">
+
+                                <!-- Top Row -->
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+
+                                    <textarea class="form-control newText"></textarea>
+
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+
+                                <div class="timelineContainer"></div>
+
+                            </div>
+
+                            <div id="forensic" class="tab-pane fade assessment-section">
+
+                                <!-- Top Row -->
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+
+                                    <textarea class="form-control newText"></textarea>
+
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <div class="timelineContainer"></div>
+                            </div>
+
+                            <div id="drug" class="tab-pane fade assessment-section">
+
+                                <!-- Top Row -->
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+
+                                    <textarea class="form-control newText"></textarea>
+
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+
+                                <div class="timelineContainer"></div>
+                            </div>
+                            <div id="premorbid" class="tab-pane fade assessment-section">
+
+                                <!-- Top Row -->
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+                                    <textarea class="form-control newText"></textarea>
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <div class="timelineContainer"></div>
+                            </div>
+
+                            <div id="mental" class="tab-pane fade assessment-section">
+                                <!-- Top Row -->
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+
+                                    <textarea class="form-control newText"></textarea>
+
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <div class="timelineContainer"></div>
+                            </div>
+                            <div id="progressmenu" class="tab-pane fade assessment-section">
+
+                                <div class="note-actions">
+                                    <button class="btn btn-primary btn-sm btnQuickInfo">
+                                        Quick Information
+                                    </button>
+
+                                    <button class="btn btn-secondary btn-sm btnAddCommon">
+                                        Add
+                                    </button>
+                                </div>
+
+                                <div class="addPanel">
+                                    <textarea class="form-control newText"
+                                              placeholder="Write progress note..."></textarea>
+
+                                    <div class="note-buttons">
+                                        <button class="btn btn-success btnSaveCommon btn-sm">
+                                            <i class="fa fa-save"></i> Save
+                                        </button>
+
+                                        <button class="btn btn-danger btnCloseCommon btn-sm">
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="timelineContainer"></div>
+
+                            </div>
+                            @*------------------------------------Investigations------------------------------------------*@
+
+                            <div id="physicalMonitoring" class="tab-pane fade assessment-section">
+
+                                <div style="display:flex; gap:8px; margin-bottom:10px;">
+                                    <button class="btn btn-secondary btn-sm btnAddColumn">
+                                        Add
+                                    </button>
+
+                                    
+                                    <button type="button" class="btn btn-danger btnClearSection">
+                                        Clear
+                                    </button>
+                                </div>
+
+                                <div style="border:1px solid #ccc; padding:10px; background:#f9f9f9;">
+
+                                    <div style="overflow-x:auto; background:#fff;">
+
+                                        <table class="table table-bordered" id="physicalTable">
+                                            <thead>
+                                                <tr>
+                                                    <th style="min-width:250px;">Parameter</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr><td>Diabetes</td></tr>
+                                                <tr><td>Cardiovascular Disease</td></tr>
+                                                <tr><td>Weight (Kg)</td></tr>
+                                                <tr><td>Body Mass Index (BMI)</td></tr>
+                                                <tr><td>Waist circumference (inches)</td></tr>
+                                                <tr><td>BP (mm Hg)</td></tr>
+                                                <tr><td>Sodium, mmol/l (135-145)</td></tr>
+                                                <tr><td>Potassium, mmol/l (3.4-5.0)</td></tr>
+                                                <tr><td>Urea, mmol/l</td></tr>
+                                                <tr><td>Creatinine, umol/l</td></tr>
+                                                <tr><td>Blood glucose, mmol/l</td></tr>
+                                                <tr><td>HbA1c (if diabetic)</td></tr>
+                                                <tr><td>Bilirubin, umol/l (0-19)</td></tr>
+                                                <tr><td>Alk Phos, U/l (35-120)</td></tr>
+                                                <tr><td>ALT, U/l (0-40)</td></tr>
+                                                <tr><td>Albumin, g/l (34-50)</td></tr>
+                                                <tr><td>Total protein, g/l (58-78)</td></tr>
+                                            </tbody>
+                                        </table>
+                                        
+                                    </div>
+
+                                </div>
+                                <div style="display:flex; gap:8px; margin-top:10px;">
+                                    <button class="btn btn-success btn-sm btnSavePhysical">
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="scans" class="tab-pane fade assessment-section">
+
+                                <!-- ADD THIS -->
+
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+
+
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+
+                                    <textarea class="form-control newText"></textarea>
+
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <div class="timelineContainer"></div>
+                            </div>
+
+                            <div id="eeg" class="tab-pane fade assessment-section">
+
+                                <!-- ADD THIS -->
+
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+
+                                    <textarea class="form-control newText"></textarea>
+
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <div class="timelineContainer"></div>
+                            </div>
+
+                            <div id="otherInvestigations" class="tab-pane fade assessment-section">
+
+                                <!-- ADD THIS -->
+
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+
+                                    <textarea class="form-control newText"></textarea>
+
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <div class="timelineContainer"></div>
+                            </div>
+
+                            @*--------------------------------------------Daignosis---------------------------------------------*@
+                            <div id="icd10" class="tab-pane fade assessment-section">
+
+                                <!-- Top Buttons -->
+                                <div style="display:flex; gap:8px; margin-bottom:10px;">
+                                    <button class="btn btn-primary btn-sm btnQuickInfo">
+                                        Quick Information
+                                    </button>
+
+                                    <button class="btn btn-secondary btn-sm" id="btnAddICDOpen">
+                                        Add
+                                    </button>
+                                </div>
+
+                                <!-- ICD PANEL -->
+                                <div id="icd10Panel"
+                                     style="display:none; border:1px solid #ccc; padding:15px; background:#f9f9f9;">
+
+                                    <!-- Custom Dropdown -->
+                                    <div style="position:relative; margin-bottom:10px;">
+
+                                        <label><b>ICD-10 Code</b></label>
+
+                                        <!-- Dropdown Button -->
+                                        <div id="dropdownBtn"
+                                             style="border:1px solid #ccc; padding:6px; background:#fff; cursor:pointer;">
+                                            Select ICD Code ▼
+                                        </div>
+
+                                        <!-- Dropdown List -->
+                                        <div id="checkboxDropdown"
+                                             style="display:none; border:1px solid #ccc;
+                 position:absolute; width:100%;
+                 background:#fff; max-height:150px;
+                 overflow-y:auto; padding:8px; z-index:1000;">
+
+                                            <label><input type="checkbox" value="F00"> F00 - Dementia in Alzheimer's disease</label><br>
+                                            <label><input type="checkbox" value="F01"> F01 - Vascular dementia</label><br>
+                                            <label><input type="checkbox" value="F02"> F02 - Dementia in other diseases</label><br>
+                                            <label><input type="checkbox" value="F03"> F03 - Unspecified dementia</label><br>
+                                            <label><input type="checkbox" value="F05"> F05 - Delirium</label><br>
+                                            <label><input type="checkbox" value="F06"> F06 - Other mental disorders</label>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- Add Remove Buttons -->
+                                    <div style="margin-bottom:10px;">
+                                        <button class="btn btn-secondary btn-sm" id="btnAddICD">
+                                            Add >>
+                                        </button>
+
+                                        <button class="btn btn-danger btn-sm" id="btnRemoveICD">
+                                            << Remove
+                                        </button>
+                                    </div>
+
+                                    <!-- Selected List -->
+                                    <div>
+                                        <select id="selectedICD" class="form-control" size="6" multiple></select>
+                                    </div>
+
+                                    <!-- Save Close -->
+                                    <div style="text-align:center; margin-top:15px;">
+                                        <button class="btn btn-success btn-sm" id="btnSaveICD">Save</button>
+                                        <button class="btn btn-danger btn-sm" id="btnCloseICD">Close</button>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div id="dsm5" class="tab-pane fade assessment-section">
+
+                                <!-- Top Buttons -->
+                                <div style="display:flex; gap:8px; margin-bottom:10px;">
+                                    <button class="btn btn-primary btn-sm btnQuickInfoDSM">
+                                        Quick Information
+                                    </button>
+
+                                    <button class="btn btn-secondary btn-sm" id="btnAddDSMOpen">
+                                        Add
+                                    </button>
+                                </div>
+
+                                <!-- DSM PANEL -->
+                                <div id="dsm5Panel"
+                                     style="display:none; border:1px solid #ccc; padding:15px; background:#f9f9f9;">
+
+                                    <!-- Custom Dropdown -->
+                                    <div style="position:relative; margin-bottom:10px;">
+
+                                        <label><b>DSM-5 Code</b></label>
+
+                                        <!-- Dropdown Button -->
+                                        <div id="dropdownBtnDSM"
+                                             style="border:1px solid #ccc; padding:6px; background:#fff; cursor:pointer;">
+                                            Select DSM Code ▼
+                                        </div>
+
+                                        <!-- Dropdown List -->
+                                        <div id="checkboxDropdownDSM"
+                                             style="display:none; border:1px solid #ccc;
+                 position:absolute; width:100%;
+                 background:#fff; max-height:150px;
+                 overflow-y:auto; padding:8px; z-index:1000;">
+
+                                            <label><input type="checkbox" value="296.21"> 296.21 - Major Depressive Disorder</label><br>
+                                            <label><input type="checkbox" value="300.02"> 300.02 - Generalized Anxiety Disorder</label><br>
+                                            <label><input type="checkbox" value="314.01"> 314.01 - ADHD Combined Type</label><br>
+                                            <label><input type="checkbox" value="309.81"> 309.81 - PTSD</label><br>
+                                            <label><input type="checkbox" value="295.90"> 295.90 - Schizophrenia</label><br>
+                                            <label><input type="checkbox" value="301.83"> 301.83 - Borderline Personality Disorder</label>
+
+                                        </div>
+                                    </div>
+
+                                    <!-- Add Remove Buttons -->
+                                    <div style="margin-bottom:10px;">
+                                        <button class="btn btn-secondary btn-sm" id="btnAddDSM">Add >></button>
+                                        <button class="btn btn-danger btn-sm" id="btnRemoveDSM"><< Remove</button>
+                                    </div>
+
+                                    <!-- Selected List -->
+                                    <div>
+                                        <select id="selectedDSM" class="form-control" size="6" multiple></select>
+                                    </div>
+
+                                    <!-- Save Close -->
+                                    <div style="text-align:center; margin-top:15px;">
+                                        <button class="btn btn-success btn-sm" id="btnSaveDSM">Save</button>
+                                        <button class="btn btn-danger btn-sm" id="btnCloseDSM">Close</button>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div id="differential" class="tab-pane fade assessment-section">
+
+                                <!-- ADD THIS -->
+
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+
+
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+                                    <div class="panel-title">Add New Details</div>
+                                    <textarea class="form-control newText"></textarea>
+
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <div class="timelineContainer"></div>
+                            </div>
+
+
+                            <div id="medicalDiagnosis" class="tab-pane fade assessment-section">
+
+                                <!-- ADD THIS -->
+
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+
+
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+
+                                    <textarea class="form-control newText"></textarea>
+
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <div class="timelineContainer"></div>
+                            </div>
+                            @*---------------------------------------------Risk Assessment----------------------------------------*@
+
+                            <div id="riskSummary" class="tab-pane fade assessment-section">
+
+                                <!-- ADD THIS -->
+
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+
+                                    <textarea class="form-control newText"></textarea>
+
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <div class="timelineContainer"></div>
+                            </div>
+                            @*---------------------------------------------------------------------*@
+                            <div id="riskPlan" class="tab-pane fade assessment-section">
+
+                                <!-- ADD THIS -->
+
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                <!-- Add Panel -->
+                                <div class="addPanel">
+                                    <div class="panel-title">Add New Details</div>
+                                    <textarea class="form-control newText"></textarea>
+
+                                    <div style="margin-top:8px;">
+                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
+                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
+                                    </div>
+                                </div>
+
+                                <br>
+                                <div class="timelineContainer"></div>
+                            </div>
+
+                            <div id="riskIndicators" class="tab-pane fade assessment-section">
+                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
+
+                                    <!-- Left Side Buttons -->
+                                    <div style="display:flex; gap:8px;">
+                                        <button class="btn btn-primary btn-sm btnQuickInfo">
+                                            Quick Information
+                                        </button>
+
+                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                </div>
+                                <!-- ========== SUICIDE ========== -->
+                                <div class="riskFullPanel" style="display:none;">
+
+                                    <div class="risk-title">Suicide</div>
+                                    <div class="risk-table-wrapper">
+                                        <table class="table table-bordered risk-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Description</th>
+                                                    <th style="width:80px;">Yes</th>
+                                                    <th style="width:80px;">No</th>
+                                                    <th style="width:100px;">Don't Know</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Previous attempts on their life</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Previous use of violent methods</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Misuse of drugs and/or alcohol</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Major psychiatric diagnoses</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- ========== NEGLECT ========== -->
+                                <div class="riskFullPanel" style="display:none;">
+                                    <div class="risk-title">Neglect</div>
+                                    <div class="risk-table-wrapper">
+                                        <table class="table table-bordered risk-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Description</th>
+                                                    <th style="width:80px;">Yes</th>
+                                                    <th style="width:80px;">No</th>
+                                                    <th style="width:100px;">Don't Know</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Previous history of neglect</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Failing to drink properly</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Failing to eat properly</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Difficulty managing physical health</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- ========== AGGRESSION / VIOLENCE ========== -->
+                                <div class="riskFullPanel" style="display:none;">
+                                    <div class="risk-title">Aggression / Violence</div>
+                                    <div class="risk-table-wrapper">
+                                        <table class="table table-bordered risk-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Description</th>
+                                                    <th style="width:80px;">Yes</th>
+                                                    <th style="width:80px;">No</th>
+                                                    <th style="width:100px;">Don't Know</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Previous incidents of violence</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Previous use of weapons</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Misuse of drugs and/or alcohol</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Male gender, under 35 years of age</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- ========== OTHERS ========== -->
+                                <div class="riskFullPanel" style="display:none;">
+                                    <div class="risk-title">Others</div>
+                                    <div class="risk-table-wrapper">
+                                        <table class="table table-bordered risk-table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Description</th>
+                                                    <th style="width:80px;">Yes</th>
+                                                    <th style="width:80px;">No</th>
+                                                    <th style="width:100px;">Don't Know</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Self-injury (e.g. cutting, burning)</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Other self-harm (e.g. eating disorders)</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Stated abuse by others</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Abuse of others</td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                    <td><input type="checkbox"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div id="riskActionButtons" style="text-align:center; margin-top:20px; display:none;">
+                                    <button class="btn btn-success btn-sm" id="btnSaveRisk">Save</button>
+                                    <button class="btn btn-danger btn-sm" id="btnCloseRisk">Close</button>
+                                </div>
+
+                            </div>
+
+                            @*--------------------------------------------PRESCRIPTIONS----------------------------------------------------------*@
+                            <div id="prescriptions" class="tab-pane fade assessment-section">
+
+                                <div style="margin-bottom:10px;">
+                                    <button class="btn btn-secondary btn-sm" id="btnOpenPrescription">
+                                        Add
+                                    </button>
+                                </div>
+
+                                <div id="prescriptionPanel" style="display:none; border:1px solid #ccc; padding:15px;">
+
+
+                                    <table class="table table-bordered" id="prescriptionTable">
+                                        <thead>
+                                            <tr>
+                                                <th style="width:60px;">Sr No.</th>
+                                                <th>Formulation</th>
+                                                <th>Medicine Name</th>
+                                                <th>Dosage</th>
+                                                <th>Route</th>
+                                                <th>Frequency</th>
+                                                <th>Others</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="srno">1</td>
+                                                <td><input type="text" class="form-control" /></td>
+                                                <td><input type="text" class="form-control" /></td>
+                                                <td><input type="text" class="form-control" /></td>
+                                                <td><input type="text" class="form-control" /></td>
+                                                <td><input type="text" class="form-control" /></td>
+                                                <td><input type="text" class="form-control" /></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <a href="javascript:void(0);" id="btnAddRow">Add New</a> |
+                                    <a href="javascript:void(0);" id="btnDeleteRow">Delete Last</a>
+
+                                    <br><br>
+
+                                    <button class="btn btn-success btn-sm" id="btnSavePrescription">Save</button>
+                                    <button class="btn btn-info btn-sm" id="btnSavePrint">Save & Print</button>
+                                    <button class="btn btn-danger btn-sm" id="btnClosePrescription">Close</button>
+
+                                </div>
+
+                            </div>
+
+                            @*----------------------------------------Old Prescription---------------------------------------*@
+                            <div id="oldprescriptions" class="tab-pane fade assessment-section">
+
+                                <div class="oldPrescriptionPanel">
+
+                                    @*  <div style="font-weight:600; margin-bottom:15px;">
+                                    | Old Prescription |
+                                </div> *@
+                                    <div style="margin-bottom:15px;">
+                                        <label style="margin-right:15px;">Select Date:</label>
+
+                                        <select id="ddlOldPrescriptionDate"
+                                                class="form-control"
+                                                style="width:200px; display:inline-block;">
+                                            <option value="">-- Select Date --</option>
+                                        </select>
+                                    </div>
+
+                                    <button type="button"
+                                            class="btn btn-success btn-sm"
+                                            id="btnProceedOldPrescription">
+                                        Proceed
+                                    </button>
+                                </div>
+
+                            </div>
+                            @*--------------------------------IN Ptient-----------------------------------------*@
+
+                            <div id="inpatients" class="tab-pane fade assessment-section">
+
+                                <!-- TOP BUTTON -->
+                                <div class="ipTopButtons" style="margin-bottom:10px;">
+                                    <button class="btn btn-secondary btn-sm" id="btnAddIP">
+                                        Add
+                                    </button>
+                                </div>
+
+                                <!-- INPATIENT FORM -->
+                                <div class="addPanel ipPanel" style="display:none; border:1px solid #ccc; padding:15px; background:#f5f7fa; border-radius:6px;">
+
+                                    <div class="container-fluid">
+
+                                        <!-- Date of Admission -->
+                                        <div class="form-group row">
+
+                                            <label class="col-md-2 col-form-label">
+                                                Date of Admission:
+                                            </label>
+
+                                            <div class="col-md-3">
+                                                <div class="input-group date">
+                                                    <input type="text"
+                                                           class="form-control date-picker"
+                                                           id="ipAdmissionDate"
+                                                           placeholder="DD-MMM-YYYY"
+                                                           maxlength="11" />
+
+                                                    <span class="input-group-addon">
+                                                        <span class="fa fa-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Date of Discharge -->
+                                        <div class="form-group row">
+
+                                            <label class="col-md-2 col-form-label">
+                                                Date of Discharge:
+                                            </label>
+
+                                            <div class="col-md-3">
+                                                <div class="input-group date">
+                                                    <input type="text"
+                                                           class="form-control date-picker"
+                                                           id="ipDischargeDate"
+                                                           placeholder="DD-MMM-YYYY"
+                                                           maxlength="11" />
+
+                                                    <span class="input-group-addon">
+                                                        <span class="fa fa-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Diagnosis -->
+                                        <div class="form-group row">
+
+                                            <label class="col-md-2 col-form-label">
+                                                Diagnosis:
+                                            </label>
+
+                                            <div class="col-md-10">
+                                                <textarea class="form-control" rows="3" id="txtDiagnosis"></textarea>
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Notes -->
+                                        <div class="form-group row">
+
+                                            <label class="col-md-2 col-form-label">
+                                                Notes:
+                                            </label>
+
+                                            <div class="col-md-10">
+                                                <textarea class="form-control" rows="3" id="txtNotes"></textarea>
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Buttons -->
+                                        <div style="margin-top:10px;">
+
+                                            <button class="btn btn-success btn-sm" id="btnSaveIP">
+                                                Save
+                                            </button>
+
+                                            <button class="btn btn-danger btn-sm" id="btnCloseIP">
+                                                Close
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            @*----------------------------------------Attachment-------------------------------------------*@
+
+                            <div id="attachments" class="tab-pane fade assessment-section">
+
+                                <div style="margin-bottom:10px;">
+                                    <button class="btn btn-secondary btn-sm" id="btnOpenAttachment">
+                                        Add Attachment
+                                    </button>
+                                </div>
+
+                                <!-- FORM BOX (Same style as Other Professionals) -->
+                                <div class="attachmentPanel" style="display:none;">
+
+                                    <div style="border:1px solid #ddd;padding:12px;background:#f9f9f9;">
+
+                                        <div class="row">
+                                            <div class="col-md-8">
+                                                <label>Doc Path</label>
+                                                <input type="file" class="form-control" id="fileAttachment">
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>Doc Name</label>
+                                                <input type="text" class="form-control" id="txtDocName">
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <label>Doc Description</label>
+                                                <textarea class="form-control" id="txtDocDescription"></textarea>
+                                            </div>
+                                        </div>
+
+                                        <!-- BUTTONS -->
+                                        <div style="margin-top:10px;display:flex;justify-content:flex-start;gap:8px;">
+
+                                            <button class="btn btn-success btn-sm" id="btnSaveAttachment">
+                                                <i class="fa fa-save"></i> Save
+                                            </button>
+
+                                            <button class="btn btn-danger btn-sm" id="btnCloseAttachment">
+                                                Close
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            @*------------------------------Medical Certificates---------------------------------------*@
+                            <div id="medicalcert" class="tab-pane fade assessment-section">
+
+                                <!-- TOP BUTTONS -->
+                                <div class="topButtons" style="display:flex; gap:8px; margin-bottom:10px;">
+                                    <button class="btn btn-primary btn-sm btnQuickInfo">
+                                        Quick Information
+                                    </button>
+
+                                    <button class="btn btn-secondary btn-sm btnAddCommon">
+                                        Add
+                                    </button>
+                                </div>
+
+                                <!-- FORM PANEL -->
+                                <div class="medicalPanel" style="display:none;">
+
+                                    <!-- SAME BACKGROUND STYLE -->
+                                    <div style="border:1px solid #ddd;padding:12px;background:#f9f9f9;">
+
+                                        <div class="container-fluid">
+
+                                            <div class="row">
+
+                                                <!-- Assessment From -->
+                                                <div class="col-md-6">
+                                                    <div class="form-group row">
+                                                        <label class="col-md-4 text-right">Assessment From:</label>
+
+                                                        <div class="input-group date">
+                                                            <input type="text"
+                                                                   class="form-control date-picker txnDate mcFromDate"
+                                                                   placeholder="DD-MMM-YYYY"
+                                                                   maxlength="11"
+                                                                   style="height:32px;" />
+
+                                                            <span class="input-group-addon" style="padding:6px 10px;">
+                                                                <span class="fa fa-calendar"></span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Assessment Date -->
+                                                <div class="col-md-6">
+                                                    <div class="form-group row">
+                                                        <label class="col-md-4 text-right">Assessment Date:</label>
+
+                                                        <div class="input-group date">
+                                                            <input type="text"
+                                                                   class="form-control date-picker txnDate mcAssessmentDate"
+                                                                   placeholder="DD-MMM-YYYY"
+                                                                   maxlength="11"
+                                                                   style="height:32px;" />
+
+                                                            <span class="input-group-addon" style="padding:6px 10px;">
+                                                                <span class="fa fa-calendar"></span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <!-- Suffering -->
+                                            <div class="form-group row">
+                                                <label class="col-md-2 text-right">Suffering From:</label>
+
+                                                <div class="col-md-10">
+                                                    <textarea class="form-control mcSuffering" rows="3"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Consequences -->
+                                            <div class="form-group row">
+                                                <label class="col-md-2 text-right">Consequences:</label>
+
+                                                <div class="col-md-10">
+                                                    <textarea class="form-control mcConsequences" rows="3"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <!-- Recommendations -->
+                                            <div class="form-group row">
+                                                <label class="col-md-2 text-right">Recommendations:</label>
+
+                                                <div class="col-md-10">
+                                                    <textarea class="form-control mcRecommendations" rows="3"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <div class="text-center" style="margin-top:20px;">
+
+                                                <button class="btn btn-success btn-sm" id="btnSaveMC">
+                                                    Save
+                                                </button>
+
+                                                <button class="btn btn-info btn-sm" id="btnSavePrintMC">
+                                                    Save & Print
+                                                </button>
+
+                                                <button class="btn btn-danger btn-sm" id="btnCloseMC">
+                                                    Close
+                                                </button>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            @*----------------------------Old Medical--------------------------*@
+                            <div id="oldmedicert" class="tab-pane fade assessment-section ">
+                                <div class="oldMedicalPanel">
+
+                                    <div style="margin-bottom:15px;">
+                                        <label style="margin-right:15px;">Select Date:</label>
+
+                                        <select id="ddlOldMedicalDate"
+                                                class="form-control"
+                                                style="width:200px; display:inline-block;">
+                                            <option value="">-- Select Date --</option>
+                                        </select>
+                                    </div>
+
+                                    <button type="button"
+                                            class="btn btn-success btn-sm"
+                                            id="btnProceedOldCertificate">
+                                        Proceed
+                                    </button>
+                                </div>
+                            </div>
+
+                            @*----------------------------Psychiatric Report----------------------------------------*@
+
+                            <div id="psyreport" class="tab-pane fade assessment-section">
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>

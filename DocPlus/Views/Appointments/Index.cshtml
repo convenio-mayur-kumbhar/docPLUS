@@ -1,0 +1,270 @@
+﻿@{
+    ViewData["Title"] = "Appointments";
+}
+
+<link href="~/assets/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+
+<style>
+    body,
+    .page-content,
+    .form-control,
+    .table,
+    .btn,
+    label,
+    select,
+    input,
+    textarea {
+        font-size: 13px !important;
+        font-family: 'Open Sans','Segoe UI',Arial !important;
+    }
+
+    .card-panel {
+        background: #fff;
+        border: 1px solid #dcdcdc;
+        border-radius: 6px;
+        padding: 20px;
+        margin-top: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .section-header {
+        background: #3b6ea5;
+        color: #fff;
+        padding: 8px 15px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 4px 4px 0 0;
+        margin: -20px -20px 20px -20px;
+    }
+</style>
+
+<!-- SUBHEADER -->
+<div class="kt-subheader kt-grid__item">
+    <div class="kt-subheader__main">
+        <div class="kt-subheader__breadcrumbs">
+            <a asp-controller="Dashboard" asp-action="Index" class="kt-subheader__breadcrumbs-home">
+                <i class="flaticon2-shelter"></i>
+            </a>
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+            <a href="javascript:;" class="kt-subheader__breadcrumbs-link">
+                Master Data Setup
+            </a>
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+            <a asp-controller="Appointment" asp-action="Index" class="kt-subheader__breadcrumbs-link">
+                Appointment Master
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- SEARCH FILTER -->
+<div class="kt-portlet kt-portlet--mobile p-2 mb-1">
+    <div class="form-group row">
+        <div class="col-md-3">
+            <label>Patient Name</label>
+            <input type="text" id="txtPatientName" class="form-control" placeholder="Patient Name">
+        </div>
+        <div class="col-md-3">
+            <label>Date</label>
+            <input type="date" id="txtDateSearch" class="form-control">
+        </div>
+        <div class="col-md-6" style="margin-top:27px;">
+            <button class="btn btn-primary" onclick="appointmentMaster.Search();">Search</button>
+            <button class="btn btn-danger" onclick="appointmentMaster.Reset();">Reset</button>
+            <button class="btn btn-default" onclick="appointmentMaster.Export();">
+                <i class="la la-download"></i> Export
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- GRID -->
+<div class="kt-portlet kt-portlet--mobile">
+    <div class="kt-portlet__head kt-portlet__head--lg">
+        <div class="kt-portlet__head-label">
+            <h3 class="kt-portlet__head-title">Appointment List</h3>
+        </div>
+        <div class="kt-portlet__head-toolbar">
+            <a href="javascript:;" class="btn btn-brand btn-elevate btn-icon-sm" onclick="appointmentMaster.OpenAdd();">
+                <i class="fas fa-plus-circle"></i> Add Appointment
+            </a>
+        </div>
+    </div>
+
+    <div class="kt-portlet__body table-responsive">
+        <table class="table table-striped table-hover table-checkable" id="tblAppointment">
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Tele</th>
+                    <th>Cell</th>
+                    <th>Comments</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal fade" id="AppointmentModal" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Appointment Details</h5>
+                <button type="button" class="close" data-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="frmAppointment">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Patient</label>
+                            <input type="text" id="txtPatient" class="form-control" placeholder="Patient Name">
+                        </div>
+                        <div class="col-md-3">
+                            <label>Date</label>
+                            <input type="date" id="txtDate" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label>Time</label>
+                            <input type="time" id="txtTime" class="form-control">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-3">
+                            <label>Tele</label>
+                            <input type="text" id="txtTele" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label>Cell</label>
+                            <input type="text" id="txtCell" class="form-control">
+                        </div>
+                        <div class="col-md-6">
+                            <label>Comments</label>
+                            <input type="text" id="txtComment" class="form-control">
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="appointmentMaster.Save();">Save</button>
+                <button class="btn btn-secondary" onclick="appointmentMaster.ResetForm();">Reset</button>
+                <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/assets/js/jquery.dataTables.min.js"></script>
+    <script src="~/assets/js/dataTables.bootstrap.min.js"></script>
+
+    <script>
+        var appointmentMaster = {
+            data: [],
+            table: null,
+
+            Init: function () {
+                this.table = $("#tblAppointment").DataTable({
+                    pageLength: 10,
+                    ordering: true
+                });
+            },
+
+            OpenAdd: function () {
+                $("#AppointmentModal").modal("show");
+            },
+
+            Save: function () {
+                var appt = {
+                    patient: $("#txtPatient").val(),
+                    date: $("#txtDate").val(),
+                    time: $("#txtTime").val(),
+                    tele: $("#txtTele").val(),
+                    cell: $("#txtCell").val(),
+                    comment: $("#txtComment").val()
+                };
+
+                if (!appt.patient) {
+                    alert("Enter patient name");
+                    return;
+                }
+
+                this.data.push(appt);
+                this.Load();
+                this.ResetForm();
+                $("#AppointmentModal").modal("hide");
+            },
+
+            Load: function () {
+                this.table.clear();
+                this.data.forEach(function (x, i) {
+                    appointmentMaster.table.row.add([
+                        x.patient,
+                        x.date,
+                        x.time,
+                        x.tele,
+                        x.cell,
+                        x.comment,
+                        "<i class='fa fa-edit' onclick='appointmentMaster.Edit(" + i + ")'></i>",
+                        "<i class='fa fa-trash text-danger' onclick='appointmentMaster.Delete(" + i + ")'></i>"
+                    ]);
+                });
+                this.table.draw();
+            },
+
+            Edit: function (i) {
+                var appt = this.data[i];
+                $("#txtPatient").val(appt.patient);
+                $("#txtDate").val(appt.date);
+                $("#txtTime").val(appt.time);
+                $("#txtTele").val(appt.tele);
+                $("#txtCell").val(appt.cell);
+                $("#txtComment").val(appt.comment);
+
+                this.data.splice(i, 1);
+                this.OpenAdd();
+            },
+
+            Delete: function (i) {
+                if (confirm("Delete appointment?")) {
+                    this.data.splice(i, 1);
+                    this.Load();
+                }
+            },
+
+            Search: function () {
+                var patient = $("#txtPatientName").val();
+                var date = $("#txtDateSearch").val();
+
+                this.table.column(0).search(patient);
+                this.table.column(1).search(date);
+                this.table.draw();
+            },
+
+            Reset: function () {
+                $("#txtPatientName").val("");
+                $("#txtDateSearch").val("");
+                this.table.search("").columns().search("").draw();
+            },
+
+            Export: function () {
+                alert("Export logic here");
+            },
+
+            ResetForm: function () {
+                $("#frmAppointment")[0].reset();
+            }
+        };
+
+        $(document).ready(function () {
+            appointmentMaster.Init();
+        });
+    </script>
+}

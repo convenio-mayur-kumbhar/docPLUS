@@ -1,0 +1,9 @@
+﻿.datepicker-dropdown {
+    z-index: 99999 !important;
+}
+
+.modal,
+.modal-body,
+.table-responsive {
+    overflow: visible !important;
+}

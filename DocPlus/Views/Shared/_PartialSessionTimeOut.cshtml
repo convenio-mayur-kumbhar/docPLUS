@@ -1,0 +1,53 @@
+﻿<div id="SessionTimeOutModal" class="modal fade">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body p-2">
+                <div class="row">
+                    <div class="col-md-2 text-center">
+                        <p>
+                            <i class="fa fa-exclamation-triangle fa-3x text-blue"></i>
+                        </p>
+                    </div>
+                    <div class="col-md-10 text-blue" style="padding-top: 10px;">
+                        <p style="font-size:16px;">You have been logged out. Please login again!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer p-2">
+                <button type="button" id="btnTimeModel" class="btn btn-brand">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    var reset = 0;
+    var timeInSecondsAfterSessionOut = 1200; // change this to change session time out (in seconds).
+    var secondTick = 0;
+
+    function ResetThisSession() { secondTick = 0; }
+
+    function StartThisSessionTimer() {
+        secondTick++;
+        var timeLeft = ((timeInSecondsAfterSessionOut - secondTick) / 60).toFixed(0); // in minutes
+        timeLeft = timeInSecondsAfterSessionOut - secondTick; // override, we have 30 secs only
+
+        if (reset == 0) {
+            if (Number(secondTick) >= Number(timeInSecondsAfterSessionOut)) {
+                clearTimeout(tick);
+                reset = 1;
+                $('#SessionTimeOutModal').modal({ backdrop: 'static' });
+                $('#SessionTimeOutModal').modal('show');
+                $("#btnTimeModel").focus();
+            }
+        }
+
+        tick = setTimeout("StartThisSessionTimer()", 1000);
+    }
+
+    $(document).ready(function () {
+        $("body").on('click keypress', function () { ResetThisSession(); });
+        $("#btnTimeModel").click(function () { window.location = window.location.origin;/*to Login*/ });
+        StartThisSessionTimer();
+    });
+
+</script>

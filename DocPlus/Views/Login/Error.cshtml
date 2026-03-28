@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Session Expired";
+}
+
+<!DOCTYPE html>
+<html lang="id" dir="ltr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <!-- Title -->
+    <title>Sorry, This Page Can&#39;t Be Accessed</title>
+    <style>
+        #footer {
+            text-align: center;
+            position: fixed;
+            margin-left: 530px;
+            bottom: 0px
+        }
+    </style>
+
+</head>
+
+<body class="bg-dark text-white py-5">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-md-2 text-center">
+                <p><i class="fa fa-exclamation-triangle fa-5x"></i><br /></p>
+                <a class="btn btn-primary" style="background-color:#646C9A;" asp-controller="Login">Go Back</a>
+            </div>
+            <div class="col-md-10">
+                <h3>Access Denied</h3>
+                <p>You don't have access of this screen<br />Go back to the previous page to continue</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+

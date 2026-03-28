@@ -1,0 +1,406 @@
+﻿@* @{
+    ViewData["Title"] = "Category Master";
+}
+
+<!-- Styles -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+<link href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css" rel="stylesheet" />
+
+<style>
+    .page-content {
+        padding: 12px 20px 20px;
+    }
+
+    .active-row {
+        background-color: #d9d9d9 !important;
+    }
+</style>
+
+<!-- Breadcrumb -->
+<div class="kt-subheader kt-grid__item" style="height:40px;">
+    <div class="kt-subheader__main">
+        <div class="kt-subheader__breadcrumbs">
+            <a asp-controller="Home" asp-action="Index" class="kt-subheader__breadcrumbs-home"><i class="flaticon2-shelter"></i></a>
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+            <a asp-controller="Settings" asp-action="CategoryMaster" class="kt-subheader__breadcrumbs-link">Category Master</a>
+        </div>
+    </div>
+
+    <div class="pull-right" style="display:flex; gap:10px; align-items:center;">
+        <a href="#" onclick="ExportToExcelGrid('#tblCategory','excel');">
+            <i class="fa fa-file-excel-o" style="font-size:20px;color:green;"></i>
+        </a>
+        <a id="btnAddCategory">
+            <i class="fa fa-plus-square" style="font-size:22px;color:#333;"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Page Content -->
+<div class="page-content">
+    <div class="row">
+
+        <!-- LEFT GRID -->
+        <div class="col-md-7">
+            <table class="table table-striped table-bordered table-hover" id="tblCategory">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Adult</td><td class="text-center"><i class="fa fa-trash text-danger btnDelete" style="cursor:pointer;"></i></td></tr>
+                    <tr><td>Child & Adolescent</td><td class="text-center"><i class="fa fa-trash text-danger btnDelete" style="cursor:pointer;"></i></td></tr>
+                    <tr><td>Learning Disability</td><td class="text-center"><i class="fa fa-trash text-danger btnDelete" style="cursor:pointer;"></i></td></tr>
+                    <tr><td>Old Age</td><td class="text-center"><i class="fa fa-trash text-danger btnDelete" style="cursor:pointer;"></i></td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="col-md-5">
+            <div class="panel panel-default" id="addPanel" style="display:none;">
+                <div class="panel-heading">
+                    <i class="fa fa-check-square-o"></i> &nbsp;&nbsp;<span>Category</span>
+                    <div class="pull-right">
+                        <i class="fa fa-window-close fa-2x" style="cursor:pointer;" onclick="$('#addPanel').hide()"></i>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <input type="text" id="txtCategory" class="form-control" maxlength="100" placeholder="Enter Category" />
+                </div>
+                <div class="panel-footer">
+                    <button class="btn btn-success" id="btnSave"><i class="fa fa-save"></i> Save</button>
+                    <button class="btn btn-warning" id="btnReset"><i class="fa fa-history"></i> Reset</button>
+                    <button class="btn btn-default pull-right" id="btnCancel"><i class="fa fa-times"></i> Cancel</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        var selectedRow = null;
+        var table = $('#tblCategory').DataTable({ pageLength: 10, lengthMenu: [10,25,50,100], ordering: false });
+
+        // Add new category
+        $("#btnAddCategory").click(function () {
+            selectedRow = null;
+            $("#tblCategory tbody tr").removeClass("active-row");
+            $("#addPanel").show();
+            $("#txtCategory").val("").focus();
+        });
+
+        // Click row to edit
+        $("#tblCategory tbody").on("click", "tr", function () {
+            selectedRow = $(this);
+            $("#tblCategory tbody tr").removeClass("active-row");
+            $(this).addClass("active-row");
+            var category = $(this).find("td:eq(0)").text().trim();
+            $("#txtCategory").val(category);
+            $("#addPanel").show();
+        });
+
+        // Save category
+        $("#btnSave").click(function () {
+            var category = $("#txtCategory").val().trim();
+            if (category == "") { alert("Enter Category"); return; }
+
+            if (selectedRow == null) {
+                table.row.add([category, "<center><i class='fa fa-trash text-danger btnDelete'></i></center>"]).draw();
+            } else {
+                selectedRow.find("td:eq(0)").text(category);
+            }
+
+            $("#txtCategory").val("");
+            $("#addPanel").hide();
+        });
+
+        // Delete row
+        $(document).on("click", ".btnDelete", function (e) {
+            e.stopPropagation();
+            table.row($(this).parents('tr')).remove().draw();
+        });
+
+        // Reset & Cancel
+        $("#btnReset").click(function () { $("#txtCategory").val("").focus(); });
+        $("#btnCancel").click(function () { $("#addPanel").hide(); });
+
+    });
+
+    function ExportToExcelGrid(tableId, type) {
+        alert("Export called for " + tableId + " as " + type);
+    }
+</script> *@
+@{
+    ViewData["Title"] = "Category Master";
+}
+
+<style>
+    .modal-dialog {
+        max-width: 600px !important;
+    }
+</style>
+
+<!-- Subheader -->
+
+<div class="kt-subheader kt-grid__item" id="kt_subheader">
+
+
+    <div class="kt-subheader__main">
+
+        <div class="kt-subheader__breadcrumbs">
+
+            <a asp-controller="Dashboard" asp-action="Index" class="kt-subheader__breadcrumbs-home">
+                <i class="flaticon2-shelter"></i>
+            </a>
+
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+
+            <a href="javascript:;" class="kt-subheader__breadcrumbs-link">
+                Basic Settings
+            </a>
+
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+
+            <a asp-controller="CategoryMaster" asp-action="Index" class="kt-subheader__breadcrumbs-link">
+                Category Master
+            </a>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+<!-- Main Portlet -->
+
+<div class="kt-portlet kt-portlet--mobile">
+
+    <div class="kt-portlet__head kt-portlet__head--lg">
+
+        <div class="kt-portlet__head-label">
+
+            <span class="kt-portlet__head-icon">
+                <i class="kt-font-brand fas fa-layer-group"></i>
+            </span>
+
+            <h3 class="kt-portlet__head-title">
+                Category Master
+            </h3>
+
+        </div>
+
+
+        <div class="kt-portlet__head-toolbar">
+
+            <div class="kt-portlet__head-wrapper">
+
+                <div class="kt-portlet__head-actions">
+
+                    <!-- Export -->
+                    <button type="button"
+                            class="btn btn-default btn-icon-sm"
+                            onclick="ExportToExcelGrid('#tblCategory','excel')">
+
+                        <i class="la la-download"></i> Export
+
+                    </button>
+
+                    &nbsp;
+
+                    <!-- Add -->
+                    <a href="javascript:;"
+                       class="btn btn-brand btn-elevate btn-icon-sm"
+                       onclick="showAddCategory()">
+
+                        <i class="fas fa-plus-circle"></i>
+
+                        Add Category
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="kt-portlet__body table-responsive">
+
+        <table class="table table-striped table-hover table-checkable" id="tblCategory">
+
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th style="width:120px;">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>Adult</td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-clean btn-icon btn-icon-md btnDelete">
+                            <i class="fas fa-trash-alt text-danger"></i>
+                        </a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Child & Adolescent</td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-clean btn-icon btn-icon-md btnDelete">
+                            <i class="fas fa-trash-alt text-danger"></i>
+                        </a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Learning Disability</td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-clean btn-icon btn-icon-md btnDelete">
+                            <i class="fas fa-trash-alt text-danger"></i>
+                        </a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Old Age</td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-clean btn-icon btn-icon-md btnDelete">
+                            <i class="fas fa-trash-alt text-danger"></i>
+                        </a>
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+    
+
+</div>
+
+<!-- Add Category Modal -->
+
+<div class="modal fade" id="AddCategoryModal">
+
+ 
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">Add Category</h5>
+
+                <button type="button" class="close" data-dismiss="modal"></button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <input type="text"
+                       id="txtCategory"
+                       class="form-control"
+                       placeholder="Enter Category" />
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button class="btn btn-primary" onclick="saveCategory()">Save</button>
+
+                <button class="btn btn-danger" onclick="resetCategory()">Reset</button>
+
+                <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function () {
+
+            $('#tblCategory').DataTable({
+                pageLength:10,
+                ordering:false
+            });
+
+        });
+
+
+        function showAddCategory()
+        {
+            $("#txtCategory").val("");
+            $("#AddCategoryModal").modal("show");
+        }
+
+
+        function saveCategory()
+        {
+
+            var category = $("#txtCategory").val().trim();
+
+            if(category=="")
+            {
+                alert("Enter Category");
+                return;
+            }
+
+            $('#tblCategory').DataTable().row.add([
+                category,
+                "<a href='#' class='btn btn-sm btn-clean btn-icon btn-icon-md btnDelete'><i class='fas fa-trash-alt text-danger'></i></a>"
+            ]).draw();
+
+            $("#AddCategoryModal").modal("hide");
+
+        }
+
+
+        function resetCategory()
+        {
+            $("#txtCategory").val("");
+        }
+
+
+        $(document).on("click",".btnDelete",function(){
+
+            $('#tblCategory').DataTable().row($(this).parents('tr')).remove().draw();
+
+        });
+
+
+        function ExportToExcelGrid(tableId,type)
+        {
+            alert("Export Called");
+        }
+
+    </script>
+
+}

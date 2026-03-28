@@ -1,0 +1,262 @@
+﻿@{
+    ViewData["Title"] = "Billing";
+}
+
+<link href="~/assets/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+
+<style>
+    body,
+    .page-content,
+    .form-control,
+    .table,
+    .btn,
+    label,
+    select,
+    input {
+        font-size: 13px !important;
+        font-family: 'Open Sans','Segoe UI',Arial !important;
+    }
+
+    .card-panel {
+        background: #fff;
+        border: 1px solid #dcdcdc;
+        border-radius: 6px;
+        padding: 20px;
+        margin-top: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .section-header {
+        background: #3b6ea5;
+        color: #fff;
+        padding: 8px 15px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 4px 4px 0 0;
+        margin: -20px -20px 20px -20px;
+    }
+</style>
+
+<!-- SUBHEADER -->
+<div class="kt-subheader kt-grid__item">
+    <div class="kt-subheader__main">
+        <div class="kt-subheader__breadcrumbs">
+            <a asp-controller="Dashboard" asp-action="Index" class="kt-subheader__breadcrumbs-home">
+                <i class="flaticon2-shelter"></i>
+            </a>
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+            <a href="javascript:;" class="kt-subheader__breadcrumbs-link">Master Data Setup</a>
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+            <a asp-controller="Admin" asp-action="Billing" class="kt-subheader__breadcrumbs-link">Billing</a>
+        </div>
+    </div>
+</div>
+
+<!-- SEARCH / ADD -->
+<div class="kt-portlet kt-portlet--mobile p-2 mb-1">
+    <div class="form-group row">
+        <div class="col-md-3">
+            <label>Patient Name</label>
+            <input type="text" id="txtPatientSearch" class="form-control" placeholder="Patient Name">
+        </div>
+        <div class="col-md-3">
+            <label>Date</label>
+            <input type="date" id="txtDateSearch" class="form-control">
+        </div>
+        <div class="col-md-6" style="margin-top:27px;">
+            <button class="btn btn-primary" onclick="Billing.Search();">Search</button>
+            <button class="btn btn-danger" onclick="Billing.Reset();">Reset</button>
+            <button class="btn btn-brand" onclick="Billing.OpenPopup();">
+                <i class="fa fa-plus"></i> Add Bill
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- GRID -->
+<div class="kt-portlet kt-portlet--mobile">
+    <div class="kt-portlet__body table-responsive">
+        <table class="table table-striped table-hover table-checkable" id="tblBilling">
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Service</th>
+                    <th>Qty</th>
+                    <th>Rate</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal fade" id="billingModal" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Billing Details</h5>
+                <button type="button" class="close" data-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="frmBilling">
+                    <div class="form-group">
+                        <label>Patient</label>
+                        <select id="txtPatient" class="form-control">
+                            <option value="">Select Patient</option>
+                            <option>Rahul Sharma</option>
+                            <option>Pooja Patel</option>
+                            <option>Amit Patil</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Service</label>
+                        <input type="text" id="txtService" class="form-control">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label>Quantity</label>
+                            <input type="number" id="txtQty" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label>Rate</label>
+                            <input type="number" id="txtRate" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label>Amount</label>
+                            <input type="text" id="txtAmount" class="form-control" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label>Date</label>
+                        <input type="date" id="txtDate" class="form-control">
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="Billing.Save();">Save</button>
+                <button class="btn btn-secondary" onclick="Billing.ResetForm();">Reset</button>
+                <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/assets/js/jquery.dataTables.min.js"></script>
+    <script src="~/assets/js/dataTables.bootstrap.min.js"></script>
+
+    <script>
+        var billingTable;
+        var Billing = {
+            data: [],
+            table: null,
+
+            Init: function () {
+                this.table = $("#tblBilling").DataTable({
+                    pageLength: 5,
+                    ordering: true
+                });
+            },
+
+            OpenPopup: function () {
+                $("#billingModal").modal("show");
+            },
+
+            Save: function () {
+                var bill = {
+                    patient: $("#txtPatient").val(),
+                    service: $("#txtService").val(),
+                    qty: $("#txtQty").val(),
+                    rate: $("#txtRate").val(),
+                    amount: $("#txtAmount").val(),
+                    date: $("#txtDate").val()
+                };
+
+                if (!bill.patient) {
+                    alert("Please select a patient");
+                    return;
+                }
+
+                this.data.push(bill);
+                this.Load();
+                this.ResetForm();
+                $("#billingModal").modal("hide");
+            },
+
+            Load: function () {
+                this.table.clear();
+                this.data.forEach(function (x, i) {
+                    Billing.table.row.add([
+                        x.patient,
+                        x.service,
+                        x.qty,
+                        x.rate,
+                        x.amount,
+                        x.date,
+                        "<i class='fa fa-edit' onclick='Billing.Edit(" + i + ")'></i>",
+                        "<i class='fa fa-trash text-danger' onclick='Billing.Delete(" + i + ")'></i>"
+                    ]);
+                });
+                this.table.draw();
+            },
+
+            Edit: function (i) {
+                var bill = this.data[i];
+                $("#txtPatient").val(bill.patient);
+                $("#txtService").val(bill.service);
+                $("#txtQty").val(bill.qty);
+                $("#txtRate").val(bill.rate);
+                $("#txtAmount").val(bill.amount);
+                $("#txtDate").val(bill.date);
+                this.data.splice(i, 1);
+                this.OpenPopup();
+            },
+
+            Delete: function (i) {
+                if (confirm("Delete this bill?")) {
+                    this.data.splice(i, 1);
+                    this.Load();
+                }
+            },
+
+            Search: function () {
+                var patient = $("#txtPatientSearch").val();
+                var date = $("#txtDateSearch").val();
+                this.table.column(0).search(patient);
+                this.table.column(5).search(date);
+                this.table.draw();
+            },
+
+            Reset: function () {
+                $("#txtPatientSearch").val("");
+                $("#txtDateSearch").val("");
+                this.table.search("").columns().search("").draw();
+            },
+
+            ResetForm: function () {
+                $("#frmBilling")[0].reset();
+                $("#txtAmount").val("");
+            }
+        };
+
+        $(document).ready(function () {
+            Billing.Init();
+
+            $("#txtQty,#txtRate").keyup(function () {
+                var qty = parseFloat($("#txtQty").val()) || 0;
+                var rate = parseFloat($("#txtRate").val()) || 0;
+                $("#txtAmount").val(qty * rate);
+            });
+        });
+    </script>
+} 
