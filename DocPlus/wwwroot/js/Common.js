@@ -150,8 +150,8 @@ function Reload_ddl_GlobalWithPost(xhr, ddlID, AjaxURL, AjaxData, DefaultLabel, 
                         $(ddlID).html("<option value=''>" + DefaultLabel + "</option>");
 
                     for (var i = 0; i < items.length; i++)
-                        if ($(ddlID + " option[value='" + items[i].Value + "']").length === 0)
-                            $(ddlID).append("<option  value='" + items[i].Value + "' " + (items[i].Selected == true ? "selected='selected'" : "") + ">" + items[i].Text + "</option>");
+                        if ($(ddlID + " option[value='" + items[i].value + "']").length === 0)
+                            $(ddlID).append("<option  value='" + items[i].value + "' " + (items[i].Selected == true ? "selected='selected'" : "") + ">" + items[i].text + "</option>");
 
                     /*$(ddlID).change(); Fire the change event to initiate chained items.*/
                     if (callback && typeof (callback) === "function")

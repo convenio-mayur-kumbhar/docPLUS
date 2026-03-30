@@ -264,7 +264,7 @@
 
             <!-- RIGHT SIDE: Close Button -->
             <div>
-                <i class="fa fa-times"
+                <i id="btnClosePatient" class="fa fa-times"
                    style="cursor:pointer;font-size:18px; color: #555555; "
                    onclick="clinical.SetForClose();">
                 </i>
@@ -272,14 +272,14 @@
 
         </div>
         <!-- ================= PATIENT DETAILS ================= -->
-        <div class="kt-portlet__body p-3 mb-2 border">
+        <div id="divPatientDetails" class="kt-portlet__body p-3 mb-2 border">
             <!-- CLOSE -->
             <!-- TOP ROW -->
             <div class="d-flex justify-content-between align-items-center">
 
                 <div class="d-flex align-items-center">
                     <i class="fa fa-user-circle text-primary ml-1 mr-1" style="font-size: 40px;"></i>
-                    <strong style="font-size: 25px;">@ViewBag.Name</strong>
+                    <strong id="lblViewName" style="font-size: 25px;">@ViewBag.Name</strong>
                 </div>
 
                 <div class="d-flex align-items-center">
@@ -289,6 +289,7 @@
                         <label class="mb-2" style="line-height:1;">Date:</label>
                         <div class="input-group input-group-sm" style="width:150px;">
                             <input type="text"
+                                   id="txtViewDate"
                                    class="form-control date-picker"
                                    placeholder="DD-MMM-YYYY" />
                             <div class="input-group-append">
@@ -307,27 +308,29 @@
 
                 <div class="mr-4">
                     <i class="fa fa-id-card" style="font-size: 15px;"></i>
-                    <span style="font-size:14px;">Reg No: @ViewBag.RegNo</span>
+                    <span style="font-size:14px;">Reg No: <span id="lblViewRegNo"></span></span>
                 </div>
 
                 <div class="mr-4">
-                    <i class="fa @(ViewBag.Gender == "Male" ? "fa-mars" : "fa-venus")" style="font-size: 15px;"></i>
-                    <span style="font-size:14px;">@ViewBag.Gender</span>
+                    <i id="iconViewGender" class="fa" style="font-size: 15px;"></i>
+                    <span id="lblViewGender" style="font-size:14px;"></span>
                 </div>
 
                 <div class="mr-4">
                     <i class="fa fa-user" style="font-size: 15px;"></i>
-                    <span style="font-size:14px;">Age: <span id="lblAge"></span></span>
+                    <span style="font-size:14px;">
+                        Age: <span id="lblViewAge"></span>
+                    </span>
                 </div>
 
                 <div class="mr-4">
                     <i class="fa fa-phone" style="font-size: 15px;"></i>
-                    <span style="font-size:14px;"> @ViewBag.Contact</span>
+                    <span id="lblViewContact" style="font-size:14px;"></span>
                 </div>
 
                 <div class="mr-4">
                     <i class="fa fa-envelope" style="font-size: 15px;"></i>
-                    <span style="font-size:14px;">@ViewBag.Email</span>
+                    <span id="lblViewEmail" style="font-size:14px;"></span>
                 </div>
 
             </div>
@@ -536,42 +539,38 @@
                                 <!-- Row 1 -->
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <label>First Name *</label>
-                                        <input type="text" class="form-control" value="@ViewBag.FirstName" />
+                                        <label>First Name</label><asterisk></asterisk>
+                                        <input id="txtAddFirstName" type="text" class="form-control"  />
                                     </div>
 
                                     <div class="col-md-4">
                                         <label>Middle Name</label>
-                                        <input type="text" class="form-control" />
+                                        <input id="txtAddMiddleName" type="text" class="form-control" />
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label>Last Name *</label>
-                                        <input type="text" class="form-control" value="@ViewBag.LastName" />
+                                        <label>Last Name </label><asterisk></asterisk>
+                                        <input type="text" id="txtAddLastName" class="form-control"  />
                                     </div>
                                 </div>
 
                                 <!-- Row 3 -->
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <label>DOB *</label>
-                                        <input type="date" class="form-control" value="@ViewBag.DOB" />
+                                        <label>DOB </label><asterisk></asterisk>
+                                        <input type="text" id="txtAddDOB" class="form-control date-picker" placeholder="@Localizer["Date"]" autocomplete="off" />
                                     </div>
                                     <div class="col-md-4">
                                         <label>Marital Status</label>
-                                        <select class="form-control">
-                                            <option>Single</option>
-                                            <option>Married</option>
-                                            <option>Divorced</option>
+                                        <select id="ddlAddMaritalStatus" class="form-control">
+                                            <option value="">Select</option>
                                         </select>
                                     </div>
 
                                     <div class="col-md-4">
                                         <label>Occupation</label>
-                                        <select class="form-control">
-                                            <option>Student</option>
-                                            <option>Employed</option>
-                                            <option>Unemployed</option>
+                                        <select id="ddlAddOccupation" class="form-control">
+                                            <option value="">Select</option>
                                         </select>
                                     </div>
                                 </div>
@@ -580,17 +579,17 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <label>Tele. No.</label>
-                                        <input type="text" class="form-control" />
+                                        <input type="text"  id="txtAddTelephone" class="form-control" />
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label>Mobile No. *</label>
-                                        <input type="text" class="form-control" value="@ViewBag.Mobile" />
+                                        <label>Mobile No. </label><asterisk></asterisk>
+                                        <input type="text" id="txtAddMobile" class="form-control"  />
                                     </div>
 
                                     <div class="col-md-4">
                                         <label>Email</label>
-                                        <input type="text" class="form-control" value="@ViewBag.Email" />
+                                        <input type="text" id="txtAddEmail" class="form-control" />
                                     </div>
                                 </div>
 
@@ -598,115 +597,65 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <label>Category</label>
-                                        <select class="form-control">
-                                            <option>Adult</option>
-                                            <option>Child</option>
+                                        <select id="ddlAddCategory" class="form-control">
+                                           <option value="">Select</option> 
                                         </select>
                                     </div>
 
                                     <div class="col-md-4">
                                         <label>Status</label>
-                                        <select class="form-control">
-                                            <option>Private</option>
-                                            <option>General</option>
+                                        <select id="ddlAddStatus" class="form-control">
+                                            <option value="">Select</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
-                                        <label>Gender *</label>
+                                        <label>Gender </label><asterisk></asterisk>
                                         <div style="margin-top:6px;">
                                             <label class="radio-inline">
-                                                <input type="radio" name="Gender"> Male
+                                                <input type="radio" name="AddGender" value="M"> Male
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="Gender"> Female
+                                                <input type="radio" name="AddGender" value="F"> Female
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="Gender"> Other
+                                                <input type="radio" name="AddGender" value="O"> Other
                                             </label>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- Row 2 : Address + Referred -->
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label>Address</label>
-                                        <input type="text" class="form-control" />
+                                        <textarea type="text" id="txtAddAddress" class="form-control small-box"></textarea>
                                     </div>
 
-                                    <div class="col-md-6">
+                                    <div class="col-md-4">
                                         <label>Referred By</label>
-                                        <input type="text" class="form-control" />
+                                        <input type="text" id="txtAddReferredBy" class="form-control" />
                                     </div>
-                                </div>
-                                <!-- Row 6 : Remarks Full Width -->
-                                <div class="row">
-                                    <div class="col-md-12">
+                                    <div class="col-md-4">
                                         <label>Remarks</label>
-                                        <textarea class="form-control small-box"></textarea>
+                                        <textarea id="txtAddRemarks" class="form-control small-box"></textarea>
                                     </div>
                                 </div>
+                                @* <!-- Row 6 : Remarks Full Width -->
+                                <div class="row">
+                                    
+                                </div> *@
 
-                                <button class="btn btn-success btn-sm">Save</button>
+                                <button id="btnAddSave" class="btn btn-success btn-sm">Save</button>
 
                             </div>
 
-                            <div id="nextOfKin" class="tab-pane fade">
-
-                                <!-- Form Section -->
-                                @*  <div style="border:1px solid #ddd;padding:12px;background:#f9f9f9;">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label>Name *</label>
-                                        <input type="text" class="form-control" id="kinName">
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label>Relation *</label>
-                                        <input type="text" class="form-control" id="kinRelation">
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <label>Tele. No.</label>
-                                        <input type="text" class="form-control" id="kinTele">
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label>Mobile No. *</label>
-                                        <input type="text" class="form-control" id="kinMobile">
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label>Email</label>
-                                        <input type="text" class="form-control" id="kinEmail">
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label>Address *</label>
-                                        <textarea class="form-control" id="kinAddress"></textarea>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label>Remarks</label>
-                                        <textarea class="form-control" id="kinRemarks"></textarea>
-                                    </div>
-                                </div>
-
-                                <!-- ADD BUTTON -->
-                                <button id="btnAddKin" class="btn btn-success btn-xs">
-                                    <i class="fa fa-plus"></i> Add
-                                </button>
-                            </div> *@
-
-
+                            <div id="nextOfKin" class="tab-pane fade">     
                                 <!-- TABLE SECTION -->
-                                <div style="overflow-x:auto;margin-top:12px;">
-                                    <table id="kinTable" class="table table-bordered table-condensed" style="width:100%;">
-
-                                        <thead style="background:#f9f9f9;">
+                                <div class="kt-portlet__body table-responsive">
+                                    <table id="tblNOK" class="table table-striped table-hover table-checkable" style="width:100%;">
+                                        <template>
+                                            NOK List
+                                        </template>
+                                        <thead>
                                             <tr>
                                                 <th>Name</th>
                                                 <th>Relation</th>
@@ -714,82 +663,36 @@
                                                 <th>Tele. No.</th>
                                                 <th>Mobile No.</th>
                                                 <th>Email</th>
-                                                <th>Remarks</th>
-                                                <th width="80">Edit</th>
+                                                <th>Remarks</th>                                                
                                             </tr>
                                         </thead>
 
-                                        <tbody id="kinTableBody"></tbody>
+                                        <tbody></tbody>
 
                                     </table>
+                                    <script id="Grid_Data_Template_tblNOK" type="text/x-jquery-tmpl">
+                                         <tr data-id="${noK_ID}">
+                                         <td>${noK_NAME}</td>
+                                         <td>${noK_RELATION}</td>
+                                         <td>${noK_ADDR}</td>
+                                         <td>${noK_TELENO}</td>
+                                         <td>${noK_MOBNO}</td>
+                                         <td>${noK_EMAIL}</td>
+                                         <td>${noK_REMARKS}</td>
+                                       
+                                         </tr>
+                                    </script>
                                 </div>
-
                             </div>
                             <!-- ===== Other Professionals ===== -->
                             <div id="otherProfessionals" class="tab-pane fade">
-
-                                <!-- FORM -->
-                                @*   <div style="border:1px solid #ddd;padding:12px;background:#f9f9f9;">
-
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <label>Name *</label>
-                                        <input type="text" class="form-control" id="profName" />
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label>Profession *</label>
-                                        <select class="form-control" id="profType">
-                                            <option>Select</option>
-                                            <option>Doctor</option>
-                                            <option>Psychologist</option>
-                                            <option>Therapist</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <label>Tele. No.</label>
-                                        <input type="text" class="form-control" id="profTele" />
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label>Mobile No. *</label>
-                                        <input type="text" class="form-control" id="profMobile" />
-                                    </div>
-
-                                    <div class="col-md-4">
-                                        <label>Email *</label>
-                                        <input type="email" class="form-control" id="profEmail" />
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <label>Address *</label>
-                                        <textarea class="form-control" id="profAddress"></textarea>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label>Remarks</label>
-                                        <textarea class="form-control" id="profRemarks"></textarea>
-                                    </div>
-                                </div>
-
-                                <!-- BUTTON -->
-                                <button id="btnAddProf" class="btn btn-success btn-xs" style="margin-top:8px;">
-                                    <i class="fa fa-plus"></i> Add
-                                </button>
-
-                            </div> *@
-
-
                                 <!-- TABLE -->
-                                <div style="overflow-x:auto;margin-top:12px;">
-                                    <table id="profTable" class="table table-bordered table-condensed" style="width:100%;">
-
-                                        <thead style="background:#f9f9f9;">
+                                <div class="kt-portlet__body table-responsive">
+                                    <table id="tblOP" class="table table-striped table-hover table-checkable" style="width:100%;">
+                                        <template>
+                                            OP List
+                                        </template>
+                                        <thead >
                                             <tr>
                                                 <th>Name</th>
                                                 <th>Profession</th>
@@ -798,13 +701,24 @@
                                                 <th>Mobile No.</th>
                                                 <th>Email</th>
                                                 <th>Remarks</th>
-                                                <th width="80">Edit</th>
                                             </tr>
                                         </thead>
 
-                                        <tbody id="profTableBody"></tbody>
+                                        <tbody></tbody>
 
                                     </table>
+                                    <script id="Grid_Data_Template_tblOP" type="text/x-jquery-tmpl">
+                                        <tr data-id="${oP_ID}">
+                                        <td>${oP_NAME}</td>
+                                        <td>${professioN_NAME}</td>
+                                        <td>${oP_ADDR}</td>
+                                        <td>${oP_TELENO}</td>
+                                        <td>${oP_MOBNO}</td>
+                                        <td>${oP_EMAIL}</td>
+                                        <td>${oP_REMARKS}</td>
+
+                                        </tr>
+                                    </script>
                                 </div>
 
                             </div>

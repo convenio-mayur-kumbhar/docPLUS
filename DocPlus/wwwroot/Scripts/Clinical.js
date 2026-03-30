@@ -14,7 +14,7 @@ var clinical = {
     ScreenAccessPermission: function () {
 
     },
-    Assessment: function (patinetID) {
+    Assessment: function (patientID) {
 
         LoadAddUpdateView('#divStartAssetment', '/Clinical/_partialStartAssessment', null, function () {
 
@@ -22,8 +22,159 @@ var clinical = {
             $('#divGrid').hide();
             ResetFormErrors("#frm_StartAssessment");
 
-            clinical.showLeftMenu('demographics', '#general')
+            clinical.showLeftMenu('demographics', '#general');
+            Reload_ddl_GlobalWithPost(null, "#ddlAddCategory", "/AjaxCommon/GetCategoryMaster", {}, "Select", function () { $("#ddlAddCategory").select2(); });
+            Reload_ddl_GlobalWithPost(null, "#ddlAddMaritalStatus", "/AjaxCommon/GetMaritalStatusMaster", {}, "Select", function () { $("#ddlAddMaritalStatus").select2(); });
+            Reload_ddl_GlobalWithPost(null, "#ddlAddOccupation", "/AjaxCommon/GetOccupationMaster", {}, "Select", function () { $("#ddlAddOccupation").select2(); });
+            $('.date-picker').datepicker({
+                autoclose: true,
+                todayHighlight: true,
+                format: DateTimeDataFormat.ddMMyyyy
+            });
+
+            Reload_ddl_GlobalWithPost(null, "#ddlAddStatus", "/AjaxCommon/GetStatusMaster", {}, "Select", function () { $("#ddlAddStatus").select2(); });
+            clinical.GetAssetmentData(patientID);
         });
+    },
+    GetAssetmentData: function (PatientID) {
+
+        GetAjaxData("/Clinical/GetAssetmentDataByID",
+            { PatientID: PatientID, __RequestVerificationToken: token },
+            function (data) {
+                if (data && data.status === "Success") {
+
+                    var res = data.data;
+                    // ========================
+                    // 👤 PATIENT DETAILS
+                    // ========================
+                    var p = res.patient;
+                    $("#lblViewName").text(p.firstName + " " + p.middleName + " " + p.lastName);
+                    // Reg No
+                    $("#lblViewRegNo").text(p.regNo);
+                    // Gender
+                    var genderText = "";
+                    switch (p.gender) {
+                        case "M": genderText = "Male";
+                            break;
+                        case "F": genderText = "Female";
+                            break;
+                        case "O": genderText = "Other";
+                            break;
+                    }
+                    $("#lblViewGender").text(genderText);
+
+                    // Gender Icon
+                    $("#iconViewGender")
+                        .removeClass()
+                        .addClass("fa " + (p.gender === "M" ? "fa-mars" : "fa-venus"));
+
+                    // Age (example calculation)
+                    if (p.dob) {
+                        var dob = new Date(p.dob);
+                        var age = new Date().getFullYear() - dob.getFullYear();
+                        $("#lblViewAge").text(age);
+                    }
+
+                    // Contact
+                    $("#lblViewContact").text(p.mobileNo);
+
+                    // Email
+                    $("#lblViewEmail").text(p.emailID);
+
+                    // Date (today or from API)
+                    $("#txtViewDate").val(new Date().toLocaleDateString());
+
+                    if (p) {
+                        $("#txtAddFirstName").val(p.firstName);
+                        $("#txtAddMiddleName").val(p.middleName);
+                        $("#txtAddLastName").val(p.lastName);
+                        $("#txtAddAddress").val(p.address);
+                        $("#txtAddMobile").val(p.mobileNo);
+                        $("#txtAddPhone").val(p.telePhoneNo);
+                        $("#txtAddEmail").val(p.emailID);
+                        // DOB
+                        $("#txtAddDOB").val(p.dobCustom);
+                        // Dropdowns
+                        $("#ddlAddCategory").val(p.categoryID).trigger("change");
+                        $("#ddlAddStatus").val(p.statusID).trigger("change");
+                        $("#ddlAddOccupation").val(p.occupationID).trigger("change");
+                        $("#ddlAddMaritalStatus").val(p.marritialStatusID).trigger("change");
+
+                        // Gender
+                        $("input[name='AddGender'][value='" + p.gender + "']").prop("checked", true);
+                    }
+                    console.log(res.nokDetails);
+                    console.log(res.opDetails);
+                    // ========================
+                    // 👨‍👩‍👧 NOK DETAILS
+                    // ========================
+                    var nokList = res.nokDetails;
+                    if ($.fn.DataTable.isDataTable('#tblNOK')) {
+                        $('#tblNOK').DataTable().destroy();
+                    }
+
+                   
+                    if (nokList && nokList.length > 0) {
+                        $("#Grid_Data_Template_tblNOK").tmpl(nokList).appendTo("#tblNOK tbody");
+                    }
+                    if (!nokList || nokList.length === 0) {
+                        $("#tblNOK tbody").append("<tr><td colspan='7' class='text-center'>No Records Found</td></tr>");
+                    }
+                    $('#tblNOK').DataTable({
+                        paging: true,
+                        searching: true,
+                        ordering: true,
+                        language: {
+                            search: "Search:",
+                            lengthMenu: "Show _MENU_ entries"
+                        }
+                    });
+                    // ========================
+                    // 🏥 OP DETAILS
+                    // ========================
+                    var opList = res.opDetails;
+
+                    if ($.fn.DataTable.isDataTable('#tblOP')) {
+                        $('#tblOP').DataTable().destroy();
+                    }
+                    
+                    if (opList && opList.length > 0) {
+                        $("#Grid_Data_Template_tblOP").tmpl(opList).appendTo("#tblOP tbody");
+                    }
+                    if (!opList || opList.length === 0) {
+                        $("#tblOP tbody").append("<tr><td colspan='7' class='text-center'>No Records Found</td></tr>");
+                    }
+                    $('#tblOP').DataTable({
+                        paging: true,
+                        searching: true,
+                        ordering: true,
+                        language: {
+                            search: "Search:",
+                            lengthMenu: "Show _MENU_ entries"
+                        }
+                    });
+                    // ========================
+                    // 🧠 INITIAL ASSESSMENT
+                    // ========================
+                    var init = res.initialDetails;
+
+                    if (init) {
+                        $("#txtPC").val(init.asS_PC);
+                        $("#txtHPC").val(init.asS_HPC);
+                        $("#txtPPH").val(init.asS_PPH);
+                        $("#txtMH").val(init.asS_MH);
+                        $("#txtFH").val(init.asS_FH);
+                        $("#txtPH").val(init.asS_PH);
+                        $("#txtDAH").val(init.asS_DAH);
+                        $("#txtFRH").val(init.asS_FRH);
+                        $("#txtPMP").val(init.asS_PMP);
+                        $("#txtMSE").val(init.asS_MSE);
+                    }
+
+                } else {
+                    alert("Failed to load data");
+                }
+            });
     },
     SetForClose: function () {
         $('#divStartAssetment').hide();

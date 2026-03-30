@@ -15,6 +15,10 @@ namespace DocPlus.Entities.ClinicalModels
         public int PAT_ID { get; set; }
         public string? NOK_NAME { get; set; }
         public string? NOK_RELATION { get; set; }
+        public string? NOK_TELENO { get; set; }
+        public string? NOK_ADDR { get; set; }
+        public string? NOK_EMAIL { get; set; }
+        public string? NOK_REMARKS { get; set; }
         public string? NOK_MOBNO { get; set; }
     }
     public class OP_CM
@@ -23,6 +27,10 @@ namespace DocPlus.Entities.ClinicalModels
         public string? OP_NAME { get; set; }
         public string? PROFESSION_NAME { get; set; }
         public string? OP_MOBNO { get; set; }
+        public string? OP_ADDR { get; set; }
+        public string? OP_TELENO { get; set; }
+        public string? OP_EMAIL { get; set; }
+        public string? OP_REMARKS { get; set; }
     }
     public class InitialAssessment_CM
     {
