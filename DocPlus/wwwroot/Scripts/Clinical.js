@@ -8,6 +8,7 @@ $(document).ready(function () {
         clinical.ScreenAccessPermission();
     });
 });
+// test changes
 
 var clinical = {
     ScreenAccessPermission: function () {
