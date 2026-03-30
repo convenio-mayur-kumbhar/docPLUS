@@ -32,4 +32,10 @@
 
     }
 
+    public class MasterDropDown : Base_VM
+    {
+        public int Value { get; set; }
+        public string? Text { get; set; }
+    }
+
 }

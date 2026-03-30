@@ -1,4 +1,5 @@
-﻿using DocPlus.Entities.ViewModels;
+﻿using DocPlus.Entities.ClinicalModels;
+using DocPlus.Entities.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
@@ -38,6 +39,43 @@ namespace DocPlus.Controllers
                         var result = JsonConvert.DeserializeObject<JsonResponse>(raw);
 
                         var data = JsonConvert.DeserializeObject<List<Patient_VM>>(result.Data.ToString());
+
+                        return GetDataResponse(data!);
+                    }
+                    else
+                    {
+                        return GetDataResponseException(default!);
+                    }
+                }
+                else
+                {
+                    return GetModelStateIsValidException(ModelState);
+                }
+            }
+            catch (Exception ex)
+            {
+                return GetDataResponseException(ex);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> GetAssetmentDataByID(Patient_VM Model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    GetUserInfo(Model);
+                    HttpResponseMessage response = await CallGetAPIAsync($"ClinicalAPI/GetClinicalDetailsByPatientId/{Model.PatientID}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string raw = await response.Content.ReadAsStringAsync();
+
+                        var result = JsonConvert.DeserializeObject<JsonResponse>(raw);
+
+                        var data = JsonConvert.DeserializeObject<ClinicalDetails_CM>(result.Data.ToString());
 
                         return GetDataResponse(data!);
                     }
