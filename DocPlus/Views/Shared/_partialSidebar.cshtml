@@ -50,7 +50,17 @@
         }
     }
 }
+<style>
+    .kt-menu__item--active > .kt-menu__link .kt-menu__link-text {
+        font-weight: 700 !important;
+        color: #fff !important; /* optional */
+    }
 
+    .kt-menu__item--active > .kt-menu__link .kt-menu__link-text {
+        font-weight: 700 !important;
+        color: #fff !important; /* optional */
+    }
+</style>
 <!-- begin:: Aside -->
 <button class="kt-aside-close " id="kt_aside_close_btn"><i class="la la-close"></i></button>
 <div class="kt-aside  kt-aside--fixed  kt-grid__item kt-grid kt-grid--desktop kt-grid--hor-desktop" id="kt_aside">
@@ -131,12 +141,24 @@
 
                                     case ScreenMenuName.BasicSettings:
                                         {
-                                            <li class="kt-menu__item kt-menu__item--submenu MainMenu">
+                                            var isBasicSettingsActive =
+                                            Html.IsActive(Screen.DoctorMaster, "Index") != "" ||
+                                            Html.IsActive(Screen.User, "Index") != "" ||
+                                            Html.IsActive(Screen.StatusMaster.Replace(" ", ""), "Index") != "" ||
+                                            Html.IsActive(Screen.ProfessionMaster.Replace(" ", ""), "Index") != "" ||
+                                            Html.IsActive(Screen.CategoryMaster.Replace(" ", ""), "Index") != "" ||
+                                            Html.IsActive(Screen.ICD10Master.Replace(" ", ""), "Index") != "" ||
+                                            Html.IsActive(Screen.DSM4Master.Replace(" ", ""), "Index") != "" ||
+                                            Html.IsActive(Screen.OccupationMaster.Replace(" ", ""), "Index") != "";
+
+                                            <li class="kt-menu__item kt-menu__item--submenu MainMenu  @(isBasicSettingsActive ? "kt-menu__item--open kt-menu__item--here" : "")">
+
                                                 <a href="javascript:;" class="kt-menu__link kt-menu__toggle">
                                                     <span class="kt-menu__link-icon">
                                                         <i class="fa fa-cogs"></i>
                                                     </span>
-                                                    <span class="kt-menu__link-text">@ScreenMenuName.BasicSettings</span><i class="kt-menu__ver-arrow la la-angle-right"></i>
+                                                    <span class="kt-menu__link-text">@ScreenMenuName.BasicSettings</span>
+                                                    <i class="kt-menu__ver-arrow la la-angle-right"></i>
                                                 </a>
 
                                                 <div class="kt-menu__submenu">
@@ -153,7 +175,6 @@
                                                                         {
                                                                             <li class="kt-menu__item @Html.IsActive(Screen.DoctorMaster, "Index")">
                                                                                 <input id="hf_DoctorMaster" type="hidden" value="@ChildMenu.EncryptScreenID" />
-
                                                                                 <a href="@Url.Action("Index", "DoctorMaster", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
                                                                                     <span class="kt-menu__link-text">@Screen.DoctorMaster</span>
                                                                                 </a>
@@ -165,7 +186,6 @@
                                                                         {
                                                                             <li class="kt-menu__item @Html.IsActive(Screen.User, "Index")">
                                                                                 <input id="hf_User" type="hidden" value="@ChildMenu.EncryptScreenID" />
-
                                                                                 <a href="@Url.Action("Index", "User", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
                                                                                     <span class="kt-menu__link-text">@Screen.User</span>
                                                                                 </a>
@@ -177,7 +197,6 @@
                                                                         {
                                                                             <li class="kt-menu__item @Html.IsActive(Screen.StatusMaster.Replace(" ", ""), "Index")">
                                                                                 <input id="hf_StatusMaster" type="hidden" value="@ChildMenu.EncryptScreenID" />
-
                                                                                 <a href="@Url.Action("Index", "StatusMaster", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
                                                                                     <span class="kt-menu__link-text">@Screen.StatusMaster</span>
                                                                                 </a>
@@ -189,7 +208,6 @@
                                                                         {
                                                                             <li class="kt-menu__item @Html.IsActive(Screen.ProfessionMaster.Replace(" ", ""), "Index")">
                                                                                 <input id="hf_ProfessionMaster" type="hidden" value="@ChildMenu.EncryptScreenID" />
-
                                                                                 <a href="@Url.Action("Index", "ProfessionMaster", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
                                                                                     <span class="kt-menu__link-text">@Screen.ProfessionMaster</span>
                                                                                 </a>
@@ -201,7 +219,6 @@
                                                                         {
                                                                             <li class="kt-menu__item @Html.IsActive(Screen.CategoryMaster.Replace(" ", ""), "Index")">
                                                                                 <input id="hf_CategoryMaster" type="hidden" value="@ChildMenu.EncryptScreenID" />
-
                                                                                 <a href="@Url.Action("Index", "CategoryMaster", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
                                                                                     <span class="kt-menu__link-text">@Screen.CategoryMaster</span>
                                                                                 </a>
@@ -213,7 +230,6 @@
                                                                         {
                                                                             <li class="kt-menu__item @Html.IsActive(Screen.ICD10Master.Replace(" ", ""), "Index")">
                                                                                 <input id="hf_ICD10Master" type="hidden" value="@ChildMenu.EncryptScreenID" />
-
                                                                                 <a href="@Url.Action("Index", "ICD10Master", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
                                                                                     <span class="kt-menu__link-text">@Screen.ICD10Master</span>
                                                                                 </a>
@@ -225,7 +241,6 @@
                                                                         {
                                                                             <li class="kt-menu__item @Html.IsActive(Screen.DSM4Master.Replace(" ", ""), "Index")">
                                                                                 <input id="hf_DSM4Master" type="hidden" value="@ChildMenu.EncryptScreenID" />
-
                                                                                 <a href="@Url.Action("Index", "DSM4Master", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
                                                                                     <span class="kt-menu__link-text">@Screen.DSM4Master</span>
                                                                                 </a>
@@ -237,20 +252,15 @@
                                                                         {
                                                                             <li class="kt-menu__item @Html.IsActive(Screen.OccupationMaster.Replace(" ", ""), "Index")">
                                                                                 <input id="hf_OccupationMaster" type="hidden" value="@ChildMenu.EncryptScreenID" />
-
                                                                                 <a href="@Url.Action("Index", "OccupationMaster", new { id = ChildMenu.EncryptScreenID })" class="kt-menu__link">
                                                                                     <span class="kt-menu__link-text">@Screen.OccupationMaster</span>
                                                                                 </a>
                                                                             </li>
                                                                             break;
                                                                         }
-
-                                                                    default: break;
                                                                 }
                                                             }
-
                                                         }
-
                                                     </ul>
                                                 </div>
                                             </li>
@@ -258,12 +268,20 @@
                                         }
                                     case ScreenMenuName.AdminSettings:
                                         {
-                                            <li class="kt-menu__item kt-menu__item--submenu MainMenu">
+                                            var isAdminActive =
+                                            Html.IsActive(Screen.Appointments, "Index") != "" ||
+                                            Html.IsActive(Screen.PatientRegistrations.Replace(" ", ""), "Index") != "" ||
+                                            Html.IsActive(Screen.Payments, "Index") != "" ||
+                                            Html.IsActive(Screen.Billing, "Index") != "";
+
+                                            <li class="kt-menu__item kt-menu__item--submenu MainMenu @(isAdminActive ? "kt-menu__item--open kt-menu__item--here" : "")">
+
                                                 <a href="javascript:;" class="kt-menu__link kt-menu__toggle">
                                                     <span class="kt-menu__link-icon">
                                                         <i class="fa fa-cog"></i>
                                                     </span>
-                                                    <span class="kt-menu__link-text">@ScreenMenuName.AdminSettings</span><i class="kt-menu__ver-arrow la la-angle-right"></i>
+                                                    <span class="kt-menu__link-text">@ScreenMenuName.AdminSettings</span>
+                                                    <i class="kt-menu__ver-arrow la la-angle-right"></i>
                                                 </a>
 
                                                 <div class="kt-menu__submenu">
@@ -334,12 +352,19 @@
 
                                     case ScreenMenuName.Reports:
                                         {
-                                            <li class="kt-menu__item kt-menu__item--submenu MainMenu">
+                                            var isReportsActive =
+                                            Html.IsActive(Screen.PatientReports.Replace(" ", ""), "Index") != "" ||
+                                            Html.IsActive(Screen.FinancialReports.Replace(" ", ""), "Index") != "" ||
+                                            Html.IsActive(Screen.AppointmentReports.Replace(" ", ""), "Index") != "";
+
+                                            <li class="kt-menu__item kt-menu__item--submenu MainMenu @(isReportsActive ? "kt-menu__item--open kt-menu__item--here" : "")">
+
                                                 <a href="javascript:;" class="kt-menu__link kt-menu__toggle">
                                                     <span class="kt-menu__link-icon">
                                                         <i class="fas fa-file-excel"></i>
                                                     </span>
-                                                    <span class="kt-menu__link-text">@ScreenMenuName.Reports</span><i class="kt-menu__ver-arrow la la-angle-right"></i>
+                                                    <span class="kt-menu__link-text">@ScreenMenuName.Reports</span>
+                                                    <i class="kt-menu__ver-arrow la la-angle-right"></i>
                                                 </a>
 
                                                 <div class="kt-menu__submenu">
@@ -461,6 +486,23 @@
             ScreenActionInfo(userScreenActionInfo);
             /*Screen search*/
             MenuScreenSearch();
+
+            var currentUrl = window.location.pathname.toLowerCase();
+
+    $(".kt-menu__item a").each(function () {
+        var link = $(this).attr("href");
+
+        if (link && currentUrl.includes(link.toLowerCase())) {
+
+            // Active child
+            $(this).closest(".kt-menu__item").addClass("kt-menu__item--active");
+
+            // Open parent menu
+            $(this).closest(".kt-menu__item--submenu")
+                   .addClass("kt-menu__item--open kt-menu__item--here");
+        }
+    });
+
         });
         var CurrentScreenID = '@ViewBag.screenID'
         var CurrentEncryptScreenID = '@ViewBag.EncryptScreenID'
