@@ -2,6 +2,8 @@
     ViewData["Title"] = "Payment";
 }
 
+<link href="~/assets/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+
 <style>
     body,
     .page-content,
@@ -12,340 +14,285 @@
     select,
     input {
         font-size: 13px !important;
-        font-family: 'Open Sans', 'Segoe UI', Arial, sans-serif !important;
+        font-family: 'Open Sans','Segoe UI',Arial !important;
     }
-
-        .table th {
-            font-weight: 400 !important;
-        }
-
-        .table td {
-            font-size: 13px !important;
-        }
 </style>
 
-<div class="kt-subheader kt-grid__item" id="kt_subheader">
-
+<!-- SUBHEADER -->
+<div class="kt-subheader kt-grid__item">
     <div class="kt-subheader__main">
-
-        <span class="kt-subheader__separator kt-hidden"></span>
-
         <div class="kt-subheader__breadcrumbs">
-
-            <a asp-controller="Admin" asp-action="Payments" class="kt-subheader__breadcrumbs-home">
+            <a asp-controller="Dashboard" asp-action="Index" class="kt-subheader__breadcrumbs-home">
                 <i class="flaticon2-shelter"></i>
             </a>
-
             <span class="kt-subheader__breadcrumbs-separator"></span>
-
-            <a asp-controller="Admin" asp-action="Payments" class="kt-subheader__breadcrumbs-link">
-                Payments
+            <a href="javascript:;" class="kt-subheader__breadcrumbs-link">
+                Admin settings
             </a>
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+            <a asp-controller="Payment" asp-action="Index" class="kt-subheader__breadcrumbs-link">
+                Payment Master
+            </a>
+        </div>
+    </div>
+</div>
 
+<!-- SEARCH -->
+<div class="kt-portlet kt-portlet--mobile p-3 mb-2">
+    <div class="form-group row align-items-end">
+
+        <div class="col-md-3">
+            <label>Patient</label>
+            <input type="text" id="txtPatientSearch" class="form-control" placeholder="Enter Patient Name">
+        </div>
+
+        <div class="col-md-3">
+            <label>Date:</label>
+            <div class="input-daterange input-group">
+                <input type="text" id="txtvalidFrom" class="form-control date-picker" name="startMonth" placeholder="Date" autocomplete="off" />
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <label>Mode</label>
+            <select id="ddlModeSearch" class="form-control">
+                <option value="">All</option>
+                <option>Cash</option>
+                <option>Card</option>
+                <option>Cheque</option>
+                <option>Bank</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <button class="btn btn-primary mr-2" onclick="paymentMaster.Search();">Search</button>
+            <button class="btn btn-danger mr-2" onclick="paymentMaster.Reset();">Reset</button>
         </div>
 
     </div>
-
 </div>
 
+<!-- GRID -->
+<div class="kt-portlet kt-portlet--mobile">
+    <div class="kt-portlet__head kt-portlet__head--lg">
+        <div class="kt-portlet__head-label">
+            <h3 class="kt-portlet__head-title">Payment List</h3>
+        </div>
+        <div class="kt-portlet__head-toolbar">
+            <a href="javascript:;" class="btn btn-brand btn-elevate btn-icon-sm" onclick="paymentMaster.OpenAdd();">
+                <i class="fas fa-plus-circle"></i> Add Payment
+            </a>
+        </div>
+    </div>
 
-<div id="divGrid">
+    <div class="kt-portlet__body table-responsive">
+        <table class="table table-striped table-hover table-checkable" id="tblPayment">
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Date</th>
+                    <th>Total</th>
+                    <th>Paid</th>
+                    <th>Balance</th>
+                    <th>Mode</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
 
-    <form id="frmPaymentSearch">
+<!-- MODAL -->
+<div class="modal fade" id="PaymentModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content payment-modal">
 
-        <div class="kt-portlet kt-portlet--mobile p-2 mb-1">
-
-            <div class="form-group row">
-
-                <div class="col-xs-12 col-md-12 col-lg-12" style="display:inline-flex;">
-
-
-                    <div class="col-md-3">
-                        <label>Patient</label>
-
-                        <select class="form-control" id="ddlPatient">
-
-                            <option value="">Select Patient</option>
-                            <option>Abeer Bagul</option>
-                            <option>Rohan Patil</option>
-                            <option>Sneha Kulkarni</option>
-
-                        </select>
-                    </div>
-
-
-                    <div class="col-md-3">
-                        <label>Appointment Date</label>
-
-                        <input type="text"
-                               id="txtApptDate"
-                               class="form-control date-picker"
-                               placeholder="Select Date">
-
-                    </div>
-
-
-                    <div class="col-md-3">
-                        <label>Mode</label>
-
-                        <select class="form-control" id="ddlMode">
-
-                            <option value="">All</option>
-                            <option>Cash</option>
-                            <option>Card</option>
-                            <option>Cheque</option>
-                            <option>Bank</option>
-
-                        </select>
-
-                    </div>
-
-
-                    <div class="col-md-3" style="padding-top:23px">
-
-                        <input type="button"
-                               class="btn btn-primary"
-                               value="Search"
-                               onclick="Payment.Search()" />
-
-                        <button type="button"
-                                class="btn btn-danger"
-                                onclick="Payment.Reset()">
-                            Reset
-                        </button>
-
-                    </div>
-
-
-                </div>
-
+            <!-- Header -->
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Details</h5>
+                <button type="button" class="close" data-dismiss="modal"></button>
             </div>
 
-        </div>
+            <!-- Body -->
+            <div class="modal-body">
+                <form id="frmPayment">
 
+                    <div class="row">
 
+                        <div class="col-md-4 form-group">
+                            <label>Patient</label>
+                            <input type="text" id="txtPatient" class="form-control" placeholder="Patient Name">
+                        </div>
 
-        <div class="kt-portlet kt-portlet--mobile">
+                        <div class="col-md-4 form-group">
+                            <label>Total Amount</label>
+                            <input type="text" id="txtTotal" class="form-control" placeholder="Total Amount">
+                        </div>
 
-            <div class="kt-portlet__head kt-portlet__head--lg">
-
-                <div class="kt-portlet__head-label"></div>
-
-                <div class="kt-portlet__head-toolbar">
-
-                    <div class="kt-portlet__head-wrapper">
-
-                        <div class="kt-portlet__head-actions">
-
-                            <span>
-
-                                <a href="javascript:;"
-                                   class="btn btn-brand btn-elevate btn-icon-sm"
-                                   onclick="Payment.OpenPanel()">
-
-                                    <i class="fas fa-plus-circle"></i>
-                                    Add Payment
-
-                                </a>
-
-                            </span>
-
+                        <div class="col-md-4 form-group">
+                            <label>Paid Amount</label>
+                            <input type="text" id="txtPaid" class="form-control" placeholder="Paid Amount">
                         </div>
 
                     </div>
 
-                </div>
+                    <div class="row">
 
+                        <div class="col-md-4 form-group">
+                            <label>Balance</label>
+                            <input type="text" id="txtBalance" class="form-control" placeholder="Balance Amount">
+                        </div>
+
+                        <div class="col-md-4 form-group">
+                            <label>Date</label>
+                            <input type="text" id="txtvalidFrom" class="form-control date-picker" placeholder="Select Date" autocomplete="off">
+                        </div>
+
+                        <div class="col-md-4 form-group">
+                            <label>Payment Mode</label>
+                            <select id="ddlMode" class="form-control">
+                                <option value="">Select Mode</option>
+                                <option>Cash</option>
+                                <option>Card</option>
+                                <option>Cheque</option>
+                                <option>Bank Transfer</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                </form>
             </div>
 
-
-
-            <div class="kt-portlet__body table-responsive">
-
-                <table class="table table-striped table-hover table-checkable">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>Patient</th>
-                            <th>Appt Date</th>
-                            <th>Appt Time</th>
-                            <th>Total Amt</th>
-                            <th>Paid Amt</th>
-                            <th>Paid Date</th>
-                            <th>Mode</th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody id="paymentTableBody">
-
-                        <tr>
-
-                            <td>Abeer Bagul</td>
-                            <td>10-Feb-2026</td>
-                            <td>11:00 AM</td>
-                            <td>2000</td>
-                            <td>1500</td>
-                            <td>10-Feb-2026</td>
-                            <td>Cash</td>
-
-                        </tr>
-
-                        <tr>
-
-                            <td>Rohan Patil</td>
-                            <td>12-Feb-2026</td>
-                            <td>02:00 PM</td>
-                            <td>3000</td>
-                            <td>3000</td>
-                            <td>12-Feb-2026</td>
-                            <td>Card</td>
-
-                        </tr>
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-
-        <!-- PAYMENT FORM PANEL -->
-
-        <div class="kt-portlet kt-portlet--mobile" id="paymentPanel" style="display:none;">
-
-            <div class="kt-portlet__head">
-
-                <h5 style="padding:10px">Payment Details</h5>
-
-            </div>
-
-            <div class="kt-portlet__body">
-
-                <div class="row">
-
-                    <div class="col-md-3">
-
-                        <label>Total Amt</label>
-                        <input type="text" id="txtTotalAmt" class="form-control">
-
-                    </div>
-
-
-                    <div class="col-md-3">
-
-                        <label>Paid Amt</label>
-                        <input type="text" id="txtPaidAmt" class="form-control">
-
-                    </div>
-
-
-                    <div class="col-md-3">
-
-                        <label>Balance Amt</label>
-                        <input type="text" id="txtBalAmt" class="form-control">
-
-                    </div>
-
-
-                    <div class="col-md-3">
-
-                        <label>Paid Date</label>
-
-                        <input type="text"
-                               id="txtPaidDate"
-                               class="form-control date-picker">
-
-                    </div>
-
-                </div>
-
-
-                <br>
-
-                <label>Mode</label>
-
-                <br>
-
-                <label class="radio-inline">
-                    <input type="radio" name="mode" value="Cash"> Cash
-                </label>
-
-                <label class="radio-inline">
-                    <input type="radio" name="mode" value="Card"> Card
-                </label>
-
-                <label class="radio-inline">
-                    <input type="radio" name="mode" value="Cheque"> Cheque
-                </label>
-
-                <label class="radio-inline">
-                    <input type="radio" name="mode" value="Bank"> Bank
-                </label>
-
-
-                <br><br>
-
-                <button class="btn btn-primary" onclick="Payment.Save()">
-                    Save Payment
+            <!-- Footer -->
+            <div class="modal-footer">
+                <button class="btn btn-success" onclick="paymentMaster.Save();">
+                    Save
                 </button>
 
-                <button class="btn btn-danger" onclick="Payment.ClosePanel()">
+                <button class="btn btn-warning" onclick="paymentMaster.ResetForm();">
+                    Reset
+                </button>
+
+                <button class="btn btn-secondary" data-dismiss="modal">
                     Close
                 </button>
-
             </div>
 
         </div>
-
-    </form>
-
+    </div>
 </div>
 
+@section Scripts {
+    <script src="~/assets/js/jquery.dataTables.min.js"></script>
+    <script src="~/assets/js/dataTables.bootstrap.min.js"></script>
 
+    <script>
+        var paymentMaster = {
+            data: [],
+            table: null,
 
-<script>
+            Init: function () {
+                this.table = $("#tblPayment").DataTable({
+                    pageLength: 10
+                });
+            },
 
-    var Payment = {
+            OpenAdd: function () {
+                $("#PaymentModal").modal("show");
+            },
 
-    Search:function(){
+            Save: function () {
+                var p = {
+                    patient: $("#txtPatient").val(),
+                    total: $("#txtTotal").val(),
+                    paid: $("#txtPaid").val(),
+                    balance: $("#txtBalance").val(),
+                    date: $("#txtDate").val(),
+                    mode: $("#ddlMode").val()
+                };
 
-    alert("Search Payment");
+                if (!p.patient) {
+                    alert("Enter patient name");
+                    return;
+                }
 
-    },
+                this.data.push(p);
+                this.Load();
+                this.ResetForm();
+                $("#PaymentModal").modal("hide");
+            },
 
-    Reset:function(){
+            Load: function () {
+                this.table.clear();
+                this.data.forEach(function (x, i) {
+                    paymentMaster.table.row.add([
+                        x.patient,
+                        x.date,
+                        x.total,
+                        x.paid,
+                        x.balance,
+                        x.mode,
+                        "<i class='fa fa-edit' onclick='paymentMaster.Edit(" + i + ")'></i>",
+                        "<i class='fa fa-trash text-danger' onclick='paymentMaster.Delete(" + i + ")'></i>"
+                    ]);
+                });
+                this.table.draw();
+            },
 
-    $("#ddlPatient").val("");
-    $("#txtApptDate").val("");
-    $("#ddlMode").val("");
+            Edit: function (i) {
+                var x = this.data[i];
+                $("#txtPatient").val(x.patient);
+                $("#txtTotal").val(x.total);
+                $("#txtPaid").val(x.paid);
+                $("#txtBalance").val(x.balance);
+                $("#txtDate").val(x.date);
+                $("#ddlMode").val(x.mode);
 
-    },
+                this.data.splice(i, 1);
+                this.OpenAdd();
+            },
 
-    OpenPanel:function(){
+            Delete: function (i) {
+                if (confirm("Delete payment?")) {
+                    this.data.splice(i, 1);
+                    this.Load();
+                }
+            },
 
-    $("#paymentPanel").slideDown();
+            Search: function () {
+                this.table.column(0).search($("#txtPatientSearch").val());
+                this.table.column(1).search($("#txtDateSearch").val());
+                this.table.column(5).search($("#ddlModeSearch").val());
+                this.table.draw();
+            },
 
-    },
+            Reset: function () {
+                $("#txtPatientSearch").val("");
+                $("#txtDateSearch").val("");
+                $("#ddlModeSearch").val("");
+                this.table.search("").columns().search("").draw();
+            },
 
-    ClosePanel:function(){
+            ResetForm: function () {
+                $("#frmPayment")[0].reset();
+            }
+        };
 
-    $("#paymentPanel").slideUp();
+        $(document).ready(function () {
+            paymentMaster.Init();
+        });
+            //// DATE PICKER
+        if ($(".date-picker").length > 0) {
+            $('.date-picker').datepicker({
+                autoclose: true,
+                todayHighlight: true,
+                format: DateTimeDataFormat.ddMyyyy
+            });
 
-    },
-
-    Save:function(){
-
-    alert("Payment Saved");
-
-    }
-
-    }
-
-</script>
+            $(".date-picker").datepicker("setDate", new Date());
+        }
+    </script>
+}
