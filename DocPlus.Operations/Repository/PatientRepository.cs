@@ -18,21 +18,21 @@ namespace DocPlus.Operations.Repository
                 using (var connection = new SqlConnection(ConnectionString))
                 {
                     var par = new DynamicParameters();
-                    par.Add("@PAT_FNAME", model.FirstName);
-                    par.Add("@PAT_MNAME", model.MiddleName);
-                    par.Add("@PAT_LNAME", model.LastName);
-                    par.Add("@PAT_ADDR", model.Address);
-                    par.Add("@PAT_DOB", model.DOB);
-                    par.Add("@PAT_GENDER", model.Gender);
-                    par.Add("@PAT_TELENO", model.TelePhoneNo);
-                    par.Add("@PAT_MOBNO", model.MobileNo);
-                    par.Add("@PAT_EMAIL", model.EmailID);
-                    par.Add("@CATEGORY_ID", model.CategoryID);
-                    par.Add("@STATUS_ID", model.StatusID);
-                    par.Add("@OCCUPATION_ID", model.OccupationID);
-                    par.Add("@MSTAT_ID", model.MarritialStatusID);
-                    par.Add("@PAT_REMARKS", model.Remarks);
-                    par.Add("@LAST_UPDATED_BY", model.LastUpdatedBy);
+                    par.Add("@p_PAT_FNAME", model.FirstName);
+                    par.Add("@p_PAT_MNAME", model.MiddleName);
+                    par.Add("@p_PAT_LNAME", model.LastName);
+                    par.Add("@p_PAT_ADDR", model.Address);
+                    par.Add("@p_PAT_DOB", model.DOB);
+                    par.Add("@p_PAT_GENDER", model.Gender);
+                    par.Add("@p_PAT_TELENO", model.TelePhoneNo);
+                    par.Add("@p_PAT_MOBNO", model.MobileNo);
+                    par.Add("@p_PAT_EMAIL", model.EmailID);
+                    par.Add("@p_CATEGORY_ID", model.CategoryID);
+                    par.Add("@p_STATUS_ID", model.StatusID);
+                    par.Add("@p_OCCUPATION_ID", model.OccupationID);
+                    par.Add("@p_MSTAT_ID", model.MarritialStatusID);
+                    par.Add("@p_PAT_REMARKS", model.Remarks);
+                    par.Add("@p_LAST_UPDATED_BY", model.LastUpdatedBy);
                     var result = await connection.QueryFirstOrDefaultAsync<dynamic>("PatientAdd", par, commandType: CommandType.StoredProcedure);
                     if (result != null)
                     {
@@ -59,23 +59,22 @@ namespace DocPlus.Operations.Repository
                 using (var connection = new SqlConnection(ConnectionString))
                 {
                     var par = new DynamicParameters();
-
-                    par.Add("@PAT_ID", model.PatientID);
-                    par.Add("@PAT_FNAME", model.FirstName);
-                    par.Add("@PAT_MNAME", model.MiddleName);
-                    par.Add("@PAT_LNAME", model.LastName);
-                    par.Add("@PAT_ADDR", model.Address);
-                    par.Add("@PAT_DOB", model.DOB);
-                    par.Add("@PAT_GENDER", model.Gender);
-                    par.Add("@PAT_TELENO", model.TelePhoneNo);
-                    par.Add("@PAT_MOBNO", model.MobileNo);
-                    par.Add("@PAT_EMAIL", model.EmailID);
-                    par.Add("@CATEGORY_ID", model.CategoryID);
-                    par.Add("@STATUS_ID", model.StatusID);
-                    par.Add("@OCCUPATION_ID", model.OccupationID);
-                    par.Add("@MSTAT_ID", model.MarritialStatusID);
-                    par.Add("@PAT_REMARKS", model.Remarks);
-                    par.Add("@LAST_UPDATED_BY", model.LastUpdatedBy);
+                    par.Add("@p_PAT_ID", model.PatientID);
+                    par.Add("@p_PAT_FNAME", model.FirstName);
+                    par.Add("@p_PAT_MNAME", model.MiddleName);
+                    par.Add("@p_PAT_LNAME", model.LastName);
+                    par.Add("@p_PAT_ADDR", model.Address);
+                    par.Add("@p_PAT_DOB", model.DOB);
+                    par.Add("@p_PAT_GENDER", model.Gender);
+                    par.Add("@p_PAT_TELENO", model.TelePhoneNo);
+                    par.Add("@p_PAT_MOBNO", model.MobileNo);
+                    par.Add("@p_PAT_EMAIL", model.EmailID);
+                    par.Add("@p_CATEGORY_ID", model.CategoryID);
+                    par.Add("@p_STATUS_ID", model.StatusID);
+                    par.Add("@p_OCCUPATION_ID", model.OccupationID);
+                    par.Add("@p_MSTAT_ID", model.MarritialStatusID);
+                    par.Add("@p_PAT_REMARKS", model.Remarks);
+                    par.Add("@p_LAST_UPDATED_BY", model.LastUpdatedBy);
 
                     var result = await connection.QueryFirstOrDefaultAsync<dynamic>(
                         "PatientUpdate",
@@ -131,7 +130,7 @@ namespace DocPlus.Operations.Repository
                 using (var connection = new SqlConnection(ConnectionString))
                 {
                     var par = new DynamicParameters();
-                    par.Add("@PAT_ID", patientId);
+                    par.Add("@p_PAT_ID", patientId);
                     var patient = await connection.QueryFirstOrDefaultAsync<Patient_VM>("PatientDataGetByID", par, commandType: CommandType.StoredProcedure);
                     if (patient != null)
                     {
