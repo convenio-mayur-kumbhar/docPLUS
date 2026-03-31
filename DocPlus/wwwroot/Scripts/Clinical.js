@@ -25,14 +25,14 @@ var clinical = {
             clinical.showLeftMenu('demographics', '#general');
             Reload_ddl_GlobalWithPost(null, "#ddlAddCategory", "/AjaxCommon/GetCategoryMaster", {}, "Select", function () { $("#ddlAddCategory").select2(); });
             Reload_ddl_GlobalWithPost(null, "#ddlAddMaritalStatus", "/AjaxCommon/GetMaritalStatusMaster", {}, "Select", function () { $("#ddlAddMaritalStatus").select2(); });
-            Reload_ddl_GlobalWithPost(null, "#ddlAddOccupation", "/AjaxCommon/GetOccupationMaster", {}, "Select", function () { $("#ddlAddOccupation").select2(); });
+            Reload_ddl_GlobalWithPost(null, "#ddlAddOccupation", "/AjaxCommon/GetOccupationMaster", {}, "Select", function () { $("#ddlAddOccupation").select2(); });          
+
+            Reload_ddl_GlobalWithPost(null, "#ddlAddStatus", "/AjaxCommon/GetStatusMaster", {}, "Select", function () { $("#ddlAddStatus").select2(); });
             $('.date-picker').datepicker({
                 autoclose: true,
                 todayHighlight: true,
                 format: DateTimeDataFormat.ddMMyyyy
             });
-
-            Reload_ddl_GlobalWithPost(null, "#ddlAddStatus", "/AjaxCommon/GetStatusMaster", {}, "Select", function () { $("#ddlAddStatus").select2(); });
             clinical.GetAssetmentData(patientID);
         });
     },
