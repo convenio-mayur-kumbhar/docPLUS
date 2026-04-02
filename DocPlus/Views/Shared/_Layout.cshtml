@@ -50,6 +50,73 @@
         div.loadercontainer.modal-backdrop {
             background-color: transparent;
         }
+
+        /* Custom Loder create eith ecg + StatusScope */
+        .med-loader {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 99999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* 🔥 MAGIC */
+            backdrop-filter: blur(6px);
+            background: rgba(255, 255, 255, 0.4);
+        }
+        /* Container */
+        .med-container {
+            text-align: center;
+        }
+
+        /* ECG LINE */
+        .ecg {
+            width: 220px;
+            height: 80px;
+            stroke: #36a3f7;
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 400;
+            stroke-dashoffset: 400;
+            animation: ecgAnim 2s linear infinite;
+        }
+
+        @@keyframes ecgAnim {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+
+        /* Stethoscope pulse */
+        .stetho {
+            font-size: 42px;
+            margin-top: 10px;
+            animation: pulse 1.2s infinite;
+        }
+
+        @@keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.25);
+            }
+        }
+
+        /* Text */
+        .med-text h4 {
+            color: #5d78ff;
+            margin-top: 10px;
+        }
+
+        .med-text p {
+            margin: 3px;
+            color: #555;
+            font-size: 14px;
+        }
     </style>
 
     <!-- ================= FONTS ================= -->
@@ -126,7 +193,7 @@
     <!-- Plugins -->
     <script src="~/Scripts.min/jquery.tmpl.min.js" asp-append-version="true"></script>
 
-   @*  <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+    @*  <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script> *@
     <script src="~/assets/js/demo1/scripts.bundle.js" asp-append-version="true" type="text/javascript"></script>
@@ -139,7 +206,7 @@
         <script src="~/assets/js/demo1/pages/crud/datatables/data-sources/ajax-client-side.js" asp-append-version="true" type="text/javascript"></script>*@
     <!--end::Global Theme Bundle -->
     <!--begin::Page Vendors(used by this page) -->
-   
+
     <script src="//maps.google.com/maps/api/js?key=AIzaSyBTGnKT7dt597vo9QgeQ7BFhvSRP4eiMSM" type="text/javascript"></script>
     <script src="~/assets/vendors/custom/gmaps/gmaps.min.js" asp-append-version="true" type="text/javascript"></script>
     <!--end::Page Vendors -->
@@ -369,7 +436,27 @@
             </div>
         </div>
     </div>
+    <!-- MEDICAL LOADER -->
+    <div id="medicalLoader" class="med-loader" style="display:none;">
+        <div class="med-container">
 
+            <!-- ECG LINE -->
+            <svg class="ecg" viewBox="0 0 200 60">
+                <polyline points="0,30 20,30 30,10 40,50 50,30 70,30 80,20 90,40 100,30 200,30" />
+            </svg>
+
+            <!-- Stethoscope -->
+            <div class="stetho">🩺</div>
+
+            <!-- Timeline Text -->
+            <div class="med-text">
+                <h4 id="medTitle">Today</h4>
+                <p id="medTime"></p>
+                <p id="medMessage">Initializing...</p>
+            </div>
+
+        </div>
+    </div>
     <!-- begin::Global Config(global config for global JS sciprts) -->
     <script>
 
@@ -426,6 +513,8 @@
             else
                LogOff();
         }
+
+
 
          if ('@IsCustomerUser' == "True")
             $("#CustomerDetail").hide();

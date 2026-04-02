@@ -1,6 +1,11 @@
-﻿@{
-    ViewData["Title"] = "Dashboard";
+﻿@using System.Reflection
+@inject IStringLocalizerFactory LocalizerFactory
+
+@{
+    var Localizer = LocalizerFactory.Create("SharedResource", Assembly.GetExecutingAssembly().GetName().Name);
+    ViewData["Title"] = @Localizer["Dashboard"];
 }
+
 <style>
     .kt-widget17 .kt-widget17__stats {
         margin: 0;

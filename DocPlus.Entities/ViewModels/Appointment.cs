@@ -6,6 +6,8 @@
         public int? PAT_ID { get; set; }
         public DateTime? APPT_DATE { get; set; }
         public string? PAT_FULLNAME { get; set; }
+        public string? PAT_TELENO { get; set; }
+        public string? PAT_MOBNO { get; set; }
         public string? APPT_TIME { get; set; }
         public string? APPT_COMMENTS { get; set; }
         public bool? AFLAG { get; set; }

@@ -2,14 +2,20 @@
 {
     public partial class Patient_VM : Base_VM
     {
-        public int PatientID { get; set; }
+        public int? PatientID { get; set; }
+        public int? AppointmentID { get; set; }
+        public DateTime? AppointmentDate { get; set; }
+        public string AppointmentDateCustom { get { return AppointmentDate == null ? string.Empty : DateFormat(AppointmentDate); } }
+        public TimeSpan? AppointmentTime { get; set; }
+        public string AppointmentTimeCustom { get { return AppointmentTime == null ? string.Empty : TimeFormat(AppointmentTime); } }        
+        public string? AppointmentComments { get; set; }
         public string? RegNo { get; set; }
         public string? FullName { get; set; }
         public string? FirstName { get; set; }
         public string? MiddleName { get; set; }
         public string? LastName { get; set; }
         public string? Address { get; set; }
-        public DateTime? DOB { get; set; }
+        public DateTime? DOB { get; set; }       
         public string DOBCustom { get { return DOB == null ? string.Empty : DateFormat(DOB); } }
         public string? Gender { get; set; }
         public string? TelePhoneNo { get; set; }

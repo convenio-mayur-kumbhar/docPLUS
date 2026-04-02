@@ -76,6 +76,8 @@ namespace DocPlus.Operations.Repository
                         result.OPDetails = (await multi.ReadAsync<OP_CM>()).ToList();
                         // 4️⃣ Initial Assessment
                         result.InitialDetails = await multi.ReadFirstOrDefaultAsync<InitialAssessment_CM>();
+                        result.AssessmentDetails = (await multi.ReadAsync<PatientAssessmentDetails>()).ToList();
+                        result.PHMDetails = (await multi.ReadAsync<PatientAssessmentPHM_CM>()).ToList();
                         return new JsonResponse { Status = "1", Message = "Success", Data = result };
                     }
                 }
@@ -192,7 +194,6 @@ namespace DocPlus.Operations.Repository
                         cmd.Parameters.AddWithValue("@ASS_FIELD", model.ASS_FIELD);
                         cmd.Parameters.AddWithValue("@ASS_VALUE", model.ASS_VALUE);
                         cmd.Parameters.AddWithValue("@LAST_UPDATED_BY", model.LAST_UPDATED_BY);
-
                         await con.OpenAsync();
                         await cmd.ExecuteNonQueryAsync();
                     }
@@ -888,6 +889,35 @@ namespace DocPlus.Operations.Repository
                 };
             }
         }
+        public async Task<JsonResponse> SaveAssessmentPHMBulk(List<PatientAssessmentPHM_CM> list)
+        {
+            try
+            {
+                using (SqlConnection con = new SqlConnection(ConnectionString))
+                using (SqlCommand cmd = new SqlCommand("AddPatientAssessmentPHMDetail", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    DataTable dt = ConvertToDatatable(list);
+
+                    SqlParameter param = cmd.Parameters.AddWithValue("@PHMData", dt);
+                    param.SqlDbType = SqlDbType.Structured;
+                    param.TypeName = "PatientAssessmentPHM_TableType";
+
+                    await con.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
+                }
+
+                return new JsonResponse { Status = "1", Message = "Bulk Saved Successfully" };
+            }
+            catch (Exception ex)
+            {
+                logger.Error("Bulk Save Error:", ex);
+                return new JsonResponse { Status = "0", Message = "Error occurred" };
+            }
+        }
+
+
     }
     public interface IClinicalRepository
     {
@@ -912,5 +942,8 @@ namespace DocPlus.Operations.Repository
         public Task<JsonResponse> SaveMedicalCertificate(PatientMedicalCertificate_CM model);
         public Task<JsonResponse> GetMedicalCertificateDates(int patId);
         public Task<JsonResponse> GetMedicalCertificateByDate(int patId, DateTime mcDate);
+        public Task<JsonResponse> SaveAssessmentPHMBulk(List<PatientAssessmentPHM_CM> list);
     }
+
+
 }

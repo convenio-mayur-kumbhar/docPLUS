@@ -94,7 +94,7 @@
                     <div class="col-xs-12 col-md-3 col-lg-3">
                         <label>@Localizer["Date"]:</label>
                         <div class="input-daterange input-group">
-                            <input type="text" id="txtDate" class="form-control date-picker" name="startMonth" placeholder="@Localizer["Date"]" autocomplete="off" />
+                            <input type="date" class="form-control" id="txtDate" placeholder="@Localizer["Date"]" autocomplete="off" />
                         </div>
                     </div>
 
@@ -141,16 +141,10 @@
                         <tr>
                             <th>@Localizer["Registration_No"]</th>
                             <th>@Localizer["Full_Name"]</th>
-                            @*  <th>@Localizer["Address"]</th> *@
-                            <th>@Localizer["DOB"]</th>
-                            <th>@Localizer["Gender"]</th>
                             <th>@Localizer["MobileNo"]</th>
-                            @*  <th>@Localizer["TelePhoneNo"]</th> *@
-                            @* <th>@Localizer["Email"]</th> *@
-                            <th>@Localizer["Category"]</th>
-                            <th>@Localizer["Status"]</th>
-                            <th>@Localizer["Occupation"]</th>
-                            @*  <th>@Localizer["Remarks"]</th> *@
+                            <th>@Localizer["AppointmentDate"]</th>
+                            <th>@Localizer["AppointmentTime"]</th>
+                            <th>@Localizer["AppointmentComments"]</th>
                             <th>@Localizer["Active"]</th>
                             <th>@Localizer["Assessment"]</th>
                         </tr>
@@ -166,24 +160,18 @@
 <div id="divStartAssetment"></div>
 <script src="~/Scripts/Clinical.js" asp-append-version="true"></script>
 <script id="Grid_Data_Template_tblPatientList" type="text/x-jquery-tmpl">
-     <tr data-id="${patientID}">
+     <tr data-id="${patientID}" data-appointment-id="${appointmentID}" >
      <td>${regNo}</td>
      <td>${fullName}</td>
-    @*  <td title="${address}"> {{if address && address.length > 25}} ${address.substring(0,25)}... {{else}} ${address} {{/if}}</td> *@
-     <td>${dobCustom}</td>
-     <td>${gender}</td>
      <td>${mobileNo}</td>
-    @*  <td>${telePhoneNo}</td> *@
-    @* <td>${emailID}</td> *@
-     <td>${categoryName}</td>
-     <td>${statusName}</td>
-     <td>${occupationName}</td>
-    @*  <td title="${remarks}">{{if remarks && remarks.length > 25}} ${remarks.substring(0,25)}... {{else}} ${remarks} {{/if}}</td> *@
+     <td>${appointmentDateCustom}</td>
+     <td>${appointmentTimeCustom}</td>
+     <td title="${appointmentComments}">{{if appointmentComments && appointmentComments.length > 25}} ${appointmentComments.substring(0,25)}... {{else}} ${appointmentComments} {{/if}}</td>
      <td> {{if aFlagName == "Active"}} <span class="badge badge-success">Active</span> {{else}} <span class="badge badge-danger">Inactive</span> {{/if}}
      </td>
       <!-- ✅ ACTION COLUMN -->
       <td class="text-center">
-           <a href="javascript:void(0);" title="Start Assessment" onclick="event.stopPropagation(); clinical.Assessment('${patientID}')">
+           <a href="javascript:void(0);" title="Start Assessment" onclick="event.stopPropagation(); clinical.Assessment('${patientID}','${appointmentID}')">
                <i class="fa fa-clipboard text-primary  mr-2" style="font-size: 20px;"></i>
           </a>
       </td>
@@ -238,7 +226,7 @@
         $(this).addClass("active");
     });
 
-    
+
 
     // ===============================
     // 🔹 YOUR EXISTING CODE (UNCHANGED)

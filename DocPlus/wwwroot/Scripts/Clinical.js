@@ -1,23 +1,21 @@
 ﻿var xhr_GetData;
 var form = $('#__AjaxAntiForgeryForm');
 var token = $('input[name="__RequestVerificationToken"]', form).val();
-
 $(document).ready(function () {
     clinical.BindGrid();
     $('#tblPatientList').on('draw.dt', function () {
         clinical.ScreenAccessPermission();
     });
 });
-// test changes
-
 var clinical = {
     ScreenAccessPermission: function () {
 
     },
-    Assessment: function (patientID) {
+    Assessment: function (patientID, appointmentID) {
 
         LoadAddUpdateView('#divStartAssetment', '/Clinical/_partialStartAssessment', null, function () {
-
+            $("#hf_PatientID").val(patientID);
+            $("#hf_AppointmentID").val(appointmentID);
             $('#divStartAssetment').show();
             $('#divGrid').hide();
             ResetFormErrors("#frm_StartAssessment");
@@ -25,7 +23,7 @@ var clinical = {
             clinical.showLeftMenu('demographics', '#general');
             Reload_ddl_GlobalWithPost(null, "#ddlAddCategory", "/AjaxCommon/GetCategoryMaster", {}, "Select", function () { $("#ddlAddCategory").select2(); });
             Reload_ddl_GlobalWithPost(null, "#ddlAddMaritalStatus", "/AjaxCommon/GetMaritalStatusMaster", {}, "Select", function () { $("#ddlAddMaritalStatus").select2(); });
-            Reload_ddl_GlobalWithPost(null, "#ddlAddOccupation", "/AjaxCommon/GetOccupationMaster", {}, "Select", function () { $("#ddlAddOccupation").select2(); });          
+            Reload_ddl_GlobalWithPost(null, "#ddlAddOccupation", "/AjaxCommon/GetOccupationMaster", {}, "Select", function () { $("#ddlAddOccupation").select2(); });
 
             Reload_ddl_GlobalWithPost(null, "#ddlAddStatus", "/AjaxCommon/GetStatusMaster", {}, "Select", function () { $("#ddlAddStatus").select2(); });
             $('.date-picker').datepicker({
@@ -37,23 +35,19 @@ var clinical = {
         });
     },
     GetAssetmentData: function (PatientID) {
-
         GetAjaxData("/Clinical/GetAssetmentDataByID",
             { PatientID: PatientID, __RequestVerificationToken: token },
             function (data) {
                 if (data && data.status === "Success") {
-
                     var res = data.data;
                     // ========================
                     // 👤 PATIENT DETAILS
                     // ========================
-                    var p = res.patient;
-                    $("#lblViewName").text(p.firstName + " " + p.middleName + " " + p.lastName);
-                    // Reg No
-                    $("#lblViewRegNo").text(p.regNo);
-                    // Gender
+                    var patient = res.patient;
+                    $("#lblViewName").text(patient.firstName + " " + patient.middleName + " " + patient.lastName);
+                    $("#lblViewRegNo").text(patient.regNo);
                     var genderText = "";
-                    switch (p.gender) {
+                    switch (patient.gender) {
                         case "M": genderText = "Male";
                             break;
                         case "F": genderText = "Female";
@@ -62,119 +56,216 @@ var clinical = {
                             break;
                     }
                     $("#lblViewGender").text(genderText);
-
-                    // Gender Icon
-                    $("#iconViewGender")
-                        .removeClass()
-                        .addClass("fa " + (p.gender === "M" ? "fa-mars" : "fa-venus"));
-
-                    // Age (example calculation)
-                    if (p.dob) {
-                        var dob = new Date(p.dob);
+                    $("#iconViewGender").removeClass().addClass("fa " + (patient.gender === "M" ? "fa-mars" : "fa-venus"));
+                    if (patient.dob) {
+                        var dob = new Date(patient.dob);
                         var age = new Date().getFullYear() - dob.getFullYear();
                         $("#lblViewAge").text(age);
                     }
-
-                    // Contact
-                    $("#lblViewContact").text(p.mobileNo);
-
-                    // Email
-                    $("#lblViewEmail").text(p.emailID);
-
-                    // Date (today or from API)
-                    $("#txtViewDate").val(new Date().toLocaleDateString());
-
-                    if (p) {
-                        $("#txtAddFirstName").val(p.firstName);
-                        $("#txtAddMiddleName").val(p.middleName);
-                        $("#txtAddLastName").val(p.lastName);
-                        $("#txtAddAddress").val(p.address);
-                        $("#txtAddMobile").val(p.mobileNo);
-                        $("#txtAddPhone").val(p.telePhoneNo);
-                        $("#txtAddEmail").val(p.emailID);
-                        // DOB
-                        $("#txtAddDOB").val(p.dobCustom);
-                        // Dropdowns
-                        $("#ddlAddCategory").val(p.categoryID).trigger("change");
-                        $("#ddlAddStatus").val(p.statusID).trigger("change");
-                        $("#ddlAddOccupation").val(p.occupationID).trigger("change");
-                        $("#ddlAddMaritalStatus").val(p.marritialStatusID).trigger("change");
-
-                        // Gender
-                        $("input[name='AddGender'][value='" + p.gender + "']").prop("checked", true);
+                    
+                    $("#lblViewContact").text(patient.mobileNo);
+                    $("#lblViewEmail").text(patient.emailID);
+                    $("#txtViewDate").val(new Date().toISOString().split('T')[0]);
+                    if (patient) {
+                        $("#txtAddFirstName").val(patient.firstName);
+                        $("#txtAddMiddleName").val(patient.middleName);
+                        $("#txtAddLastName").val(patient.lastName);
+                        $("#txtAddAddress").val(patient.address);
+                        $("#txtAddMobile").val(patient.mobileNo);
+                        $("#txtAddPhone").val(patient.telePhoneNo);
+                        $("#txtAddEmail").val(patient.emailID);
+                        $("#txtAddDOB").val(formatDateLocal(patient.dobCustom));
+                        $("#ddlAddCategory").val(patient.categoryID).trigger("change");
+                        $("#ddlAddStatus").val(patient.statusID).trigger("change");
+                        $("#ddlAddOccupation").val(patient.occupationID).trigger("change");
+                        $("#ddlAddMaritalStatus").val(patient.marritialStatusID).trigger("change");
+                        $("input[name='AddGender'][value='" + patient.gender + "']").prop("checked", true);
                     }
-                    console.log(res.nokDetails);
-                    console.log(res.opDetails);
                     // ========================
                     // 👨‍👩‍👧 NOK DETAILS
                     // ========================
                     var nokList = res.nokDetails;
-                    if ($.fn.DataTable.isDataTable('#tblNOK')) {
-                        $('#tblNOK').DataTable().destroy();
-                    }
-
-                   
+                    if ($.fn.DataTable.isDataTable('#tblNOK')) { $('#tblNOK').DataTable().destroy(); }
+                    $("#tblNOK tbody").empty();
                     if (nokList && nokList.length > 0) {
                         $("#Grid_Data_Template_tblNOK").tmpl(nokList).appendTo("#tblNOK tbody");
+                        $('#tblNOK').DataTable({
+                            paging: true,
+                            searching: true,
+                            ordering: true
+                        });
+                    } else {
+                        var colCount = $("#tblNOK thead th").length;
+                        $("#tblNOK tbody").append("<tr><td colspan='" + colCount + "' class='text-center'>No Records Found</td></tr>");
                     }
-                    if (!nokList || nokList.length === 0) {
-                        $("#tblNOK tbody").append("<tr><td colspan='7' class='text-center'>No Records Found</td></tr>");
-                    }
-                    $('#tblNOK').DataTable({
-                        paging: true,
-                        searching: true,
-                        ordering: true,
-                        language: {
-                            search: "Search:",
-                            lengthMenu: "Show _MENU_ entries"
-                        }
-                    });
                     // ========================
                     // 🏥 OP DETAILS
                     // ========================
                     var opList = res.opDetails;
-
-                    if ($.fn.DataTable.isDataTable('#tblOP')) {
-                        $('#tblOP').DataTable().destroy();
-                    }
-                    
+                    if ($.fn.DataTable.isDataTable('#tblOP')) { $('#tblOP').DataTable().destroy(); }
+                    $("#tblOP tbody").empty();
                     if (opList && opList.length > 0) {
                         $("#Grid_Data_Template_tblOP").tmpl(opList).appendTo("#tblOP tbody");
+                        $('#tblOP').DataTable({
+                            paging: true,
+                            searching: true,
+                            ordering: true
+                        });
+                    } else {
+                        var colCount = $("#tblOP thead th").length;
+                        $("#tblOP tbody").append("<tr><td colspan='" + colCount + "' class='text-center'>No Records Found</td></tr>");
                     }
-                    if (!opList || opList.length === 0) {
-                        $("#tblOP tbody").append("<tr><td colspan='7' class='text-center'>No Records Found</td></tr>");
-                    }
-                    $('#tblOP').DataTable({
-                        paging: true,
-                        searching: true,
-                        ordering: true,
-                        language: {
-                            search: "Search:",
-                            lengthMenu: "Show _MENU_ entries"
-                        }
-                    });
                     // ========================
                     // 🧠 INITIAL ASSESSMENT
                     // ========================
-                    var init = res.initialDetails;
-
-                    if (init) {
-                        $("#txtPC").val(init.asS_PC);
-                        $("#txtHPC").val(init.asS_HPC);
-                        $("#txtPPH").val(init.asS_PPH);
-                        $("#txtMH").val(init.asS_MH);
-                        $("#txtFH").val(init.asS_FH);
-                        $("#txtPH").val(init.asS_PH);
-                        $("#txtDAH").val(init.asS_DAH);
-                        $("#txtFRH").val(init.asS_FRH);
-                        $("#txtPMP").val(init.asS_PMP);
-                        $("#txtMSE").val(init.asS_MSE);
+                    var initial = res.initialDetails;
+                    if (initial && initial.length > 0) {
+                        $("#txtPC").val(initial.asS_PC);
+                        $("#txtHPC").val(initial.asS_HPC);
+                        $("#txtPPH").val(initial.asS_PPH);
+                        $("#txtMH").val(initial.asS_MH);
+                        $("#txtFH").val(initial.asS_FH);
+                        $("#txtPH").val(initial.asS_PH);
+                        $("#txtDAH").val(initial.asS_DAH);
+                        $("#txtFRH").val(initial.asS_FRH);
+                        $("#txtPMP").val(initial.asS_PMP);
+                        $("#txtMSE").val(initial.asS_MSE);
                     }
-
+                    clinical.loadAssessment("PN", res);
+                    clinical.loadAssessment("SCAN", res);
+                    clinical.loadAssessment("EEG", res);
+                    clinical.loadAssessment("OI", res);
+                    clinical.loadAssessment("DD", res);
+                    clinical.loadAssessment("MD", res);
+                    clinical.loadAssessment("RS", res);
+                    clinical.loadAssessment("RMP", res);
+                    // ========================
+                    // 🧠 PHYSICAL MONITORING ASSESSMENT
+                    // ========================
+                    clinical.RenderPhysicalMonitoring();
+                    let phmList = res.phmDetails;
+                    if (phmList && phmList.length > 0) {
+                        phmList.forEach(item => {
+                            let dateObj = new Date(item.ass_date);
+                            let formattedDate = dateObj.getFullYear() + "/" + ("0" + (dateObj.getMonth() + 1)).slice(-2) + "/" + ("0" + dateObj.getDate()).slice(-2);
+                            let hours = dateObj.getHours();
+                            let minutes = ("0" + dateObj.getMinutes()).slice(-2);
+                            let ampm = hours >= 12 ? "PM" : "AM";
+                            hours = hours % 12;
+                            hours = hours ? hours : 12;
+                            let time = ("0" + hours).slice(-2) + ":" + minutes + " " + ampm;
+                            let headerText = formattedDate + " - " + time;
+                            clinical.AddColumnToTable(headerText);
+                            let colIndex = $("#physicalTable thead th").length - 1;
+                            $("#physicalTable tbody tr").each(function () {
+                                let parameter = $(this).find("td:first").text().trim();
+                                let input = $(this).find("td").eq(colIndex).find("input");
+                                switch (parameter) {
+                                    case "BP (mm Hg)": input.val(item.bp); break;
+                                    case "Weight (Kg)": input.val(item.wt); break;
+                                    case "Body Mass Index (BMI)": input.val(item.bmi); break;
+                                    case "Diabetes": input.val(item.diabetes); break;
+                                    case "Cardiovascular Disease": input.val(item.cardiovas); break;
+                                    case "Waist circumference (inches)": input.val(item.waist); break;
+                                    case "Sodium, mmol/l (135-145)": input.val(item.sodium); break;
+                                    case "Potassium, mmol/l (3.4-5.0)": input.val(item.potassium); break;
+                                    case "Urea, mmol/l": input.val(item.urea); break;
+                                    case "Creatinine, umol/l": input.val(item.creatinine); break;
+                                    case "Blood glucose, mmol/l": input.val(item.glucose); break;
+                                    case "HbA1c (if diabetic)": input.val(item.hba1c); break;
+                                    case "Bilirubin, umol/l (0-19)": input.val(item.bilirubin); break;
+                                    case "Alk Phos, U/l (35-120)": input.val(item.alkphos); break;
+                                    case "ALT, U/l (0-40)": input.val(item.alt); break;
+                                    case "Albumin, g/l (34-50)": input.val(item.albumin); break;
+                                    case "Total protein, g/l (58-78)": input.val(item.protein); break;
+                                    case "Gamma-GT, U/l (0-50)": input.val(item.gamma); break;
+                                    case "TSH, mIU / l": input.val(item.tsh); break;
+                                    case "Free thyroxine": input.val(item.thyroxine); break;
+                                    case "Hb, g / dl": input.val(item.hb); break;
+                                    case "WBC": input.val(item.wbc); break;
+                                    case "Plt": input.val(item.plt); break;
+                                    case "Total cholesterol, mmol / l": input.val(item.tot_cholesterol); break;
+                                    case "HDL cholesterol, mmol / l": input.val(item.hdl_cholesterol); break;
+                                    case "Total / HDL - cholesterol ratio": input.val(item.tot_hdl_ratio); break;
+                                    case "Triglycerides, mmol / l": input.val(item.trigly); break;
+                                    case "10 - year CV risk score": input.val(item.cv_risk); break;
+                                    case "Urinalysis(glucose / protein)": input.val(item.urinalysis); break;
+                                    case "LUNSERS score": input.val(item.lunsers); break;
+                                    case "QTc interval, ms": input.val(item.qtc); break;
+                                    case "Prolactin(if symptoms)": input.val(item.prolactin); break;
+                                }
+                            });
+                        });
+                    }
                 } else {
                     alert("Failed to load data");
                 }
             });
+    },
+    loadAssessment: function (section, res) {
+        let assessment = res.assessmentDetails.filter(x =>
+            (x.ASS_FIELD || x.asS_FIELD) === section
+        );
+        let lastDate = "";
+        let container = $("#div" + section + "timeline");
+        if (assessment && assessment.length > 0) {
+            container.empty().show();
+            assessment.forEach(function (item) {
+                let text = item.ASS_VALUE || item.asS_VALUE;
+                let dateVal = item.ASS_DATE || item.asS_DATE;
+                if (!text || !dateVal) return;
+                let d = new Date(dateVal);
+                let time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                let displayDate = clinical.formatDateLabel(d);
+                if (lastDate !== displayDate) {
+                    container.append(`<div class="timelineRow dateRow">
+                                        <div></div>
+                                        <div class="timelineMiddle">
+                                            <span class="timelineDateHeader">${displayDate}</span>
+                                        </div>
+                                        <div></div>
+                                    </div>`);
+                    lastDate = displayDate;
+                }
+                container.append(`<div class="timelineRow">
+                                    <div class="timelineTime">${time}</div>
+                                    <div class="timelineMiddle">
+                                        <div class="timelineDot"></div>
+                                    </div>
+                                    <div class="timelineContent">
+                                        <div class="timelineCard">${text}</div>
+                                    </div>
+                                </div>`);
+            });
+
+        } else {
+            container.empty().hide();
+        }
+    },
+    formatDateLabel: function (date) {
+        let today = new Date();
+        let yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+        let diffTime = today - date;
+        let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        if (date.toDateString() === today.toDateString())
+            return "Today";
+        if (date.toDateString() === yesterday.toDateString())
+            return "Yesterday";
+        if (diffDays < 7) {
+            return date.toLocaleDateString(undefined, { weekday: 'long' });
+        }
+        let dayName = date.toLocaleDateString(undefined, { weekday: 'long' });
+        let day = date.getDate();
+        let month = date.toLocaleDateString(undefined, { month: 'long' });
+        let year = date.getFullYear();
+
+        return `${dayName}, ${clinical.getOrdinal(day)} ${month} ${year}`;
+    },
+    getOrdinal: function (n) {
+        let s = ["th", "st", "nd", "rd"],
+            v = n % 100;
+        return n + (s[(v - 20) % 10] || s[v] || s[0]);
     },
     SetForClose: function () {
         $('#divStartAssetment').hide();
@@ -318,31 +409,19 @@ var clinical = {
         return visibleCols;
     },
     ExportToExcelGrid1: function (tableName, type) {
-
         var tableId = tableName.replace('#', '');
-
-        // ✅ Check DataTable initialized
         if (!$.fn.DataTable.isDataTable('#' + tableId)) {
             console.error("DataTable not initialized");
             return;
         }
-
         var dt = $('#' + tableId).DataTable();
         var cols = clinical.getVisibleColumns();
-
-        // ✅ Fallback: if no checkbox selected → export all columns
         if (cols.length === 0) {
             dt.columns().every(function (i) {
                 cols.push(i);
             });
         }
-
-        console.log("Total Rows:", dt.rows().count());
-        console.log("Selected Columns:", cols);
-
         var excel = '<table border="1"><thead><tr>';
-
-        // ✅ Header (Exclude Assessment)
         dt.columns().every(function (i) {
 
             var headerText = $(this.header()).text().trim();
@@ -351,59 +430,36 @@ var clinical = {
                 excel += '<th>' + headerText + '</th>';
             }
         });
-
         excel += '</tr></thead><tbody>';
-
-        // ✅ Rows
         dt.rows().every(function () {
-
             var row = this.data();
             excel += '<tr>';
-
-            // ✅ If row is ARRAY
             if (Array.isArray(row)) {
-
                 for (var i = 0; i < row.length; i++) {
-
                     var headerText = $(dt.column(i).header()).text().trim();
-
                     if (cols.indexOf(i) !== -1 && headerText !== "Assessment") {
-
                         var cellData = $('<div>').html(row[i]).text();
                         excel += '<td>' + cellData + '</td>';
                     }
                 }
             }
-            // ✅ If row is OBJECT
             else if (typeof row === "object") {
-
                 var index = 0;
-
                 for (var key in row) {
-
                     var headerText = $(dt.column(index).header()).text().trim();
-
                     if (cols.indexOf(index) !== -1 && headerText !== "Assessment") {
-
                         var cellData = row[key];
-
                         if (typeof cellData === "string") {
                             cellData = $('<div>').html(cellData).text();
                         }
-
                         excel += '<td>' + cellData + '</td>';
                     }
-
                     index++;
                 }
             }
-
             excel += '</tr>';
         });
-
         excel += '</tbody></table>';
-
-        // ✅ Download
         clinical.downloadXls(excel, "PatientClinicalList.xls");
     },
     downloadXls: function (tableHtml, fileName) {
@@ -433,5 +489,365 @@ var clinical = {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-    }
+    },
+    //InitialAssestmentData
+    AddSection: function (section) {
+        $("#div" + section + "Action").show();
+        $("#btnAdd" + section).hide();
+        $("#txt" + section).prop("readonly", false).css("background-color", "").focus();
+    },
+    CloseSection: function (section) {
+        $("#div" + section + "Action").hide();
+        $("#btnAdd" + section).show();
+        $("#txt" + section).prop("readonly", true).css("background-color", "#ddd");
+    },
+    GetSectionData: function (section) {
+        let data = {
+            PAT_ID: $("#hf_PatientID").val(),
+            LAST_UPDATED_BY: UserID
+        };
+        data["ASS_" + section] = $("#txt" + section).val();
+        return data;
+    },
+    ValidateSectionData: function (section, data) {
+        if (!data.PAT_ID || data.PAT_ID == 0) {
+            showSweetAlert("Error", "Invalid Patient", "error");
+            return false;
+        }
+        if (!data["ASS_" + section]) {
+            showSweetAlert("Error", section + " is required", "error");
+            return false;
+        }
+        return true;
+    },
+    SaveSection: function (section) {
+        Reset_Form_Errors();
+        var FormData = clinical.GetSectionData(section);
+        if (clinical.ValidateSectionData(section, FormData)) {
+            AddUpdateData("/Clinical/SaveInitialDetails", { Model: FormData, __RequestVerificationToken: token },
+                function (data) {
+                    if (data.status === true || data.status === 'Success') {
+                        showSweetAlert("Success", data.message, 'success', null);
+                        clinical.CloseSection(section);
+                    }
+                    else {
+                        showSweetAlert("Failed", data.message, 'error', null);
+                    }
+                },
+                function (response_data) {
+                    showSweetAlert("Error", response_data.message || "Something went wrong", 'error', null);
+                }
+            );
+        }
+    },
+    //Pending
+    SaveQuickInfo: function () {
+
+    },
+    CloseQuickInfo: function () {
+
+    },
+    // AssessmentData
+    AddAssetmentSection: function (section) {
+        $("#div" + section + "Panel").show();
+        $("#div" + section + "Action").show();
+        $("#btnAdd" + section).hide();
+        $("#txt" + section).prop("readonly", false).val("").focus();
+    },
+    CloseAssetmentSection: function (section) {
+        $("#div" + section + "Panel").hide();
+        $("#div" + section + "Action").hide();
+        $("#btnAdd" + section).show();
+        $("#txt" + section).val("");
+    },
+    GetAssetmentSectionData: function (section) {
+        let dateVal = $("#txtViewDate").val();
+        let now = new Date();
+        let hours = String(now.getHours()).padStart(2, '0');
+        let minutes = String(now.getMinutes()).padStart(2, '0');
+        let seconds = String(now.getSeconds()).padStart(2, '0');
+        let finalDateTime = `${dateVal} ${hours}:${minutes}:${seconds}`;
+        return {
+            PAT_ID: $("#hf_PatientID").val(),
+            APPT_ID: $("#hf_AppointmentID").val() || null,
+            ASS_DATE: finalDateTime,
+            ASS_FIELD: section,
+            ASS_VALUE: $("#txt" + section).val(),
+            LAST_UPDATED_BY: UserID
+        };
+    },
+    ValidateSectionData: function (section, data) {
+        if (!data.PAT_ID || data.PAT_ID == 0) {
+            showSweetAlert("Error", "Invalid Patient", "error");
+            return false;
+        }
+        if (!data.ASS_VALUE || data.ASS_VALUE.trim() === "") {
+            showSweetAlert("Error", section + " is required", "error");
+            return false;
+        }
+        return true;
+    },
+    SaveAssetmentSection: function (section) {
+        Reset_Form_Errors();
+        var FormData = clinical.GetAssetmentSectionData(section);
+        if (clinical.ValidateSectionData(section, FormData)) {
+            AddUpdateData("/Clinical/SaveAssessmentDetails", { Model: FormData, __RequestVerificationToken: token },
+                function (data) {
+                    if (data.status === true || data.status === 'Success') {
+                        showSweetAlert("Success", data.Message || data.message, 'success', null);
+                        clinical.GetAssetmentData($("#hf_PatientID").val());
+                        clinical.CloseAssetmentSection(section);
+                    } else {
+                        showSweetAlert("Failed", data.Message || data.message, 'error', null);
+                    }
+                },
+                function (response_data) { showSweetAlert("Error", response_data.message || "Something went wrong", 'error', null); }
+            );
+        }
+    },
+    //AssessmentPHMData
+    RenderPhysicalMonitoring: function () {
+        let parameters = [
+            "Diabetes",
+            "Cardiovascular Disease",
+            "Weight (Kg)",
+            "Body Mass Index (BMI)",
+            "Waist circumference (inches)",
+            "BP (mm Hg)",
+            "Sodium, mmol/l (135-145)",
+            "Potassium, mmol/l (3.4-5.0)",
+            "Urea, mmol/l",
+            "Creatinine, umol/l",
+            "Blood glucose, mmol/l",
+            "HbA1c (if diabetic)",
+            "Bilirubin, umol/l (0-19)",
+            "Alk Phos, U/l (35-120)",
+            "ALT, U/l (0-40)",
+            "Albumin, g/l (34-50)",
+            "Total protein, g/l (58-78)",
+            "Gamma-GT, U/l (0-50)",
+            "TSH, mIU / l(0.3 - 4.7))",
+            "Free thyroxine, pmol / l(11 - 23)",
+            "Hb, g / dl(11.5 - 16.5)",
+            "WBC, x109 / l(4.0 - 11.0)",
+            "Plt, x109 / l(150 - 450)",
+            "Total cholesterol, mmol / l",
+            "HDL cholesterol, mmol / l",
+            "Total / HDL - cholesterol ratio",
+            "Triglycerides, mmol / l",
+            "10 - year CV risk score",
+            "Urinalysis(glucose / protein)",
+            "LUNSERS score",
+            "QTc interval, ms",
+            "Prolactin(if symptoms)"
+        ];
+        let rows = "";
+        parameters.forEach(p => {
+            rows += `<tr><td class="sticky-col">${p}</td></tr>`;
+        });
+        $("#physicalTableBody").html(rows);
+    },
+    AddColumnToTable: function (headerText) {
+        let table = $("#physicalTable");
+        let scrollContainer = $(".table-scroll-x");
+        table.find("thead tr").append(
+            `<th class="text-center">${headerText}</th>`
+        );
+        table.find("tbody tr").each(function () {
+            $(this).append(`<td class="text-center">
+            <input type="text" class="form-control valueCellInput" />
+        </td>`);
+        });
+        clinical.applyStickyColumn();
+        setTimeout(function () {
+            scrollContainer.animate({
+                scrollLeft: scrollContainer[0].scrollWidth
+            }, 400);
+        }, 100);
+        $("#btnClearPhysicalMonitoring").show();
+        $("#btnSavePHM").show();
+    },
+    AddPhysicalMonitoring: function () {
+
+        let table = $("#physicalTable");
+
+        let selectedDate = new Date($("#txtViewDate").val());
+
+        let formattedDate =
+            selectedDate.getFullYear() + "/" +
+            ("0" + (selectedDate.getMonth() + 1)).slice(-2) + "/" +
+            ("0" + selectedDate.getDate()).slice(-2);
+
+        let now = new Date();
+        let hours = now.getHours();
+        let minutes = ("0" + now.getMinutes()).slice(-2);
+        let ampm = hours >= 12 ? "PM" : "AM";
+
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+
+        let currentTime = ("0" + hours).slice(-2) + ":" + minutes + " " + ampm;
+
+        let headerText = formattedDate + " - " + currentTime;
+
+        let exists = false;
+
+        table.find("thead th").each(function () {
+            if ($(this).text().trim() === headerText) {
+                exists = true;
+                return false;
+            }
+        });
+
+        if (exists) {
+            showSweetAlert("Warning", headerText + " already added", "warning");
+            return;
+        }
+
+        columnCount++;
+        clinical.AddColumnToTable(headerText);
+    },
+    applyStickyColumn: function () {
+        $("#physicalTable thead th:first-child").addClass("sticky-col");
+        $("#physicalTable tbody tr").each(function () {
+            $(this).find("td:first-child").addClass("sticky-col");
+        });
+    },
+    ClearPhysicalMonitoring: function () {
+        if (!confirm("Are you sure you want to remove last entry?"))
+            return;
+        let table = $("#physicalTable");
+        let totalCols = table.find("thead tr th").length;
+        if (totalCols <= 1) {
+            alert("No columns to remove");
+            return;
+        }
+        table.find("thead tr th:last").remove();
+        table.find("tbody tr").each(function () {
+            $(this).find("td:last").remove();
+        });
+        columnCount--;
+        let remainingCols = table.find("thead tr th").length;
+        if (remainingCols <= 1) {
+            $("#btnClearPhysicalMonitoring").hide();
+            $("#btnSavePHM").hide();
+        }
+    },
+    GetPHMData: function () {
+        let table = $("#physicalTable");
+        let dataList = [];
+        let headers = [];
+        table.find("thead th:not(:first)").each(function () {
+            headers.push($(this).text().trim());
+        });
+        headers.forEach((headerText, colIndex) => {
+
+            let model = {
+                PAT_ID: parseInt($("#hf_PatientID").val()),
+                APPT_ID: $("#hf_AppointmentID").val() || null,
+                LAST_UPDATED_BY: UserID
+            };
+
+            let hasValue = false;
+
+            let parts = headerText.split(" - ");
+            let date = parts[0].replaceAll("/", "-");
+            let time = parts[1];
+
+            model.ASS_DATE = date + " " + clinical.convertTo24Hour(time);
+
+            $("#physicalTable tbody tr").each(function () {
+
+                let parameter = $(this).find("td:first").text().trim();
+                let value = $(this).find("td").eq(colIndex + 1).find("input").val();
+
+                if (!value) return;
+
+                hasValue = true; // ✅ mark row has data
+
+                switch (parameter) {
+                    case "BP (mm Hg)": model.BP = value; break;
+                    case "Weight (Kg)": model.WT = value; break;
+                    case "Body Mass Index (BMI)": model.BMI = value; break;
+                    case "Diabetes": model.DIABETES = value; break;
+                    case "Cardiovascular Disease": model.CARDIOVAS = value; break;
+                    case "Waist circumference (inches)": model.WAIST = value; break;
+                    case "Sodium, mmol/l (135-145)": model.SODIUM = value; break;
+                    case "Potassium, mmol/l (3.4-5.0)": model.POTASSIUM = value; break;
+                    case "Urea, mmol/l": model.UREA = value; break;
+                    case "Creatinine, umol/l": model.CREATININE = value; break;
+                    case "Blood glucose, mmol/l": model.GLUCOSE = value; break;
+                    case "HbA1c (if diabetic)": model.HBA1C = value; break;
+                    case "Bilirubin, umol/l (0-19)": model.BILIRUBIN = value; break;
+                    case "Alk Phos, U/l (35-120)": model.ALKPHOS = value; break;
+                    case "ALT, U/l (0-40)": model.ALT = value; break;
+                    case "Albumin, g/l (34-50)": model.ALBUMIN = value; break;
+                    case "Total protein, g/l (58-78)": model.PROTEIN = value; break;
+                    case "Gamma-GT, U/l (0-50)": model.GAMMA = value; break;
+                    case "TSH, mIU / l": model.TSH = value; break;
+                    case "Free thyroxine": model.THYROXINE = value; break;
+                    case "Hb, g / dl": model.HB = value; break;
+                    case "WBC": model.WBC = value; break;
+                    case "Plt": model.PLT = value; break;
+                    case "Total cholesterol, mmol / l": model.TOT_CHOLESTEROL = value; break;
+                    case "HDL cholesterol, mmol / l": model.HDL_CHOLESTEROL = value; break;
+                    case "Total / HDL - cholesterol ratio": model.TOT_HDL_RATIO = value; break;
+                    case "Triglycerides, mmol / l": model.TRIGLY = value; break;
+                    case "10 - year CV risk score": model.CV_RISK = value; break;
+                    case "Urinalysis(glucose / protein)": model.URINALYSIS = value; break;
+                    case "LUNSERS score": model.LUNSERS = value; break;
+                    case "QTc interval, ms": model.QTC = value; break;
+                    case "Prolactin(if symptoms)": model.PROLACTIN = value; break;
+                }
+            });
+
+            if (hasValue) {
+                dataList.push(model); // ✅ only valid rows
+            }
+        });
+        return dataList;
+    },
+    convertTo24Hour: function (time12h) {
+        let [time, modifier] = time12h.split(' ');
+        let [hours, minutes] = time.split(':');
+        if (modifier === 'PM' && hours !== '12') {
+            hours = parseInt(hours) + 12;
+        }
+        if (modifier === 'AM' && hours === '12') {
+            hours = '00';
+        }
+        return `${hours}:${minutes}:00`;
+    },
+    SaveAssetmentPHMData: function () {
+        let dataList = clinical.GetPHMData();
+        if (!dataList || dataList.length === 0) {
+            showSweetAlert("Error", "No data to save", "error");
+            return;
+        }
+       console.log(dataList)
+        $.ajax({
+            url: "/Clinical/SaveAssessmentPHM",
+            type: "POST",
+
+            data: JSON.stringify(dataList),   // ✅ NO wrapper
+            contentType: "application/json; charset=utf-8",
+
+            headers: {
+                'RequestVerificationToken': token   // ✅ token in header
+            },
+
+           
+            success: function (res) {
+                if (res.Status === true) {
+                    showSweetAlert("Success", res.Message, 'success');
+                } else {
+                    showSweetAlert("Failed", res.Message, 'error');
+                }
+            },
+            error: function (err) {
+                showSweetAlert("Error", "Something went wrong", 'error');
+            }
+        });
+    },
+
 }

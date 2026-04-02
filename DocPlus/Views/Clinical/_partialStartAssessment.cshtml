@@ -148,60 +148,96 @@
         font-size: 13px;
     }
 
-    /* ================= TIMELINE COMPONENT ================= */
+    /* ================= FINAL TIMELINE ================= */
 
-    .timelineContainer {
+    .simpleTimeline {
+        position: relative;
         margin-top: 20px;
-        position: relative;
     }
 
-    .timelineItem {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 20px;
-        position: relative;
-    }
-
-    .timelineLeft {
-        padding-right: 15px;
-    }
-
-    .timelineDate {
-        font-weight: 600;
-        color: #333;
-        font-size: 14px;
-    }
-
-    .timelineTime {
-        font-size: 12px;
-        color: #888;
-        margin-top: 2px;
-    }
-
-    .timelineMiddle {
-        width: 3px;
-        background: #4CAF50;
-        margin-right: 15px;
-        border-radius: 2px;
-        min-height: 60px;
-    }
-
-    .timelineRight {
-        flex: 1;
-        background: linear-gradient(135deg, #f8fafc, #eef2f7);
-        border-radius: 10px;
-        padding: 14px 16px;
-        border: 1px solid #e2e6ea;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        font-size: 14px;
-        line-height: 1.5;
-        transition: all 0.2s;
-    }
-
-        .timelineRight:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        /* 🔥 GLOBAL LINE */
+        .simpleTimeline::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 120px;
+            width: 2px;
+            background: repeating-linear-gradient( to bottom, #cfcfcf, #cfcfcf 6px, transparent 6px, transparent 12px );
         }
+
+    /* GRID STRUCTURE */
+    .timelineRow {
+        display: grid;
+        grid-template-columns: 100px 40px 1fr;
+        align-items: center;
+        margin-bottom: 25px;
+        position: relative;
+    }
+
+    /* TIME */
+    .timelineTime {
+        text-align: right;
+    }
+
+    /* MIDDLE COLUMN */
+    .timelineMiddle {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    }
+
+    /* DOT */
+    .timelineDot {
+        width: 10px;
+        height: 10px;
+        background: #4caf50;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        z-index: 2;
+    }
+
+    /* CONTENT */
+    .timelineContent {
+        padding-left: 10px;
+    }
+
+    /* CARD */
+    .timelineCard {
+        background: #fff;
+        padding: 12px 16px;
+        border-radius: 5px;
+        font-size: 14px;
+        max-width: 600px;
+        box-shadow: 5px 5px 10px rgba(0,0,0,0.30)
+    }
+
+    .dateRow {
+        display: grid;
+        grid-template-columns: 100px 40px 1fr;
+        margin: 20px 0;
+    }
+
+        .dateRow .timelineMiddle {
+            display: flex;
+            justify-content: center;
+        }
+
+    .timelineDateHeader {
+        position: relative;
+        left: 50%;
+        transform: translateX(-10%); /* 🔥 centers exactly */
+
+        background: #2f2f2f;
+        color: #fff;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+
 
     /* ================= UTILITY CLASSES ================= */
 
@@ -210,12 +246,7 @@
     }
 
     .addPanel {
-        /*  display: none; */
-        background: #f9f9f9;
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid #ddd;
-        margin-bottom: 10px;
+        display: none;
     }
 
     .note-buttons {
@@ -235,6 +266,61 @@
         .menu-group.demographics {
             display: block;
         }
+
+    .bg-white-force {
+        background-color: #fff !important;
+    }
+
+    .button-header {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .table-scroll-x {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    #physicalTable {
+        width: max-content; /* 🔥 required */
+        border-collapse: collapse;
+    }
+
+    .valueCellInput {
+        width: 100%;
+        height: 28px;
+        border: 1px solid #cdcdcd;
+    }
+
+    .table-scroll-x {
+        overflow-x: auto;
+        width: 100%;
+        max-height: 500px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+    }
+
+    /* important */
+    #physicalTable {
+        width: max-content;
+        border-collapse: collapse;
+    }
+
+    /* 🔥 sticky column */
+    .sticky-col {
+        position: sticky;
+        left: 0;
+        /* background: #f8f9fa; */
+        z-index: 2;
+        min-width: 220px; /* match your parameter width */
+    }
+
+    /* header priority */
+    #physicalTable thead th.sticky-col {
+        z-index: 5;
+    }
 </style>
 <div class="kt-subheader kt-grid__item" id="kt_subheader">
     <div class="kt-subheader__main">
@@ -283,20 +369,20 @@
                 </div>
 
                 <div class="d-flex align-items-center">
-
+                    <!-- Filter -->
+                    <div class="mr-2 d-flex flex-column" style="justify-content:center;">
+                        <label class="mb-2" style="line-height:1;">Filter:</label>
+                        <select id="ddlAssetmentFiler" class="form-control">
+                            <option value="1">Last 1 Year</option>
+                            <option value="2">Last 6 Months</option>
+                            <option value="3">First Contact</option>
+                        </select>
+                    </div>
                     <!-- DATE -->
                     <div class="mr-2 d-flex flex-column" style="justify-content:center;">
                         <label class="mb-2" style="line-height:1;">Date:</label>
                         <div class="input-group input-group-sm" style="width:150px;">
-                            <input type="text"
-                                   id="txtViewDate"
-                                   class="form-control date-picker"
-                                   placeholder="DD-MMM-YYYY" />
-                            <div class="input-group-append">
-                                <span class="input-group-text">
-                                    <i class="fa fa-calendar"></i>
-                                </span>
-                            </div>
+                            <input type="date" id="txtViewDate" class="form-control" placeholder="@Localizer["Date"]" autocomplete="off" />
                         </div>
                     </div>
                 </div>
@@ -540,7 +626,7 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <label>First Name</label><asterisk></asterisk>
-                                        <input id="txtAddFirstName" type="text" class="form-control"  />
+                                        <input id="txtAddFirstName" type="text" class="form-control" />
                                     </div>
 
                                     <div class="col-md-4">
@@ -550,7 +636,7 @@
 
                                     <div class="col-md-4">
                                         <label>Last Name </label><asterisk></asterisk>
-                                        <input type="text" id="txtAddLastName" class="form-control"  />
+                                        <input type="text" id="txtAddLastName" class="form-control" />
                                     </div>
                                 </div>
 
@@ -558,7 +644,7 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <label>DOB </label><asterisk></asterisk>
-                                        <input type="text" id="txtAddDOB" class="form-control date-picker" placeholder="@Localizer["Date"]" autocomplete="off" />
+                                        <input type="date" id="txtAddDOB" class="form-control" placeholder="@Localizer["Date"]" autocomplete="off" />
                                     </div>
                                     <div class="col-md-4">
                                         <label>Marital Status</label>
@@ -579,12 +665,12 @@
                                 <div class="row">
                                     <div class="col-md-4">
                                         <label>Tele. No.</label>
-                                        <input type="text"  id="txtAddTelephone" class="form-control" />
+                                        <input type="text" id="txtAddTelephone" class="form-control" />
                                     </div>
 
                                     <div class="col-md-4">
                                         <label>Mobile No. </label><asterisk></asterisk>
-                                        <input type="text" id="txtAddMobile" class="form-control"  />
+                                        <input type="text" id="txtAddMobile" class="form-control" />
                                     </div>
 
                                     <div class="col-md-4">
@@ -598,7 +684,7 @@
                                     <div class="col-md-4">
                                         <label>Category</label>
                                         <select id="ddlAddCategory" class="form-control">
-                                           <option value="">Select</option> 
+                                            <option value="">Select</option>
                                         </select>
                                     </div>
 
@@ -641,14 +727,14 @@
                                 </div>
                                 @* <!-- Row 6 : Remarks Full Width -->
                                 <div class="row">
-                                    
+
                                 </div> *@
 
                                 <button id="btnAddSave" class="btn btn-success btn-sm">Save</button>
 
                             </div>
 
-                            <div id="nextOfKin" class="tab-pane fade">     
+                            <div id="nextOfKin" class="tab-pane fade">
                                 <!-- TABLE SECTION -->
                                 <div class="kt-portlet__body table-responsive">
                                     <table id="tblNOK" class="table table-striped table-hover table-checkable" style="width:100%;">
@@ -663,7 +749,7 @@
                                                 <th>Tele. No.</th>
                                                 <th>Mobile No.</th>
                                                 <th>Email</th>
-                                                <th>Remarks</th>                                                
+                                                <th>Remarks</th>
                                             </tr>
                                         </thead>
 
@@ -671,16 +757,16 @@
 
                                     </table>
                                     <script id="Grid_Data_Template_tblNOK" type="text/x-jquery-tmpl">
-                                         <tr data-id="${noK_ID}">
-                                         <td>${noK_NAME}</td>
-                                         <td>${noK_RELATION}</td>
-                                         <td>${noK_ADDR}</td>
-                                         <td>${noK_TELENO}</td>
-                                         <td>${noK_MOBNO}</td>
-                                         <td>${noK_EMAIL}</td>
-                                         <td>${noK_REMARKS}</td>
-                                       
-                                         </tr>
+                                        <tr data-id="${noK_ID}">
+                                        <td>${noK_NAME}</td>
+                                        <td>${noK_RELATION}</td>
+                                        <td>${noK_ADDR}</td>
+                                        <td>${noK_TELENO}</td>
+                                        <td>${noK_MOBNO}</td>
+                                        <td>${noK_EMAIL}</td>
+                                        <td>${noK_REMARKS}</td>
+
+                                        </tr>
                                     </script>
                                 </div>
                             </div>
@@ -692,7 +778,7 @@
                                         <template>
                                             OP List
                                         </template>
-                                        <thead >
+                                        <thead>
                                             <tr>
                                                 <th>Name</th>
                                                 <th>Profession</th>
@@ -722,559 +808,297 @@
                                 </div>
 
                             </div>
-
                             <div id="presenting" class="tab-pane fade assessment-section">
-
-                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-
-                                    <!-- LEFT -->
-                                    <div style="font-weight:600;">
-                                        <button id="btnQuickInfo" type="button" class="btn btn-primary btn-sm">
-                                            Quick Information
-                                        </button>
-                                    </div>
-
-
+                                <div class="button-header">
+                                    <button id="btnPCQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddPC" type="button" onclick="clinical.AddSection('PC');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
                                 </div>
                                 <!-- QUICK INFO PANEL -->
-                                <div id="quickInfoPanel"
-                                     style="display:none; margin-top:10px; border:1px solid #ccc; padding:15px;">
-
+                                <div id="quickInfoPanel" style="display:none; margin-top:10px; border:1px solid #ccc; padding:15px; ">
                                     <div class="row">
-
                                         <div class="col-md-3">
                                             <b>Dementia</b><br>
                                             <label><input type="checkbox" class="quickChk" value="Amnesia"> Amnesia</label><br>
                                             <label><input type="checkbox" class="quickChk" value="Aphasia"> Aphasia</label><br>
                                             <label><input type="checkbox" class="quickChk" value="Apraxia"> Apraxia</label><br>
                                         </div>
-
                                         <div class="col-md-3">
                                             <b>Organic</b><br>
                                             <label><input type="checkbox" class="quickChk" value="Fever"> Fever</label><br>
                                             <label><input type="checkbox" class="quickChk" value="Head Injury"> Head Injury</label><br>
                                         </div>
-
                                         <div class="col-md-3">
                                             <b>Substance Use</b><br>
                                             <label><input type="checkbox" class="quickChk" value="Present-Alcohol"> Present-Alcohol</label><br>
                                             <label><input type="checkbox" class="quickChk" value="Present-Tobacco"> Present-Tobacco</label><br>
                                         </div>
-
                                         <div class="col-md-3">
                                             <b>Dependence Criteria</b><br>
                                             <label><input type="checkbox" class="quickChk" value="Craving"> Craving</label><br>
                                             <label><input type="checkbox" class="quickChk" value="Withdrawal"> Withdrawal</label><br>
                                         </div>
-
                                     </div>
-
                                     <!-- SAVE & CLOSE BUTTONS -->
                                     <div style="margin-top:15px;">
-                                        <button type="button" id="btnSaveQuickInfo" class="btn btn-success btn-sm">
-                                            Save
-                                        </button>
-
-                                        <button type="button" id="btnCloseQuickInfo" class="btn btn-danger btn-sm">
-                                            Close
-                                        </button>
+                                        <button type="button" id="btnSaveQuickInfo" onclick="clinical.SaveQuickInfo();" class="btn btn-success btn-sm">Save</button>
+                                        <button type="button" id="btnCloseQuickInfo" onclick="clinical.CloseQuickInfo();" class="btn btn-danger btn-sm">Close</button>
                                     </div>
-
                                 </div>
-
                                 <!-- TEXTAREA -->
-                                <textarea id="presentingTextarea"
-                                          class="form-control"
-                                          style="margin-top:10px;height:150px;"></textarea>
 
-                                <button id="btnAddPresenting"
-                                        class="btn btn-secondary btn-sm"
-                                        style="margin-top:8px;">
-                                    Add
-                                </button>
-                                <!-- Table -->
-                                <div class="timelineContainer"></div>
+                                <textarea id="txtPC" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <div id="divPCAction" style="margin-top:15px; display:none;">
+                                    <button type="button" id="btnSavePC" onclick="clinical.SaveSection('PC');" class="btn btn-success btn-sm">Save</button>
+                                    <button type="button" id="btnClosePC" onclick="clinical.CloseSection('PC');" class="btn btn-danger btn-sm">Close</button>
+                                </div>
                             </div>
-
                             <div id="history" class="tab-pane fade assessment-section">
-
-                                <!-- Top Row -->
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
-                                        </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
-                                        </button>
-                                    </div>
-
-
-                                </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-
-                                    <textarea class="form-control newText"></textarea>
-
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-                                <div class="timelineContainer"></div>
-
-                            </div>
-
-                            <div id="past" class="tab-pane fade assessment-section">
-                                <!-- Top Row -->
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
-                                        </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
-                                        </button>
-                                    </div>
-
-                                </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-
-                                    <textarea class="form-control newText"></textarea>
-
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-                                <div class="timelineContainer"></div>
-                            </div>
-
-                            <div id="medical" class="tab-pane fade assessment-section">
-
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
-                                        </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-
-                                    <textarea class="form-control newText"></textarea>
-
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-                                <div class="timelineContainer"></div>
-                            </div>
-
-                            <div id="family" class="tab-pane fade assessment-section">
-
-                                <!-- Top Row -->
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
-                                        </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
-                                        </button>
-                                    </div>
-
-                                </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-
-                                    <textarea class="form-control newText"></textarea>
-
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-
-                                <div class="timelineContainer"></div>
-                            </div>
-
-                            <div id="personal" class="tab-pane fade assessment-section">
-
-                                <!-- Top Row -->
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
-                                        </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
-                                        </button>
-                                    </div>
-
-                                </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-
-                                    <textarea class="form-control newText"></textarea>
-
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-
-                                <div class="timelineContainer"></div>
-
-                            </div>
-
-                            <div id="forensic" class="tab-pane fade assessment-section">
-
-                                <!-- Top Row -->
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
-                                        </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
-                                        </button>
-                                    </div>
-
-                                </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-
-                                    <textarea class="form-control newText"></textarea>
-
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-                                <div class="timelineContainer"></div>
-                            </div>
-
-                            <div id="drug" class="tab-pane fade assessment-section">
-
-                                <!-- Top Row -->
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
-                                        </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-
-                                    <textarea class="form-control newText"></textarea>
-
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-
-                                <div class="timelineContainer"></div>
-                            </div>
-                            <div id="premorbid" class="tab-pane fade assessment-section">
-
-                                <!-- Top Row -->
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
-                                        </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
-                                        </button>
-                                    </div>
-
-                                </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-                                    <textarea class="form-control newText"></textarea>
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-                                <div class="timelineContainer"></div>
-                            </div>
-
-                            <div id="mental" class="tab-pane fade assessment-section">
-                                <!-- Top Row -->
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
-                                        </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
-                                        </button>
-                                    </div>
-
-                                </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-
-                                    <textarea class="form-control newText"></textarea>
-
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-                                <div class="timelineContainer"></div>
-                            </div>
-                            <div id="progressmenu" class="tab-pane fade assessment-section">
-
-                                <div class="note-actions">
-                                    <button class="btn btn-primary btn-sm btnQuickInfo">
-                                        Quick Information
-                                    </button>
-
-                                    <button class="btn btn-secondary btn-sm btnAddCommon">
+                                <div class="button-header">
+                                    <button id="btnHPCQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddHPC" type="button" onclick="clinical.AddSection('HPC');" class="btn btn-secondary btn-sm">
                                         Add
                                     </button>
                                 </div>
-
-                                <div class="addPanel">
-                                    <textarea class="form-control newText"
-                                              placeholder="Write progress note..."></textarea>
-
-                                    <div class="note-buttons">
-                                        <button class="btn btn-success btnSaveCommon btn-sm">
-                                            <i class="fa fa-save"></i> Save
-                                        </button>
-
-                                        <button class="btn btn-danger btnCloseCommon btn-sm">
-                                            Close
-                                        </button>
+                                <!-- QUICK INFO PANEL -->
+                                <!-- TEXTAREA -->
+                                <textarea id="txtHPC" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <div id="divHPCAction" style="margin-top:15px; display:none;">
+                                    <button type="button" id="btnSaveHPC" onclick="clinical.SaveSection('HPC');" class="btn btn-success btn-sm">Save</button>
+                                    <button type="button" id="btnCloseHPC" onclick="clinical.CloseSection('HPC');" class="btn btn-danger btn-sm">Close</button>
+                                </div>
+                            </div>
+                            <div id="past" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnPPHQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddPPH" type="button" onclick="clinical.AddSection('PPH');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <!-- QUICK INFO PANEL -->
+                                <!-- TEXTAREA -->
+                                <textarea id="txtPPH" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <div id="divPPHAction" style="margin-top:15px; display:none;">
+                                    <button type="button" id="btnSavePPH" onclick="clinical.SaveSection('PPH');" class="btn btn-success btn-sm">Save</button>
+                                    <button type="button" id="btnClosePPH" onclick="clinical.CloseSection('PPH');" class="btn btn-danger btn-sm">Close</button>
+                                </div>
+                            </div>
+                            <div id="medical" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnMHQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddMH" type="button" onclick="clinical.AddSection('MH');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <!-- QUICK INFO PANEL -->
+                                <!-- TEXTAREA -->
+                                <textarea id="txtMH" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <div id="divMHAction" style="margin-top:15px; display:none;">
+                                    <button type="button" id="btnSaveMH" onclick="clinical.SaveSection('MH');" class="btn btn-success btn-sm">Save</button>
+                                    <button type="button" id="btnCloseMH" onclick="clinical.CloseSection('MH');" class="btn btn-danger btn-sm">Close</button>
+                                </div>
+                            </div>
+                            <div id="family" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnFHQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddFH" type="button" onclick="clinical.AddSection('FH');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <!-- QUICK INFO PANEL -->
+                                <!-- TEXTAREA -->
+                                <textarea id="txtFH" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <div id="divFHAction" style="margin-top:15px; display:none;">
+                                    <button type="button" id="btnSaveFH" onclick="clinical.SaveSection('FH');" class="btn btn-success btn-sm">Save</button>
+                                    <button type="button" id="btnCloseFH" onclick="clinical.CloseSection('FH');" class="btn btn-danger btn-sm">Close</button>
+                                </div>
+                            </div>
+                            <div id="personal" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnPHQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddPH" type="button" onclick="clinical.AddSection('PH');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <!-- QUICK INFO PANEL -->
+                                <!-- TEXTAREA -->
+                                <textarea id="txtPH" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <div id="divPHAction" style="margin-top:15px; display:none;">
+                                    <button type="button" id="btnSavePH" onclick="clinical.SaveSection('PH');" class="btn btn-success btn-sm">Save</button>
+                                    <button type="button" id="btnClosePH" onclick="clinical.CloseSection('PH');" class="btn btn-danger btn-sm">Close</button>
+                                </div>
+                            </div>
+                            <div id="forensic" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnFRHQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddFRH" type="button" onclick="clinical.AddSection('FRH');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <!-- QUICK INFO PANEL -->
+                                <!-- TEXTAREA -->
+                                <textarea id="txtFRH" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <div id="divFRHAction" style="margin-top:15px; display:none;">
+                                    <button type="button" id="btnSaveFRH" onclick="clinical.SaveSection('FRH');" class="btn btn-success btn-sm">Save</button>
+                                    <button type="button" id="btnCloseFRH" onclick="clinical.CloseSection('FRH');" class="btn btn-danger btn-sm">Close</button>
+                                </div>
+                            </div>
+                            <div id="drug" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnDAHQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddDAH" type="button" onclick="clinical.AddSection('DAH');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <!-- QUICK INFO PANEL -->
+                                <!-- TEXTAREA -->
+                                <textarea id="txtDAH" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <div id="divDAHAction" style="margin-top:15px; display:none;">
+                                    <button type="button" id="btnSaveDAH" onclick="clinical.SaveSection('DAH');" class="btn btn-success btn-sm">Save</button>
+                                    <button type="button" id="btnCloseDAH" onclick="clinical.CloseSection('DAH');" class="btn btn-danger btn-sm">Close</button>
+                                </div>
+                            </div>
+                            <div id="premorbid" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnPMPQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddPMP" type="button" onclick="clinical.AddSection('PMP');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <!-- QUICK INFO PANEL -->
+                                <!-- TEXTAREA -->
+                                <textarea id="txtPMP" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <div id="divPMPAction" style="margin-top:15px; display:none;">
+                                    <button type="button" id="btnSavePMP" onclick="clinical.SaveSection('PMP');" class="btn btn-success btn-sm">Save</button>
+                                    <button type="button" id="btnClosePMP" onclick="clinical.CloseSection('PMP');" class="btn btn-danger btn-sm">Close</button>
+                                </div>
+                            </div>
+                            <div id="mental" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnMSEQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddMSE" type="button" onclick="clinical.AddSection('MSE');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <!-- QUICK INFO PANEL -->
+                                <!-- TEXTAREA -->
+                                <textarea id="txtMSE" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <div id="divMSEAction" style="margin-top:15px; display:none;">
+                                    <button type="button" id="btnSaveMSE" onclick="clinical.SaveSection('MSE');" class="btn btn-success btn-sm">Save</button>
+                                    <button type="button" id="btnCloseMSE" onclick="clinical.CloseSection('MSE');" class="btn btn-danger btn-sm">Close</button>
+                                </div>
+                            </div>
+                            <div id="progressmenu" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnPNQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddPN" type="button" onclick="clinical.AddAssetmentSection('PN');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <div id="divPNPanel" class="addPanel">
+                                    <textarea id="txtPN" class="form-control" placeholder="Write progress note..." style="height:300px;"> </textarea>
+                                    <div id="divPNAction" style="margin-top:15px; display:none;">
+                                        <button type="button" id="btnSavePN" onclick="clinical.SaveAssetmentSection('PN');" class="btn btn-success btn-sm">Save</button>
+                                        <button type="button" id="btnClosePN" onclick="clinical.CloseAssetmentSection('PN');" class="btn btn-danger btn-sm">Close</button>
                                     </div>
                                 </div>
-
-                                <div class="timelineContainer"></div>
-
+                                <div id="divPNtimeline" class="simpleTimeline" style="display:none;"></div>
                             </div>
                             @*------------------------------------Investigations------------------------------------------*@
 
                             <div id="physicalMonitoring" class="tab-pane fade assessment-section">
-
                                 <div style="display:flex; gap:8px; margin-bottom:10px;">
-                                    <button class="btn btn-secondary btn-sm btnAddColumn">
+                                    <button class="btn btn-secondary btn-sm" id="btnAddPhysicalMonitoring" type="button" onclick="clinical.AddPhysicalMonitoring();">
                                         Add
                                     </button>
-
-                                    
-                                    <button type="button" class="btn btn-danger btnClearSection">
+                                    <button type="button" class="btn btn-danger" id="btnClearPhysicalMonitoring" onclick="clinical.ClearPhysicalMonitoring();" style="display:none;">
                                         Clear
                                     </button>
                                 </div>
-
-                                <div style="border:1px solid #ccc; padding:10px; background:#f9f9f9;">
-
-                                    <div style="overflow-x:auto; background:#fff;">
-
-                                        <table class="table table-bordered" id="physicalTable">
+                                <div style="overflow-x:auto; background:#fff;">
+                                    <div class="table-scroll-x">
+                                        <table class="table table-striped table-hover table-checkable border" id="physicalTable" height="300px">
+                                            <template>
+                                                AssestmentPHMData
+                                            </template>
                                             <thead>
                                                 <tr>
-                                                    <th style="min-width:250px;">Parameter</th>
+                                                    <th class="sticky-col" style="min-width:250px; background: #9d9c9c !important; color:#fff;">Parameter</th>
                                                 </tr>
                                             </thead>
-                                            <tbody>
-                                                <tr><td>Diabetes</td></tr>
-                                                <tr><td>Cardiovascular Disease</td></tr>
-                                                <tr><td>Weight (Kg)</td></tr>
-                                                <tr><td>Body Mass Index (BMI)</td></tr>
-                                                <tr><td>Waist circumference (inches)</td></tr>
-                                                <tr><td>BP (mm Hg)</td></tr>
-                                                <tr><td>Sodium, mmol/l (135-145)</td></tr>
-                                                <tr><td>Potassium, mmol/l (3.4-5.0)</td></tr>
-                                                <tr><td>Urea, mmol/l</td></tr>
-                                                <tr><td>Creatinine, umol/l</td></tr>
-                                                <tr><td>Blood glucose, mmol/l</td></tr>
-                                                <tr><td>HbA1c (if diabetic)</td></tr>
-                                                <tr><td>Bilirubin, umol/l (0-19)</td></tr>
-                                                <tr><td>Alk Phos, U/l (35-120)</td></tr>
-                                                <tr><td>ALT, U/l (0-40)</td></tr>
-                                                <tr><td>Albumin, g/l (34-50)</td></tr>
-                                                <tr><td>Total protein, g/l (58-78)</td></tr>
-                                            </tbody>
+                                            <tbody id="physicalTableBody"></tbody>
                                         </table>
-                                        
                                     </div>
-
                                 </div>
-                                <div style="display:flex; gap:8px; margin-top:10px;">
-                                    <button class="btn btn-success btn-sm btnSavePhysical">
+                                <div style="margin-top:10px; ">
+                                    <button type="button" style="display:none;" class="btn btn-success btn-sm " id="btnSavePHM" onclick="clinical.SaveAssetmentPHMData();">
                                         Save
                                     </button>
                                 </div>
                             </div>
                             <div id="scans" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnScanQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddSCAN" type="button" onclick="clinical.AddAssetmentSection('SCAN');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <div id="divSCANPanel" class="addPanel">
+                                    <textarea id="txtSCAN" class="form-control" placeholder="Write scan details..." style="height:300px;"></textarea>
 
-                                <!-- ADD THIS -->
-
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
+                                    <div id="divSCANAction" style="margin-top:15px; display:none;">
+                                        <button type="button" onclick="clinical.SaveAssetmentSection('SCAN');" class="btn btn-success btn-sm">
+                                            Save
                                         </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
+                                        <button type="button" onclick="clinical.CloseAssetmentSection('SCAN');" class="btn btn-danger btn-sm">
+                                            Close
                                         </button>
                                     </div>
-
-
                                 </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-
-                                    <textarea class="form-control newText"></textarea>
-
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-                                <div class="timelineContainer"></div>
+                                <div id="divSCANtimeline" class="simpleTimeline" style="display:none;"></div>
                             </div>
-
                             <div id="eeg" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnEEGQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddEEG" type="button" onclick="clinical.AddAssetmentSection('EEG');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <div id="divEEGPanel" class="addPanel">
+                                    <textarea id="txtEEG" class="form-control" placeholder="Write EEG details..." style="height:300px;"></textarea>
 
-                                <!-- ADD THIS -->
-
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
+                                    <div id="divEEGAction" style="margin-top:15px; display:none;">
+                                        <button type="button" onclick="clinical.SaveAssetmentSection('EEG');" class="btn btn-success btn-sm">
+                                            Save
                                         </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
+                                        <button type="button" onclick="clinical.CloseAssetmentSection('EEG');" class="btn btn-danger btn-sm">
+                                            Close
                                         </button>
                                     </div>
-
                                 </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-
-                                    <textarea class="form-control newText"></textarea>
-
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-                                <div class="timelineContainer"></div>
+                                <div id="divEEGtimeline" class="simpleTimeline" style="display:none;"></div>
                             </div>
-
                             <div id="otherInvestigations" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnOIQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddOI" type="button" onclick="clinical.AddAssetmentSection('OI');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <div id="divOIPanel" class="addPanel">
+                                    <textarea id="txtOI" class="form-control" placeholder="Write OI details..." style="height:300px;"></textarea>
 
-                                <!-- ADD THIS -->
-
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
+                                    <div id="divOIAction" style="margin-top:15px; display:none;">
+                                        <button type="button" onclick="clinical.SaveAssetmentSection('OI');" class="btn btn-success btn-sm">
+                                            Save
                                         </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
+                                        <button type="button" onclick="clinical.CloseAssetmentSection('OI');" class="btn btn-danger btn-sm">
+                                            Close
                                         </button>
                                     </div>
-
                                 </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-
-                                    <textarea class="form-control newText"></textarea>
-
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-                                <div class="timelineContainer"></div>
+                                <div id="divOItimeline" class="simpleTimeline" style="display:none;"></div>
                             </div>
 
                             @*--------------------------------------------Daignosis---------------------------------------------*@
@@ -1414,145 +1238,95 @@
                                 </div>
 
                             </div>
-
                             <div id="differential" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnDDQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddDD" type="button" onclick="clinical.AddAssetmentSection('DD');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <div id="divDDPanel" class="addPanel">
+                                    <textarea id="txtDD" class="form-control" placeholder="Write DD details..." style="height:300px;"></textarea>
 
-                                <!-- ADD THIS -->
-
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
+                                    <div id="divDDAction" style="margin-top:15px; display:none;">
+                                        <button type="button" onclick="clinical.SaveAssetmentSection('DD');" class="btn btn-success btn-sm">
+                                            Save
                                         </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
+                                        <button type="button" onclick="clinical.CloseAssetmentSection('DD');" class="btn btn-danger btn-sm">
+                                            Close
                                         </button>
                                     </div>
-
-
                                 </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-                                    <div class="panel-title">Add New Details</div>
-                                    <textarea class="form-control newText"></textarea>
-
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-                                <div class="timelineContainer"></div>
+                                <div id="divDDtimeline" class="simpleTimeline" style="display:none;"></div>
                             </div>
-
-
                             <div id="medicalDiagnosis" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnMDQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddMD" type="button" onclick="clinical.AddAssetmentSection('MD');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <div id="divMDPanel" class="addPanel">
+                                    <textarea id="txtMD" class="form-control" placeholder="Write MD details..." style="height:300px;"></textarea>
 
-                                <!-- ADD THIS -->
-
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
+                                    <div id="divMDAction" style="margin-top:15px; display:none;">
+                                        <button type="button" onclick="clinical.SaveAssetmentSection('MD');" class="btn btn-success btn-sm">
+                                            Save
                                         </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
+                                        <button type="button" onclick="clinical.CloseAssetmentSection('MD');" class="btn btn-danger btn-sm">
+                                            Close
                                         </button>
                                     </div>
-
-
                                 </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-
-                                    <textarea class="form-control newText"></textarea>
-
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-                                <div class="timelineContainer"></div>
+                                <div id="divMDtimeline" class="simpleTimeline" style="display:none;"></div>
                             </div>
+
+
+
                             @*---------------------------------------------Risk Assessment----------------------------------------*@
-
                             <div id="riskSummary" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnRSQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddRS" type="button" onclick="clinical.AddAssetmentSection('RS');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <div id="divRSPanel" class="addPanel">
+                                    <textarea id="txtRS" class="form-control" placeholder="Write RS details..." style="height:300px;"></textarea>
 
-                                <!-- ADD THIS -->
-
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
+                                    <div id="divRSAction" style="margin-top:15px; display:none;">
+                                        <button type="button" onclick="clinical.SaveAssetmentSection('RS');" class="btn btn-success btn-sm">
+                                            Save
                                         </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
+                                        <button type="button" onclick="clinical.CloseAssetmentSection('RS');" class="btn btn-danger btn-sm">
+                                            Close
                                         </button>
                                     </div>
-
                                 </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-
-                                    <textarea class="form-control newText"></textarea>
-
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-                                <div class="timelineContainer"></div>
+                                <div id="divRStimeline" class="simpleTimeline" style="display:none;"></div>
                             </div>
+
                             @*---------------------------------------------------------------------*@
                             <div id="riskPlan" class="tab-pane fade assessment-section">
+                                <div class="button-header">
+                                    <button id="btnRMPQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
+                                    <button id="btnAddRMP" type="button" onclick="clinical.AddAssetmentSection('RMP');" class="btn btn-secondary btn-sm">
+                                        Add
+                                    </button>
+                                </div>
+                                <div id="divRMPPanel" class="addPanel">
+                                    <textarea id="txtRMP" class="form-control" placeholder="Write RMP details..." style="height:300px;"></textarea>
 
-                                <!-- ADD THIS -->
-
-                                <div style="display:flex; align-items:center; width:100%; margin-bottom:10px;">
-
-                                    <!-- Left Side Buttons -->
-                                    <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
+                                    <div id="divRMPAction" style="margin-top:15px; display:none;">
+                                        <button type="button" onclick="clinical.SaveAssetmentSection('RMP');" class="btn btn-success btn-sm">
+                                            Save
                                         </button>
-
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
-                                            Add
+                                        <button type="button" onclick="clinical.CloseAssetmentSection('RMP');" class="btn btn-danger btn-sm">
+                                            Close
                                         </button>
                                     </div>
-
                                 </div>
-
-                                <!-- Add Panel -->
-                                <div class="addPanel">
-                                    <div class="panel-title">Add New Details</div>
-                                    <textarea class="form-control newText"></textarea>
-
-                                    <div style="margin-top:8px;">
-                                        <button class="btn btn-success btn-sm btnSaveCommon">Save</button>
-                                        <button class="btn btn-danger btn-sm btnCloseCommon">Close</button>
-                                    </div>
-                                </div>
-
-                                <br>
-                                <div class="timelineContainer"></div>
+                                <div id="divRMPtimeline" class="simpleTimeline" style="display:none;"></div>
                             </div>
 
                             <div id="riskIndicators" class="tab-pane fade assessment-section">
@@ -1564,7 +1338,7 @@
                                             Quick Information
                                         </button>
 
-                                        <button class="btn btn-secondary btn-sm btnAddCommon">
+                                        <button class="btn btn-secondary btn-sm ">
                                             Add
                                         </button>
                                     </div>
@@ -1749,7 +1523,6 @@
                                 </div>
 
                             </div>
-
                             @*--------------------------------------------PRESCRIPTIONS----------------------------------------------------------*@
                             <div id="prescriptions" class="tab-pane fade assessment-section">
 
@@ -1799,7 +1572,6 @@
                                 </div>
 
                             </div>
-
                             @*----------------------------------------Old Prescription---------------------------------------*@
                             <div id="oldprescriptions" class="tab-pane fade assessment-section">
 
@@ -1827,7 +1599,6 @@
 
                             </div>
                             @*--------------------------------IN Ptient-----------------------------------------*@
-
                             <div id="inpatients" class="tab-pane fade assessment-section">
 
                                 <!-- TOP BUTTON -->
@@ -1933,7 +1704,6 @@
 
                             </div>
                             @*----------------------------------------Attachment-------------------------------------------*@
-
                             <div id="attachments" class="tab-pane fade assessment-section">
 
                                 <div style="margin-bottom:10px;">
@@ -1995,7 +1765,7 @@
                                         Quick Information
                                     </button>
 
-                                    <button class="btn btn-secondary btn-sm btnAddCommon">
+                                    <button class="btn btn-secondary btn-sm ">
                                         Add
                                     </button>
                                 </div>
@@ -2121,9 +1891,7 @@
                                     </button>
                                 </div>
                             </div>
-
                             @*----------------------------Psychiatric Report----------------------------------------*@
-
                             <div id="psyreport" class="tab-pane fade assessment-section">
                             </div>
 
@@ -2131,7 +1899,8 @@
                     </div>
                 </div>
             </div>
-
+            <input type="hidden" id="hf_PatientID" value="" />
+            <input type="hidden" id="hf_AppointmentID" value="" />
         </div>
     </form>
 </div>

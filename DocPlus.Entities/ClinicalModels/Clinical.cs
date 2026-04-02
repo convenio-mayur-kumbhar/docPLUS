@@ -8,6 +8,8 @@ namespace DocPlus.Entities.ClinicalModels
         public List<NOK_CM>? NOKDetails { get; set; }
         public List<OP_CM>? OPDetails { get; set; }
         public InitialAssessment_CM? InitialDetails { get; set; }
+        public List<PatientAssessmentDetails>? AssessmentDetails { get; set; }
+        public List<PatientAssessmentPHM_CM>? PHMDetails { get; set; }
     }
     public class NOK_CM
     {
@@ -51,7 +53,7 @@ namespace DocPlus.Entities.ClinicalModels
         public int ID { get; set; }
         public string? DisplayText { get; set; }
     }
-    public class PatientInitialDetails_CM
+    public class PatientInitialDetails_CM : Base_VM
     {
         public int PAT_ID { get; set; }
         public string? ASS_PC { get; set; }
@@ -66,7 +68,7 @@ namespace DocPlus.Entities.ClinicalModels
         public string? ASS_MSE { get; set; }
         public int LAST_UPDATED_BY { get; set; }
     }
-    public class PatientAssessmentDetails
+    public class PatientAssessmentDetails : Base_VM
     {
         public int PAT_ASS_ID { get; set; }
         public int PAT_ID { get; set; }
@@ -114,7 +116,7 @@ namespace DocPlus.Entities.ClinicalModels
     {
         public int RISK_ID { get; set; }
         public string? RISK_DETAILS { get; set; }
-        public string? RISK_FLAG { get; set; } 
+        public string? RISK_FLAG { get; set; }
     }
     public class PatientRiskSave_CM
     {
@@ -154,7 +156,6 @@ namespace DocPlus.Entities.ClinicalModels
         public string? INPT_NOTES { get; set; }
         public int? LAST_UPDATED_BY { get; set; }
     }
-   
     public class PatientAttachment_CM
     {
         public int ASS_ATTACH_ID { get; set; }
@@ -186,6 +187,46 @@ namespace DocPlus.Entities.ClinicalModels
         public string? MC_SUFF_FROM { get; set; }
         public string? MC_CONSEQUENCES { get; set; }
         public string? MC_RECO { get; set; }
+        public int LAST_UPDATED_BY { get; set; }
+    }
+    public class PatientAssessmentPHM_CM : Base_VM
+    {
+        public int? PAT_PHM_ID { get; set; }
+        public int? PAT_ID { get; set; }
+        public DateTime? ASS_DATE { get; set; }
+        public string? DIABETES { get; set; }
+        public string? CARDIOVAS { get; set; }
+        public string? WT { get; set; }
+        public string? BMI { get; set; }
+        public string? WAIST { get; set; }
+        public string? BP { get; set; }
+        public string? SODIUM { get; set; }
+        public string? POTASSIUM { get; set; }
+        public string? UREA { get; set; }
+        public string? CREATININE { get; set; }
+        public string? GLUCOSE { get; set; }
+        public string? HBA1C { get; set; }
+        public string? BILIRUBIN { get; set; }
+        public string? ALKPHOS { get; set; }
+        public string? ALT { get; set; }
+        public string? ALBUMIN { get; set; }
+        public string? PROTEIN { get; set; }
+        public string? GAMMA { get; set; }
+        public string? TSH { get; set; }
+        public string? THYROXINE { get; set; }
+        public string? HB { get; set; }
+        public string? WBC { get; set; }
+        public string? PLT { get; set; }
+        public string? TOT_CHOLESTEROL { get; set; }
+        public string? HDL_CHOLESTEROL { get; set; }
+        public string? TOT_HDL_RATIO { get; set; }
+        public string? TRIGLY { get; set; }
+        public string? CV_RISK { get; set; }
+        public string? URINALYSIS { get; set; }
+        public string? LUNSERS { get; set; }
+        public string? QTC { get; set; }
+        public string? PROLACTIN { get; set; }                     
+        public bool? AFLAG { get; set; }
         public int LAST_UPDATED_BY { get; set; }
     }
 }

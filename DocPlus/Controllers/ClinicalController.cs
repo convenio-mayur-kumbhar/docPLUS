@@ -18,7 +18,7 @@ namespace DocPlus.Controllers
 
         public PartialViewResult _partialStartAssessment()
         {
-                return PartialView("_partialStartAssessment");
+            return PartialView("_partialStartAssessment");
         }
 
         [HttpPost]
@@ -26,7 +26,7 @@ namespace DocPlus.Controllers
         public async Task<JsonResult> GetData(Patient_VM Model)
         {
             try
-            {               
+            {
                 if (ModelState.IsValid)
                 {
                     GetUserInfo(Model);
@@ -92,6 +92,122 @@ namespace DocPlus.Controllers
             catch (Exception ex)
             {
                 return GetDataResponseException(ex);
+            }
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> SaveInitialDetails(PatientInitialDetails_CM Model)
+        {
+            if (!ModelState.IsValid)
+                return GetModelStateIsValidException(ModelState);
+            try
+            {
+                GetUserInfo(Model);
+                if (Model.PAT_ID > 0)
+                {
+                    HttpResponseMessage response = await CallPostAPIAsync("ClinicalAPI/SaveInitialDetails", Model);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string raw = await response.Content.ReadAsStringAsync();
+
+                        var result = JsonConvert.DeserializeObject<JsonResponse>(raw);
+
+                        return Json(new
+                        {
+                            Status = result.Status == "1",
+                            Message = result.Message
+                        });
+                    }
+                    else
+                    {
+                        return Json(new { Status = false, Message = "API Error" });
+                    }
+                }
+
+                return Json(new { Status = false, Message = "Invalid Patient ID" });
+            }
+            catch (Exception ex)
+            {
+                logger.Error("SaveInitialDetails Error: ", ex);
+                return Json(new { Status = false, Message = "Exception occurred" });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> SaveAssessmentDetails(PatientAssessmentDetails Model)
+        {
+            if (!ModelState.IsValid)
+                return GetModelStateIsValidException(ModelState);
+            try
+            {
+                GetUserInfo(Model);
+                if (Model.PAT_ID > 0)
+                {
+                    HttpResponseMessage response = await CallPostAPIAsync("ClinicalAPI/SaveAssessmentDetails", Model);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string raw = await response.Content.ReadAsStringAsync();
+
+                        var result = JsonConvert.DeserializeObject<JsonResponse>(raw);
+
+                        return Json(new
+                        {
+                            Status = result.Status == "1",
+                            Message = result.Message
+                        });
+                    }
+                    else
+                    {
+                        return Json(new { Status = false, Message = "API Error" });
+                    }
+                }
+
+                return Json(new { Status = false, Message = "Invalid Patient ID" });
+            }
+            catch (Exception ex)
+            {
+                logger.Error("SaveInitialDetails Error: ", ex);
+                return Json(new { Status = false, Message = "Exception occurred" });
+            }
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> SaveAssessmentPHM(List<PatientAssessmentPHM_CM> Model)
+        {
+            if (Model == null || Model.Count == 0)
+                return Json(new { Status = false, Message = "No data received" });
+
+            if (!ModelState.IsValid)
+                return GetModelStateIsValidException(ModelState);
+
+            try
+            {
+                // ✅ Add user info to all records
+                foreach (var item in Model)
+                {
+                    GetUserInfo(item);
+
+                    if (item.PAT_ID <= 0)
+                        return Json(new { Status = false, Message = "Invalid Patient ID" });
+                }
+
+                // ✅ SINGLE API CALL (PASS FULL LIST)
+                HttpResponseMessage response = await CallPostAPIAsync("ClinicalAPI/SaveAssessmentPHM", Model);  // 🔥 FULL LIST           
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return Json(new { Status = false, Message = "API Error" });
+                }
+
+                return Json(new { Status = true, Message = "Saved Successfully" });
+            }
+            catch (Exception ex)
+            {
+                logger.Error("SavePHM Error: ", ex);
+                return Json(new { Status = false, Message = "Exception occurred" });
             }
         }
         public ActionResult StartAssessment(string reg, string name, string age,

@@ -1,4 +1,70 @@
-﻿var BindDataTableRowCount = 0;
+﻿let ajaxCount = 0;
+function showMedLoader(type) {
+    const config = {
+        save: "Saving Data...",
+        load: "Loading Dashboard...",
+        delete: "Deleting Record...",
+        update: "Updating Information...",
+        process: "Processing Request..."
+    };
+    $("#medTitle").text("Loading docPLUS...");
+    $("#medTime").text(new Date().toLocaleTimeString());
+    $("#medMessage").text(config[type] || "Please wait...");
+    // 🔥 stop previous animations & show
+    $("#medicalLoader").stop(true, true).fadeIn();
+}
+function hideMedLoader(delay = 500) {
+    setTimeout(() => {
+        $("#medicalLoader").stop(true, true).fadeOut();
+    }, delay);
+}
+function startTimelineLoader(type) {
+    showMedLoader(type);
+
+    setTimeout(() => {
+        $("#medMessage").text("Validating...");
+    }, 300);
+
+    setTimeout(() => {
+        $("#medMessage").text("Processing...");
+    }, 700);
+
+    setTimeout(() => {
+        $("#medMessage").text("Finalizing...");
+    }, 1200);
+}
+// ✅ When AJAX starts
+$(document).ajaxSend(function (e, xhr, settings) {
+    ajaxCount++;
+    if (ajaxCount === 1) {
+        if (settings.url.includes("Save"))
+            startTimelineLoader("save");
+        else if (settings.url.includes("Delete"))
+            startTimelineLoader("delete");
+        else if (settings.url.includes("Update"))
+            startTimelineLoader("update");
+        else if (settings.url.includes("Load") || settings.url.includes("Get"))
+            startTimelineLoader("load");
+        else
+            startTimelineLoader("process");
+    }
+});
+// ✅ When EACH AJAX completes (success OR error)
+$(document).ajaxComplete(function (e, xhr) {
+    ajaxCount--;
+    if (ajaxCount <= 0) {
+        ajaxCount = 0;
+        // 🔥 Handle error response
+        if (xhr.status >= 400) {
+            $("#medTitle").text("Error");
+            $("#medMessage").text("❌ Something went wrong...");
+        } else {
+            $("#medMessage").text("✅ Completed");
+        }
+        hideMedLoader(1500);
+    }
+});
+var BindDataTableRowCount = 0;
 
 var dataColors = {
     0: "#91A8D0", 1: "#7F4145", 2: "#BD3D3A", 3: "#D5AE41", 4: "#E47A2E", 5: "#009B77", 6: "#D1B894", 7: "#EC9787", 8: "#672E3B", 9: "#92B6D5",
@@ -692,7 +758,7 @@ function loadTableWithoutPagingWithoutSortable(tableID, model) {
         "bInfo": false, // hide showing entries
     };
 
-   
+
     var columss = [];
     $("#" + tableID + " thead tr th").each(function () {
         if (!$(this).hasClass("sorting_disabled"))
@@ -2656,29 +2722,38 @@ function IsDataExists(val) {
 }
 
 function AddUpdateData(Ajaxurl, AjaxData, SuccessCallback, ErrorCallback) {
-    debugger;
+
     $.ajax({
-        type: "POST", cache: false, url: Ajaxurl, data: AjaxData,
+        type: "POST",
+        cache: false,
+        url: Ajaxurl,
+        data: AjaxData,
+
         success: function (data) {
             if (data != null) {
-                if (data.status == 'Success') {
-                    if (SuccessCallback && typeof (SuccessCallback) === "function")
+                // ✅ FIXED CONDITION
+                if (data.status === true || data.status === 'Success') {
+                    if (SuccessCallback && typeof SuccessCallback === "function") {
                         SuccessCallback(data);
-                } else if (data.status == 'Error') {
-
-                    if (data.toString().indexOf("LoginBody") >= 0) {
-                        window.open(ProjectURL.BaseURL, "_self")
                     }
-
-                    if (ErrorCallback && typeof (ErrorCallback) === "function")
+                } else {
+                    if (data.toString().indexOf("LoginBody") >= 0) {
+                        window.open(ProjectURL.BaseURL, "_self");
+                    }
+                    if (ErrorCallback && typeof ErrorCallback === "function") {
                         ErrorCallback(data);
+                    }
                 }
-
-            } /*else showSweetAlert("Error!", data.message, "error", null);*/
+            }
+        },
+        error: function (xhr) {
+            console.error("AJAX Error:", xhr);
+            if (ErrorCallback && typeof ErrorCallback === "function") {
+                ErrorCallback(xhr);
+            }
         }
     });
 }
-
 function GetAjaxData(Ajaxurl, AjaxData, SuccessCallback, ErrorCallback) {
 
     /*Below three lines added for Inpsection form grid data load by lazy load*/
@@ -3162,7 +3237,7 @@ function showSweetAlert(title, message, type, ClosingCallBack) {
     });
 }
 
-function Reload_ddl_Global_staticData(xhr, ddlID, AjaxURL, AjaxData, DefaultLabel, data, callback, ) {
+function Reload_ddl_Global_staticData(xhr, ddlID, AjaxURL, AjaxData, DefaultLabel, data, callback,) {
 
     var items = eval(data);
 
@@ -3208,3 +3283,14 @@ function AllowOnlyNumberOrDecimalValue(MyID) {
 }
 
 const IsNumeric = (num) => /^-{0,1}\d*\.{0,1}\d+$/.test(num);
+
+function formatDateLocal(dateValue) {
+    let date = new Date(dateValue);
+
+    let year = date.getFullYear();
+    let month = String(date.getMonth() + 1).padStart(2, '0');
+    let day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+}
+
