@@ -180,7 +180,7 @@ namespace DocPlus.Operations.Repository
                 };
             }
         }
-        public async Task<JsonResponse> GetPatientById(int patId)
+        public async Task<JsonResponse> GetAppointmentDetailsById(int patId)
         {
             try
             {
@@ -192,7 +192,7 @@ namespace DocPlus.Operations.Repository
                     param.Add("@p_PAT_ID", patId);
 
                     var data = await connection.QueryFirstOrDefaultAsync<Patient_VM>(
-                        "GetPatientDetailsById",
+                        "GetAppointmentDetailsById",
                         param,
                         commandType: CommandType.StoredProcedure);
 
@@ -224,7 +224,7 @@ namespace DocPlus.Operations.Repository
         public Task<JsonResponse> UpdateAppointment(Appointment_VM model);
         public Task<JsonResponse> DeleteAppointment(int patId);
         public Task<JsonResponse> GetPatientDropdown();
-        public Task<JsonResponse> GetPatientById(int patId);
+        public Task<JsonResponse> GetAppointmentDetailsById(int patId);
 
     }
 }

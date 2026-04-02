@@ -52,10 +52,10 @@ namespace DocPlus.API.Controllers
             return Ok(result);
         }
         [Authorize]
-        [HttpGet("GetPatientById")]
-        public async Task<IActionResult> GetPatientById(int id)
+        [HttpGet("GetAppointmentDetailsById")]
+        public async Task<IActionResult> GetAppointmentDetailsById(int id)
         {
-            var result = await _IAppointmentRepo.GetPatientById(id);
+            var result = await _IAppointmentRepo.GetAppointmentDetailsById(id);
             return Ok(result);
         }
     }

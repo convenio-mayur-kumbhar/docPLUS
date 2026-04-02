@@ -41,8 +41,8 @@ namespace DocPlus.API.Controllers
         [HttpPost("SaveInitialDetails")]
         public async Task<IActionResult> SaveInitialDetails(PatientInitialDetails_CM model)
         {
-            await _ClinicalRepo.SaveInitialDetails(model);
-            return Ok("Saved successfully");
+            var result = await _ClinicalRepo.SaveInitialDetails(model);
+            return Ok(result); // ✅ return full object
         }
         [Authorize]
         [HttpPost("SaveAssessmentDetails")]
@@ -162,6 +162,24 @@ namespace DocPlus.API.Controllers
         {
             var res = await _ClinicalRepo.GetMedicalCertificateByDate(patId, date);
             return Ok(res);
+        }
+        [Authorize]
+        [HttpPost("SaveAssessmentPHM")]
+        public async Task<IActionResult> SaveAssessmentPHMDetail(List<PatientAssessmentPHM_CM> models)
+        {
+            if (models == null || models.Count == 0)
+            {
+                return BadRequest(new JsonResponse
+                {
+                    Status = "0",
+                    Message = "No data received"
+                });
+            }
+
+            // ✅ SINGLE REPO CALL
+            var result = await _ClinicalRepo.SaveAssessmentPHMBulk(models);
+            return Ok(result);
+
         }
     }
 }
