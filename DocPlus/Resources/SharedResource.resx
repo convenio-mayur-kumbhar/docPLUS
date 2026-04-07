@@ -123,8 +123,20 @@
   <data name="Active" xml:space="preserve">
     <value>Active</value>
   </data>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="Add_Appointment" xml:space="preserve">
+    <value>Add Appointment</value>
+  </data>
   <data name="Add_Patient" xml:space="preserve">
     <value>Add Patient</value>
+  </data>
+  <data name="Admin_Settings" xml:space="preserve">
+    <value>Admin Settings</value>
+  </data>
+  <data name="Age" xml:space="preserve">
+    <value>Age</value>
   </data>
   <data name="All" xml:space="preserve">
     <value>All</value>
@@ -135,8 +147,38 @@
   <data name="All_Status" xml:space="preserve">
     <value>All Status</value>
   </data>
+  <data name="Appointment_Comments" xml:space="preserve">
+    <value>Appointment Comments</value>
+  </data>
+  <data name="Appointment_Date" xml:space="preserve">
+    <value>Appointment Date</value>
+  </data>
+  <data name="Appointment_Details" xml:space="preserve">
+    <value>Appointment Details</value>
+  </data>
+  <data name="Appointment_List" xml:space="preserve">
+    <value>Appointment List</value>
+  </data>
+  <data name="Appointment_Time" xml:space="preserve">
+    <value>Appointment Time</value>
+  </data>
+  <data name="Assessment" xml:space="preserve">
+    <value>Assessment</value>
+  </data>
+  <data name="Attachments" xml:space="preserve">
+    <value>Attachments</value>
+  </data>
+  <data name="Clear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
   <data name="Clinical" xml:space="preserve">
     <value>Clinical</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Comments" xml:space="preserve">
+    <value>Comments</value>
   </data>
   <data name="Contact" xml:space="preserve">
     <value>Contact</value>
@@ -147,14 +189,41 @@
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
+  <data name="Demographics" xml:space="preserve">
+    <value>Demographics</value>
+  </data>
+  <data name="Diagnosis" xml:space="preserve">
+    <value>Diagnosis</value>
+  </data>
+  <data name="Differential_Diagnosis" xml:space="preserve">
+    <value>Differential Diagnosis</value>
+  </data>
   <data name="DOB" xml:space="preserve">
     <value>DOB</value>
   </data>
   <data name="Doctor" xml:space="preserve">
     <value>Doctor</value>
   </data>
+  <data name="Drug_Alcohol_History" xml:space="preserve">
+    <value>Drug &amp; Alcohol History</value>
+  </data>
+  <data name="DSM_5" xml:space="preserve">
+    <value>DSM-5</value>
+  </data>
+  <data name="DSM_5_Diagnosis" xml:space="preserve">
+    <value>DSM-5 Diagnosis</value>
+  </data>
   <data name="Edit" xml:space="preserve">
     <value>Edit</value>
+  </data>
+  <data name="EEG" xml:space="preserve">
+    <value>EEG</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Enter_Comments" xml:space="preserve">
+    <value>Enter the Comments</value>
   </data>
   <data name="Enter_First_Name" xml:space="preserve">
     <value>Enter First Name</value>
@@ -165,26 +234,77 @@
   <data name="Enter_Mobile_No" xml:space="preserve">
     <value>Enter Mobile No</value>
   </data>
+  <data name="Enter_Patient_Name" xml:space="preserve">
+    <value>Enter Patient Name</value>
+  </data>
   <data name="Enter_Reg_No" xml:space="preserve">
     <value>Enter Reg No</value>
+  </data>
+  <data name="Enter_Telephone_no" xml:space="preserve">
+    <value>Enter Telephone no</value>
+  </data>
+  <data name="Enter_the_details" xml:space="preserve">
+    <value>Enter the details</value>
   </data>
   <data name="Export" xml:space="preserve">
     <value>Export</value>
   </data>
+  <data name="Family_History" xml:space="preserve">
+    <value>Family History</value>
+  </data>
   <data name="Female" xml:space="preserve">
     <value>Female</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filter</value>
+  </data>
+  <data name="First_Contact" xml:space="preserve">
+    <value>First Contact</value>
   </data>
   <data name="First_Name" xml:space="preserve">
     <value>First Name</value>
   </data>
+  <data name="Forensic_History" xml:space="preserve">
+    <value>Forensic History</value>
+  </data>
+  <data name="Full_Name" xml:space="preserve">
+    <value>Full Name</value>
+  </data>
   <data name="Gender" xml:space="preserve">
     <value>Gender</value>
+  </data>
+  <data name="General_Information" xml:space="preserve">
+    <value>General Information</value>
   </data>
   <data name="History" xml:space="preserve">
     <value>History</value>
   </data>
+  <data name="History_of_Presenting_Complaints" xml:space="preserve">
+    <value>History of Presenting Complaints</value>
+  </data>
+  <data name="ICD_10" xml:space="preserve">
+    <value>ICD-10</value>
+  </data>
+  <data name="ICD_10_Diagnosis" xml:space="preserve">
+    <value>ICD-10 Diagnosis</value>
+  </data>
   <data name="Inactive" xml:space="preserve">
     <value>Inactive</value>
+  </data>
+  <data name="Initial_Assessment" xml:space="preserve">
+    <value>Initial Assessment</value>
+  </data>
+  <data name="Inpatients" xml:space="preserve">
+    <value>Inpatients</value>
+  </data>
+  <data name="Investigations" xml:space="preserve">
+    <value>Investigations</value>
+  </data>
+  <data name="Last_1_Year" xml:space="preserve">
+    <value>Last 1 Year</value>
+  </data>
+  <data name="Last_6_Months" xml:space="preserve">
+    <value>Last 6 Months</value>
   </data>
   <data name="Last_Name" xml:space="preserve">
     <value>Last Name</value>
@@ -195,11 +315,92 @@
   <data name="Male" xml:space="preserve">
     <value>Male</value>
   </data>
+  <data name="Marital_Status" xml:space="preserve">
+    <value>Marital Status</value>
+  </data>
+  <data name="Medical_Certificate" xml:space="preserve">
+    <value>Medical Certificate</value>
+  </data>
+  <data name="Medical_Diagnosis" xml:space="preserve">
+    <value>Medical Diagnosis</value>
+  </data>
+  <data name="Medical_History" xml:space="preserve">
+    <value>Medical History</value>
+  </data>
+  <data name="Mental_State_Examination" xml:space="preserve">
+    <value>Mental State Examination</value>
+  </data>
+  <data name="Middle_Name" xml:space="preserve">
+    <value>Middle Name</value>
+  </data>
   <data name="Mobile_No" xml:space="preserve">
     <value>Mobile No</value>
   </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="Next_of_Kin" xml:space="preserve">
+    <value>Next of Kin</value>
+  </data>
+  <data name="NOK_List" xml:space="preserve">
+    <value>NOK List</value>
+  </data>
+  <data name="OP_List" xml:space="preserve">
+    <value>OP List</value>
+  </data>
   <data name="Other" xml:space="preserve">
     <value>Other</value>
+  </data>
+  <data name="Other_Investigations" xml:space="preserve">
+    <value>Other Investigations</value>
+  </data>
+  <data name="Other_Professionals" xml:space="preserve">
+    <value>Other Professionals</value>
+  </data>
+  <data name="Parameter" xml:space="preserve">
+    <value>Parameter</value>
+  </data>
+  <data name="Past_Psychiatric_History" xml:space="preserve">
+    <value>Past Psychiatric History</value>
+  </data>
+  <data name="Patient_Details" xml:space="preserve">
+    <value>Patient Details</value>
+  </data>
+  <data name="Patient_Name" xml:space="preserve">
+    <value>Patient Name</value>
+  </data>
+  <data name="Personal_History" xml:space="preserve">
+    <value>Personal History</value>
+  </data>
+  <data name="Physical_Health_Monitoring" xml:space="preserve">
+    <value>Physical Health Monitoring</value>
+  </data>
+  <data name="Physical_Monitoring" xml:space="preserve">
+    <value>Physical Monitoring</value>
+  </data>
+  <data name="Premorbid_Personality" xml:space="preserve">
+    <value>Premorbid Personality</value>
+  </data>
+  <data name="Prescriptions" xml:space="preserve">
+    <value>Prescriptions</value>
+  </data>
+  <data name="Presenting_Complaints" xml:space="preserve">
+    <value>Presenting Complaints</value>
+  </data>
+  <data name="Profession" xml:space="preserve">
+    <value>Profession</value>
+  </data>
+  <data name="Progress_Notes" xml:space="preserve">
+    <value>Progress Notes</value>
+  </data>
+  <data name="Psychiatric_Report" xml:space="preserve">
+    <value>Psychiatric Report</value>
+  </data>
+  <data name="Quick_Information" xml:space="preserve">
+    <value>Quick Information</value>
+  </data>
+  <data name="Referred_By" xml:space="preserve">
+    <value>Referred By</value>
   </data>
   <data name="Registration_No" xml:space="preserve">
     <value>Registration No</value>
@@ -207,17 +408,53 @@
   <data name="Reg_No" xml:space="preserve">
     <value>Reg No</value>
   </data>
+  <data name="Relation" xml:space="preserve">
+    <value>Relation</value>
+  </data>
+  <data name="Remarks" xml:space="preserve">
+    <value>Remarks</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
   <data name="Reset" xml:space="preserve">
     <value>Reset</value>
   </data>
+  <data name="Risk_Assessment" xml:space="preserve">
+    <value>Risk Assessment</value>
+  </data>
+  <data name="Risk_Indicators" xml:space="preserve">
+    <value>Risk Indicators</value>
+  </data>
+  <data name="Risk_Management_Plan" xml:space="preserve">
+    <value>Risk Management Plan</value>
+  </data>
+  <data name="Risk_Summary" xml:space="preserve">
+    <value>Risk Summary</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="Scans" xml:space="preserve">
+    <value>Scans</value>
+  </data>
   <data name="Search" xml:space="preserve">
     <value>Search</value>
+  </data>
+  <data name="Select_Date" xml:space="preserve">
+    <value>Select Date</value>
   </data>
   <data name="Start_Assessment" xml:space="preserve">
     <value>Start Assessment</value>
   </data>
   <data name="Status" xml:space="preserve">
     <value>Status</value>
+  </data>
+  <data name="Tele_No" xml:space="preserve">
+    <value>Telephone No</value>
+  </data>
+  <data name="Time" xml:space="preserve">
+    <value>Time</value>
   </data>
   <data name="View" xml:space="preserve">
     <value>View</value>

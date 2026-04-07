@@ -31,6 +31,27 @@ namespace DocPlus.API.Controllers
             return Ok(result);
         }
         [Authorize]
+        [HttpGet("GetClinicalInitailsDetailsByPatientID/{id}/{assValue}")]
+        public async Task<IActionResult> GetClinicalInitailsDetailsByPatientID(int id, string assValue)
+        {
+            var result = await _ClinicalRepo.GetClinicalInitailsDetailsByPatientID(id, assValue);
+            return Ok(result);
+        }
+        [Authorize]
+        [HttpGet("GetClinicalAssetmentsDetailsByPatientID/{id}/{assValue}/{filterType}")]
+        public async Task<IActionResult> GetClinicalAssetmentsDetailsByPatientID(int id, string assValue, int filterType)
+        {
+            var result = await _ClinicalRepo.GetClinicalAssetmentsDetailsByPatientID(id, assValue, filterType);
+            return Ok(result);
+        }
+        [Authorize]
+        [HttpGet("GetClinicalPHMDetailsByPatientID/{id}/{filterType}")]
+        public async Task<IActionResult> GetClinicalPHMDetailsByPatientID(int id, int filterType)
+        {
+            var result = await _ClinicalRepo.GetClinicalPHMDetailsByPatientID(id, filterType);
+            return Ok(result);
+        }
+        [Authorize]
         [HttpGet("GetDSM4_ICD10MasterData")]
         public async Task<IActionResult> GetDSM4_ICD10MasterData(string type)
         {

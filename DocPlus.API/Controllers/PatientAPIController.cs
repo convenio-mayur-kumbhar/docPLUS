@@ -46,5 +46,40 @@ namespace DocPlus.API.Controllers
             var result = await _PatientRepo.GetPatientById(id);
             return Ok(result);
         }
+        [Authorize]
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> DeletePatient(int id)
+        {
+            var result = await _PatientRepo.DeletePatient(id);
+            return Ok(result);
+        }
+        [Authorize]
+        [HttpPost("addNOK")]
+        public async Task<IActionResult> SavePatientNOK(PatientNOKDetails model)
+        {
+            var result = await _PatientRepo.SavePatientNOK(model);
+            return Ok(result);
+        }
+        [Authorize]
+        [HttpPost("addOP")]
+        public async Task<IActionResult> SavePatientOP(PatientOPDetails model)
+        {
+            var result = await _PatientRepo.SavePatientOP(model);
+            return Ok(result);
+        }
+        [Authorize]
+        [HttpDelete("DeletePatientNOK")]
+        public async Task<IActionResult> DeletePatientNOK(int id, int userId)
+        {
+            var result = await _PatientRepo.DeletePatientNOK(id, userId);
+            return Ok(result);
+        }
+        [Authorize]
+        [HttpDelete("DeletePatientOP")]
+        public async Task<IActionResult> DeletePatientOP(int id, int userId)
+        {
+            var result = await _PatientRepo.DeletePatientOP(id, userId);
+            return Ok(result);
+        }
     }
 }

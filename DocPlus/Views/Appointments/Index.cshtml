@@ -1,8 +1,10 @@
-﻿@{
-    ViewData["Title"] = "Appointments";
-}
+﻿@using System.Reflection
+@inject IStringLocalizerFactory LocalizerFactory
 
-<link href="~/assets/css/dataTables.bootstrap.min.css" rel="stylesheet" />
+@{
+    var Localizer = LocalizerFactory.Create("SharedResource", Assembly.GetExecutingAssembly().GetName().Name);
+    ViewData["Title"] = @Localizer["Appointments"];
+}
 
 <style>
     body,
@@ -42,7 +44,7 @@
         max-width: 900px;
     }
 
-  
+
 
     /* Title */
     .appointment-modal .modal-title {
@@ -72,9 +74,12 @@
     .appointment-modal textarea {
         height: auto;
     }
+    /* Fix select2 inside modal */
+    .appointment-modal .select2-container {
+        width: 100% !important;
+    }
 
-    /* Footer */
-   
+
 
     /* Buttons */
     .modal-footer .btn {
@@ -84,7 +89,9 @@
 </style>
 
 <!-- SUBHEADER -->
-<div class="kt-subheader kt-grid__item">
+<div class="kt-subheader kt-grid__item d-flex justify-content-between align-items-center">
+
+    <!-- LEFT SIDE → Breadcrumb -->
     <div class="kt-subheader__main">
         <div class="kt-subheader__breadcrumbs">
             <a asp-controller="Dashboard" asp-action="Index" class="kt-subheader__breadcrumbs-home">
@@ -92,90 +99,64 @@
             </a>
             <span class="kt-subheader__breadcrumbs-separator"></span>
             <a href="javascript:;" class="kt-subheader__breadcrumbs-link">
-                Admin Settings
+                @Localizer["Admin_Settings"]
             </a>
             <span class="kt-subheader__breadcrumbs-separator"></span>
             <a asp-controller="Appointment" asp-action="Index" class="kt-subheader__breadcrumbs-link">
-                Appointment Master
+                @Localizer["Appointments"]
             </a>
         </div>
     </div>
-</div>
 
-<!-- SEARCH FILTER -->
-@* <div class="kt-portlet kt-portlet--mobile p-3 mb-2">
+    <!-- RIGHT SIDE → Buttons -->
+    <div class="kt-subheader__toolbar d-flex">
 
-    <div class="form-group row align-items-end">
+        <a href="javascript:;" id="btnAddAppointment"
+           class="btn btn-brand btn-elevate btn-icon-sm mr-2"
+           onclick="appointments.SetForAdd();">
+            <i class="fas fa-plus-circle"></i> @Localizer["Add_Appointment"]
+        </a>
 
-        <div class="col-md-3">
-            <label>Patient Name</label>
-            <input type="text"
-                   id="txtPatientName"
-                   class="form-control"
-                   placeholder="Enter Patient Name">
-        </div>
-
-        <div class="col-md-3">
-            <label>Date:</label>
-            <div class="input-daterange input-group">
-                <input type="text" id="txtvalidFrom" class="form-control date-picker" name="startMonth" placeholder="Date" autocomplete="off" />
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <button class="btn btn-primary mr-2"
-                    onclick="appointmentMaster.Search();">
-                Search
-            </button>
-
-            <button class="btn btn-danger mr-2"
-                    onclick="appointmentMaster.Reset();">
-                Reset
-            </button>
-
-            <button class="btn btn-secondary"
-                    onclick="appointmentMaster.Export();">
-                <i class="la la-download"></i> Export
+        <div id="divExport" style="display:none;">
+            <button type="button"
+                    class="btn btn-default btn-icon-sm"
+                    onclick="appointments.Export();">
+                <i class="la la-download"></i> @Localizer["Export"]
             </button>
         </div>
 
     </div>
 
-</div> *@
+</div>
+
 <div class="kt-portlet kt-portlet--mobile p-3 mb-2">
 
     <div class="form-group row align-items-end">
 
         <div class="col-md-3">
-            <label>Patient Name</label>
+            <label>@Localizer["Patient_Name"]:</label>
             <input type="text"
                    id="txtPatientName"
                    class="form-control"
                    placeholder="Enter Patient Name">
         </div>
 
-        <div class="col-md-3">
-            <label>Date:</label>
+        <div class="col-xs-12 col-md-3 col-lg-3">
+            <label>@Localizer["Date"]:</label>
             <div class="input-daterange input-group">
-                <input type="text" id="txtvalidFrom" class="form-control date-picker" name="startMonth" placeholder="Date" autocomplete="off" />
+                <input type="date" class="form-control" id="textSearchDate" />
             </div>
         </div>
-
         <div class="col-md-6">
-            <button class="btn btn-primary mr-2"
-                    onclick="appointmentMaster.Search();">
-                Search
+            <button type="button" class="btn btn-success"
+                    onclick="appointments.SetForSearch()">
+                @Localizer["Search"]
+            </button>
+            <button type="button" class="btn btn-danger"
+                    onclick="appointments.ResetSearch();">
+                @Localizer["Reset"]
             </button>
 
-            <button class="btn btn-danger mr-2"
-                    onclick="appointmentMaster.Reset();">
-                Reset
-            </button>
-
-            <button class="btn btn-secondary"
-                    onclick="appointmentMaster.Export();">
-                <i class="la la-download"></i> Export
-            </button>
         </div>
 
     </div>
@@ -188,32 +169,31 @@
 </div>
 <!-- GRID -->
 <div class="kt-portlet kt-portlet--mobile">
-    <div class="kt-portlet__head kt-portlet__head--lg">
-        <div class="kt-portlet__head-label">
-            <h3 class="kt-portlet__head-title">Appointment List</h3>
-        </div>
-        <div class="kt-portlet__head-toolbar">
-            <a href="javascript:;" class="btn btn-brand btn-elevate btn-icon-sm" onclick="appointmentMaster.OpenAdd();">
-                <i class="fas fa-plus-circle"></i> Add Appointment
-            </a>
-        </div>
-    </div>
 
-    <div class="kt-portlet__body table-responsive">
+    <div class="kt-portlet__body table-responsive" id="divIDViewAppointments" style="display:none;">
+        <!--begin: Datatable -->
         <table class="table table-striped table-hover table-checkable" id="tblAppointment">
+
+            <template>
+                @Localizer["Appointment_List"]
+
+            </template>
+
             <thead>
                 <tr>
-                    <th>Patient</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Tele</th>
-                    <th>Cell</th>
-                    <th>Comments</th>
-                    <th>Edit</th>
-                    <th>Delete</th>
+                    <th>@Localizer["Patient_Name"]</th>
+                    <th>@Localizer["Date"]</th>
+                    <th>@Localizer["Time"]</th>
+                    <th>@Localizer["Tele_No"]</th>
+                    <th>@Localizer["Mobile_No"]</th>
+                    <th>@Localizer["Comments"]</th>
+                    <th>@Localizer["Edit"]</th>
+                    <th>@Localizer["Delete"]</th>
                 </tr>
             </thead>
+
             <tbody></tbody>
+
         </table>
     </div>
 </div>
@@ -226,28 +206,34 @@
 
             <!-- HEADER -->
             <div class="modal-header">
-                <h5 class="modal-title">Appointment Details</h5>
-                <button type="button" class="close" data-dismiss="modal"></button>
+                <h5 class="modal-title">@Localizer["Appointment_Details"]</h5>
+                <button type="button" class="close" data-dismiss="modal" onclick="appointments.SetForClose();"></button>
             </div>
 
             <!-- BODY -->
             <div class="modal-body">
                 <form id="frmAppointment">
-
+                    <!-- ✅ Hidden Fields -->
+                    <input type="hidden" id="APPT_ID" />
+                    <input type="hidden" id="PAT_ID" />
                     <div class="row">
 
                         <div class="col-md-6 form-group">
-                            <label>Patient Name</label>
-                            <input type="text" id="txtPatient" class="form-control" placeholder="Enter Patient Name">
+                            <label>@Localizer["Patient_Name"]<span class="text-danger">*</span></label>
+                            <select id="ddlPatientDropdown" class="form-control">
+                                <option value="">--Select--</option>
+                            </select>
                         </div>
 
                         <div class="col-md-3 form-group">
-                            <label>Date</label>
-                            <input type="text" id="txtvalidFrom" class="form-control date-picker" placeholder="Select Date" autocomplete="off">
+                            <label>@Localizer["Date"]<span class="text-danger">*</span></label>
+                            <input type="date" id="txtDate" class="form-control" placeholder="@Localizer["Select_Date"]">
+
+
                         </div>
 
                         <div class="col-md-3 form-group">
-                            <label>Time</label>
+                            <label>@Localizer["Time"]<span class="text-danger">*</span></label>
                             <input type="time" id="txtTime" class="form-control">
                         </div>
 
@@ -256,18 +242,18 @@
                     <div class="row">
 
                         <div class="col-md-3 form-group">
-                            <label>Telephone</label>
-                            <input type="text" id="txtTele" class="form-control" placeholder="Telephone">
+                            <label>@Localizer["Tele_No"]</label>
+                            <input type="text" id="txtTele" class="form-control" readonly placeholder="@Localizer["Enter_Telephone_no"]">
                         </div>
 
                         <div class="col-md-3 form-group">
-                            <label>Mobile</label>
-                            <input type="text" id="txtCell" class="form-control" placeholder="Mobile Number">
+                            <label>@Localizer["Mobile_No"]</label>
+                            <input type="text" id="txtCell" class="form-control" readonly placeholder="@Localizer["Enter_Mobile_No"]">
                         </div>
 
                         <div class="col-md-6 form-group">
-                            <label>Comments</label>
-                            <textarea id="txtComment" class="form-control" rows="2" placeholder="Add comments"></textarea>
+                            <label>@Localizer["Comments"] <span class="text-danger">*</span></label>
+                            <textarea id="txtComments" class="form-control" rows="2" style="height:65px;" placeholder="@Localizer["Enter_Comments"]"></textarea>
                         </div>
 
                     </div>
@@ -277,136 +263,42 @@
 
             <!-- FOOTER -->
             <div class="modal-footer">
-                <button class="btn btn-success" onclick="appointmentMaster.Save();">
-                    Save
-                </button>
 
-                <button class="btn btn-warning" onclick="appointmentMaster.ResetForm();">
-                    Reset
-                </button>
-
-                <button class="btn btn-secondary" data-dismiss="modal">
-                    Close
-                </button>
+                <button class="btn btn-success" onclick="appointments.AddUpdate();" title="@Localizer["Save"]">@Localizer["Save"]</button>
+                <button type="button" class="btn btn-warning" onclick="appointments.ResetData();" title="@Localizer["Reset"]">@Localizer["Reset"]</button>
+                <button class="btn btn-danger" onclick="appointments.SetForClose();" title="@Localizer["Close"]">@Localizer["Close"]</button>
+                <div id="divExport" style="display:none">
+                    <button class="btn btn-secondary" onclick="appointments.Export();" title="@Localizer["Export"]"><i class="la la-download"></i> @Localizer["Export"]</button>
+                </div>
             </div>
-
-        </div>
+            </div>
     </div>
 </div>
+<input type="hidden" id="hdnAppointmentID" value="0" />
+<form id="__AjaxAntiForgeryForm">
+    @Html.AntiForgeryToken()
+</form>
+<script id="Grid_Data_Template_tblAppointment" type="text/x-jquery-tmpl">
+    <tr>
+        <td>${paT_FULLNAME}</td>
+        <td>${appT_DATECustom}</td>
+        <td>${appT_TIMECustom}</td>
+        <td>${paT_TELENO}</td>
+        <td>${paT_MOBNO}</td>
+        <td>${appT_COMMENTS}</td>
+        <td>
+            <button class="btn btn-sm btn-primary"
+                    onclick="appointments.Edit(${appT_ID})">
+                Edit
+            </button>
+        </td>
+        <td>
+            <button class="btn btn-sm btn-danger"
+                    onclick="appointments.Delete(${appT_ID})">
+                Delete
+            </button>
+        </td>
+    </tr>
+</script>
+<script src="~/scripts/appointments.js"></script>
 
-@section Scripts {
-    <script src="~/assets/js/jquery.dataTables.min.js"></script>
-    <script src="~/assets/js/dataTables.bootstrap.min.js"></script>
-
-    <script>
-        var appointmentMaster = {
-            data: [],
-            table: null,
-
-            Init: function () {
-                this.table = $("#tblAppointment").DataTable({
-                    pageLength: 10,
-                    ordering: true
-                });
-            },
-
-            OpenAdd: function () {
-                $("#AppointmentModal").modal("show");
-            },
-
-            Save: function () {
-                var appt = {
-                    patient: $("#txtPatient").val(),
-                    date: $("#txtDate").val(),
-                    time: $("#txtTime").val(),
-                    tele: $("#txtTele").val(),
-                    cell: $("#txtCell").val(),
-                    comment: $("#txtComment").val()
-                };
-
-                if (!appt.patient) {
-                    alert("Enter patient name");
-                    return;
-                }
-
-                this.data.push(appt);
-                this.Load();
-                this.ResetForm();
-                $("#AppointmentModal").modal("hide");
-            },
-
-            Load: function () {
-                this.table.clear();
-                this.data.forEach(function (x, i) {
-                    appointmentMaster.table.row.add([
-                        x.patient,
-                        x.date,
-                        x.time,
-                        x.tele,
-                        x.cell,
-                        x.comment,
-                        "<i class='fa fa-edit' onclick='appointmentMaster.Edit(" + i + ")'></i>",
-                        "<i class='fa fa-trash text-danger' onclick='appointmentMaster.Delete(" + i + ")'></i>"
-                    ]);
-                });
-                this.table.draw();
-            },
-
-            Edit: function (i) {
-                var appt = this.data[i];
-                $("#txtPatient").val(appt.patient);
-                $("#txtDate").val(appt.date);
-                $("#txtTime").val(appt.time);
-                $("#txtTele").val(appt.tele);
-                $("#txtCell").val(appt.cell);
-                $("#txtComment").val(appt.comment);
-
-                this.data.splice(i, 1);
-                this.OpenAdd();
-            },
-
-            Delete: function (i) {
-                if (confirm("Delete appointment?")) {
-                    this.data.splice(i, 1);
-                    this.Load();
-                }
-            },
-
-            Search: function () {
-                var patient = $("#txtPatientName").val();
-                var date = $("#txtDateSearch").val();
-
-                this.table.column(0).search(patient);
-                this.table.column(1).search(date);
-                this.table.draw();
-            },
-
-            Reset: function () {
-                $("#txtPatientName").val("");
-                $("#txtDateSearch").val("");
-                this.table.search("").columns().search("").draw();
-            },
-
-            Export: function () {
-                alert("Export logic here");
-            },
-
-            ResetForm: function () {
-                $("#frmAppointment")[0].reset();
-            }
-        };
-            //// DATE PICKER
-        if ($(".date-picker").length > 0) {
-            $('.date-picker').datepicker({
-                autoclose: true,
-                todayHighlight: true,
-                format: DateTimeDataFormat.ddMyyyy
-            });
-
-            $(".date-picker").datepicker("setDate", new Date());
-        }
-        $(document).ready(function () {
-            appointmentMaster.Init();
-        });
-    </script>
-}

@@ -35,13 +35,44 @@
         public DateTime? LastUpdatedOn { get; set; }
         public bool? AFlag { get; set; }
         public string? AFlagName { get; set; }
-
+        public List<PatientNOKDetails>? NOKList { get; set; }
+        public List<PatientOPDetails>? OPList { get; set; }
+    }
+    public class PatientNOKDetails
+    {
+        public int? NOK_ID { get; set; }
+        public int? PAT_ID { get; set; }
+        public string? NOK_NAME { get; set; }
+        public string? NOK_RELATION { get; set; }
+        public string? NOK_ADDR { get; set; }
+        public string? NOK_TELENO { get; set; }
+        public string? NOK_MOBNO { get; set; }
+        public string? NOK_EMAIL { get; set; }
+        public string? NOK_REMARKS { get; set; }
+        public int? AFLAG { get; set; }
+        public int? LAST_UPDATED_BY { get; set; }
+        public DateTime? LAST_UPDATED_ON { get; set; }
     }
 
+    public class PatientOPDetails
+    {
+        public int? OP_ID { get; set; }
+        public int? PAT_ID { get; set; }
+        public string? OP_NAME { get; set; }
+        public string? PROFESSION_NAME { get; set; }
+        public string? OP_ADDR { get; set; }
+        public string? OP_TELENO { get; set; }
+        public string? OP_MOBNO { get; set; }
+        public string? OP_EMAIL { get; set; }
+        public string? OP_REMARKS { get; set; }
+        public int? AFLAG { get; set; }
+        public int? LAST_UPDATED_BY { get; set; }
+        public DateTime? LAST_UPDATED_ON { get; set; }
+    }
     public class MasterDropDown : Base_VM
     {
         public int Value { get; set; }
         public string? Text { get; set; }
-    }
+    }   
 
 }

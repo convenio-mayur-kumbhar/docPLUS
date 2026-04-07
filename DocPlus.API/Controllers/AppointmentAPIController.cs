@@ -27,16 +27,10 @@ namespace DocPlus.API.Controllers
         [HttpPost("AddAppointment")]
         public async Task<IActionResult> AddAppointment([FromBody] Appointment_VM model)
         {
-            var result = await _IAppointmentRepo.AddAppointment(model);
+            var result = await _IAppointmentRepo.AddUpdateAppointment(model);
             return Ok(result);
         }
-        [Authorize]
-        [HttpPost("UpdateAppointment")]
-        public async Task<IActionResult> UpdateAppointment([FromBody] Appointment_VM model)
-        {
-            var result = await _IAppointmentRepo.UpdateAppointment(model);
-            return Ok(result);
-        }
+        
         [Authorize]
         [HttpPost("DeleteAppointment")]
         public async Task<IActionResult> DeleteAppointment([FromBody] int id)

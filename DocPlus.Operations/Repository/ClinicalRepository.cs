@@ -21,6 +21,7 @@ namespace DocPlus.Operations.Repository
                     await connection.OpenAsync();
                     var parameters = new DynamicParameters();
 
+                    parameters.Add("@p_RegNo", string.IsNullOrEmpty(model.RegNo) ? null : model.RegNo);
                     parameters.Add("@p_FirstName", string.IsNullOrEmpty(model.FirstName) ? null : model.FirstName);
                     parameters.Add("@p_LastName", string.IsNullOrEmpty(model.LastName) ? null : model.LastName);
                     parameters.Add("@p_MobileNo", string.IsNullOrEmpty(model.MobileNo) ? null : model.MobileNo);
@@ -74,10 +75,10 @@ namespace DocPlus.Operations.Repository
                         result.NOKDetails = (await multi.ReadAsync<NOK_CM>()).ToList();
                         // 3️⃣ OP
                         result.OPDetails = (await multi.ReadAsync<OP_CM>()).ToList();
-                        // 4️⃣ Initial Assessment
-                        result.InitialDetails = await multi.ReadFirstOrDefaultAsync<InitialAssessment_CM>();
-                        result.AssessmentDetails = (await multi.ReadAsync<PatientAssessmentDetails>()).ToList();
-                        result.PHMDetails = (await multi.ReadAsync<PatientAssessmentPHM_CM>()).ToList();
+                        //// 4️⃣ Initial Assessment
+                        //result.InitialDetails = await multi.ReadFirstOrDefaultAsync<InitialAssessment_CM>();
+                        //result.AssessmentDetails = (await multi.ReadAsync<PatientAssessmentDetails>()).ToList();
+                        //result.PHMDetails = (await multi.ReadAsync<PatientAssessmentPHM_CM>()).ToList();
                         return new JsonResponse { Status = "1", Message = "Success", Data = result };
                     }
                 }
@@ -85,6 +86,76 @@ namespace DocPlus.Operations.Repository
             catch (Exception ex)
             {
                 logger.Error("GetClinicalDetailsByPatientID Error: ", ex);
+                return new JsonResponse { Status = "0", Message = "Error occurred", Data = null! };
+            }
+        }
+        public async Task<JsonResponse> GetClinicalInitailsDetailsByPatientID(int patientId, string Ass_Value)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(ConnectionString))
+                {
+                    var par = new DynamicParameters();
+                    par.Add("@p_PAT_ID", patientId);
+                    par.Add("@p_Ass_value", Ass_Value);
+                    using (var multi = await connection.QueryMultipleAsync("ClinicalInitailsDetailsByPatientID", par, commandType: CommandType.StoredProcedure))
+                    {
+                        var result = new ClinicalDetails_CM();
+                        result.InitialDetails = await multi.ReadFirstOrDefaultAsync<InitialAssessment_CM>();
+                        return new JsonResponse { Status = "1", Message = "Success", Data = result };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("GetClinicalInitailsDetailsByPatientID Error: ", ex);
+                return new JsonResponse { Status = "0", Message = "Error occurred", Data = null! };
+            }
+        }
+        public async Task<JsonResponse> GetClinicalAssetmentsDetailsByPatientID(int patientId, string Ass_Value, int filterType)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(ConnectionString))
+                {
+                    var par = new DynamicParameters();
+                    par.Add("@p_PAT_ID", patientId);
+                    par.Add("@p_Ass_value", Ass_Value);
+                    par.Add("@p_FilterType", filterType);
+                    using (var multi = await connection.QueryMultipleAsync("GetClinicalAssetmentsDetailsByPatientID", par, commandType: CommandType.StoredProcedure))
+                    {
+                        var result = new ClinicalDetails_CM();
+                        result.AssessmentDetails = (await multi.ReadAsync<PatientAssessmentDetails>()).ToList();
+                        return new JsonResponse { Status = "1", Message = "Success", Data = result };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("GetClinicalInitailsDetailsByPatientID Error: ", ex);
+                return new JsonResponse { Status = "0", Message = "Error occurred", Data = null! };
+            }
+        }
+        public async Task<JsonResponse> GetClinicalPHMDetailsByPatientID(int patientId, int filterType)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(ConnectionString))
+                {
+                    var par = new DynamicParameters();
+                    par.Add("@p_PAT_ID", patientId);
+                    par.Add("@p_FilterType", filterType);
+                    using (var multi = await connection.QueryMultipleAsync("GetClinicalPHMDetailsByPatientID", par, commandType: CommandType.StoredProcedure))
+                    {
+                        var result = new ClinicalDetails_CM();
+                        result.PHMDetails = (await multi.ReadAsync<PatientAssessmentPHM_CM>()).ToList();
+                        return new JsonResponse { Status = "1", Message = "Success", Data = result };
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("GetClinicalInitailsDetailsByPatientID Error: ", ex);
                 return new JsonResponse { Status = "0", Message = "Error occurred", Data = null! };
             }
         }
@@ -253,7 +324,7 @@ namespace DocPlus.Operations.Repository
                 return new JsonResponse
                 {
                     Status = "1",
-                    Message = "ICD10 saved successfully",
+                    Message = "Saved successfully",
                     Data = null!
                 };
             }
@@ -305,7 +376,7 @@ namespace DocPlus.Operations.Repository
                 return new JsonResponse
                 {
                     Status = "1",
-                    Message = "DSM4 saved successfully",
+                    Message = "Saved successfully",
                     Data = null!
                 };
             }
@@ -382,7 +453,7 @@ namespace DocPlus.Operations.Repository
                 return new JsonResponse
                 {
                     Status = "1",
-                    Message = "Risk saved successfully"
+                    Message = "Saved successfully"
                 };
             }
             catch (Exception ex)
@@ -484,7 +555,7 @@ namespace DocPlus.Operations.Repository
                 return new JsonResponse
                 {
                     Status = "1",
-                    Message = "Prescription saved successfully"
+                    Message = "Saved successfully"
                 };
             }
             catch (Exception ex)
@@ -580,7 +651,7 @@ namespace DocPlus.Operations.Repository
                 return new JsonResponse
                 {
                     Status = "1",
-                    Message = "Inpatient saved successfully"
+                    Message = "Saved successfully"
                 };
             }
             catch (Exception ex)
@@ -678,7 +749,7 @@ namespace DocPlus.Operations.Repository
                 return new JsonResponse
                 {
                     Status = "1",
-                    Message = "Attachments saved successfully"
+                    Message = "Saved successfully"
                 };
             }
             catch (Exception ex)
@@ -724,7 +795,7 @@ namespace DocPlus.Operations.Repository
                 return new JsonResponse
                 {
                     Status = "1",
-                    Message = "Attachment deleted successfully"
+                    Message = "Deleted successfully"
                 };
             }
             catch (Exception ex)
@@ -808,7 +879,7 @@ namespace DocPlus.Operations.Repository
                 return new JsonResponse
                 {
                     Status = "1",
-                    Message = "Medical Certificate saved successfully"
+                    Message = "Saved successfully"
                 };
             }
             catch (Exception ex)
@@ -898,7 +969,7 @@ namespace DocPlus.Operations.Repository
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
 
-                    DataTable dt = ConvertToDatatable(list);
+                    DataTable dt = ConvertToPHMDataTable(list);
 
                     SqlParameter param = cmd.Parameters.AddWithValue("@PHMData", dt);
                     param.SqlDbType = SqlDbType.Structured;
@@ -908,7 +979,7 @@ namespace DocPlus.Operations.Repository
                     await cmd.ExecuteNonQueryAsync();
                 }
 
-                return new JsonResponse { Status = "1", Message = "Bulk Saved Successfully" };
+                return new JsonResponse { Status = "1", Message = "Saved successfully" };
             }
             catch (Exception ex)
             {
@@ -917,12 +988,96 @@ namespace DocPlus.Operations.Repository
             }
         }
 
+        public DataTable ConvertToPHMDataTable(List<PatientAssessmentPHM_CM> list)
+        {
+            DataTable dt = new DataTable();
+            dt.Columns.Add("PAT_ID", typeof(int));
+            dt.Columns.Add("ASS_DATE", typeof(DateTime));
+            dt.Columns.Add("DIABETES", typeof(string));
+            dt.Columns.Add("CARDIOVAS", typeof(string));
+            dt.Columns.Add("WT", typeof(string));
+            dt.Columns.Add("BMI", typeof(string));
+            dt.Columns.Add("WAIST", typeof(string));
+            dt.Columns.Add("BP", typeof(string));
+            dt.Columns.Add("SODIUM", typeof(string));
+            dt.Columns.Add("POTASSIUM", typeof(string));
+            dt.Columns.Add("UREA", typeof(string));
+            dt.Columns.Add("CREATININE", typeof(string));
+            dt.Columns.Add("GLUCOSE", typeof(string));
+            dt.Columns.Add("HBA1C", typeof(string));
+            dt.Columns.Add("BILIRUBIN", typeof(string));
+            dt.Columns.Add("ALKPHOS", typeof(string));
+            dt.Columns.Add("ALT", typeof(string));
+            dt.Columns.Add("ALBUMIN", typeof(string));
+            dt.Columns.Add("PROTEIN", typeof(string));
+            dt.Columns.Add("GAMMA", typeof(string));
+            dt.Columns.Add("TSH", typeof(string));
+            dt.Columns.Add("THYROXINE", typeof(string));
+            dt.Columns.Add("HB", typeof(string));
+            dt.Columns.Add("WBC", typeof(string));
+            dt.Columns.Add("PLT", typeof(string));
+            dt.Columns.Add("TOT_CHOLESTEROL", typeof(string));
+            dt.Columns.Add("HDL_CHOLESTEROL", typeof(string));
+            dt.Columns.Add("TOT_HDL_RATIO", typeof(string));
+            dt.Columns.Add("TRIGLY", typeof(string));
+            dt.Columns.Add("CV_RISK", typeof(string));
+            dt.Columns.Add("URINALYSIS", typeof(string));
+            dt.Columns.Add("LUNSERS", typeof(string));
+            dt.Columns.Add("QTC", typeof(string));
+            dt.Columns.Add("PROLACTIN", typeof(string));
+            dt.Columns.Add("LAST_UPDATED_BY", typeof(int));
 
+            foreach (var item in list)
+            {
+                dt.Rows.Add(
+                    item.PAT_ID ?? (object)DBNull.Value,
+                    item.ASS_DATE ?? (object)DBNull.Value,
+                    item.DIABETES ?? (object)DBNull.Value,
+                    item.CARDIOVAS ?? (object)DBNull.Value,
+                    item.WT ?? (object)DBNull.Value,
+                    item.BMI ?? (object)DBNull.Value,
+                    item.WAIST ?? (object)DBNull.Value,
+                    item.BP ?? (object)DBNull.Value,
+                    item.SODIUM ?? (object)DBNull.Value,
+                    item.POTASSIUM ?? (object)DBNull.Value,
+                    item.UREA ?? (object)DBNull.Value,
+                    item.CREATININE ?? (object)DBNull.Value,
+                    item.GLUCOSE ?? (object)DBNull.Value,
+                    item.HBA1C ?? (object)DBNull.Value,
+                    item.BILIRUBIN ?? (object)DBNull.Value,
+                    item.ALKPHOS ?? (object)DBNull.Value,
+                    item.ALT ?? (object)DBNull.Value,
+                    item.ALBUMIN ?? (object)DBNull.Value,
+                    item.PROTEIN ?? (object)DBNull.Value,
+                    item.GAMMA ?? (object)DBNull.Value,
+                    item.TSH ?? (object)DBNull.Value,
+                    item.THYROXINE ?? (object)DBNull.Value,
+                    item.HB ?? (object)DBNull.Value,
+                    item.WBC ?? (object)DBNull.Value,
+                    item.PLT ?? (object)DBNull.Value,
+                    item.TOT_CHOLESTEROL ?? (object)DBNull.Value,
+                    item.HDL_CHOLESTEROL ?? (object)DBNull.Value,
+                    item.TOT_HDL_RATIO ?? (object)DBNull.Value,
+                    item.TRIGLY ?? (object)DBNull.Value,
+                    item.CV_RISK ?? (object)DBNull.Value,
+                    item.URINALYSIS ?? (object)DBNull.Value,
+                    item.LUNSERS ?? (object)DBNull.Value,
+                    item.QTC ?? (object)DBNull.Value,
+                    item.PROLACTIN ?? (object)DBNull.Value,
+                    item.LAST_UPDATED_BY
+                );
+            }
+
+            return dt;
+        }
     }
     public interface IClinicalRepository
     {
         public Task<JsonResponse> GetPatientsList(Patient_VM model);
         public Task<JsonResponse> GetClinicalDetailsByPatientID(int patientId);
+        public Task<JsonResponse> GetClinicalInitailsDetailsByPatientID(int patientId, string Ass_Value);
+        public Task<JsonResponse> GetClinicalAssetmentsDetailsByPatientID(int patientId, string Ass_Value, int filterType);
+        public Task<JsonResponse> GetClinicalPHMDetailsByPatientID(int patientId, int filterType);
         public Task<JsonResponse> GetDSM4_ICD10MasterData(string type);
         public Task<JsonResponse> SaveInitialDetails(PatientInitialDetails_CM model);
         public Task<JsonResponse> SaveAssessmentDetail(PatientAssessmentDetails model);

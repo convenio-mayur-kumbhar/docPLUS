@@ -38,6 +38,7 @@ namespace DocPlus.Entities.ClinicalModels
     {
         public int PAT_ID { get; set; }
         public string? ASS_PC { get; set; }
+        public string? ASS_Value { get; set; }        
         public string? ASS_HPC { get; set; }
         public string? ASS_PPH { get; set; }
         public string? ASS_MH { get; set; }
@@ -225,8 +226,8 @@ namespace DocPlus.Entities.ClinicalModels
         public string? URINALYSIS { get; set; }
         public string? LUNSERS { get; set; }
         public string? QTC { get; set; }
-        public string? PROLACTIN { get; set; }                     
-        public bool? AFLAG { get; set; }
+        public string? PROLACTIN { get; set; }    
         public int LAST_UPDATED_BY { get; set; }
     }
+
 }

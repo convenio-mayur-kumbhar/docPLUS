@@ -13790,7 +13790,7 @@ code {
         -webkit-box-flex: 1;
         -ms-flex-positive: 1;
         flex-grow: 1;
-        padding: .7rem 1.2rem
+        padding: .3rem .5rem
     }
 
         .dropdown-menu > .dropdown-item [class*=" la-"], .dropdown-menu > .dropdown-item [class^=la-], .dropdown-menu > li > a [class*=" la-"], .dropdown-menu > li > a [class^=la-] {
@@ -27019,7 +27019,7 @@ b, strong {
     -webkit-box-direction: normal;
     -ms-flex-direction: column;
     flex-direction: column;
-    padding: 15px;
+    padding: 10px;
     border-radius: 4px
 }
 
@@ -39014,7 +39014,7 @@ body.swal2-height-auto {
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
     padding: 10px 25px;
-    background-color: #fff
+    /*background-color: #fff*/
 }
 
     .kt-subheader .btn {

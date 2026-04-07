@@ -8,7 +8,9 @@
         public string? PAT_FULLNAME { get; set; }
         public string? PAT_TELENO { get; set; }
         public string? PAT_MOBNO { get; set; }
-        public string? APPT_TIME { get; set; }
+        public TimeSpan? APPT_TIME { get; set; }
+        public string APPT_DATECustom { get { return APPT_DATE == null ? string.Empty : DateFormat(APPT_DATE); } }
+        public string APPT_TIMECustom { get { return APPT_TIME == null ? string.Empty : TimeFormat(APPT_TIME); } }
         public string? APPT_COMMENTS { get; set; }
         public bool? AFLAG { get; set; }
         public bool? VFLAG { get; set; }
@@ -21,6 +23,7 @@
     {
         public int? PAT_ID { get; set; }
         public string? PAT_FULLNAME { get; set; }
-    }
-
+        public int Value => PAT_ID ?? 0;
+        public string? Text => PAT_FULLNAME;
+    }      
 }
