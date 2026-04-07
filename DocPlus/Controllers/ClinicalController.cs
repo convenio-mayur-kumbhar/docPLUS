@@ -57,10 +57,9 @@ namespace DocPlus.Controllers
                 return GetDataResponseException(ex);
             }
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<JsonResult> GetAssetmentDataByID(Patient_VM Model)
+        public async Task<JsonResult> GetClinicalDetailsByPatientId(Patient_VM Model)
         {
             try
             {
@@ -68,6 +67,116 @@ namespace DocPlus.Controllers
                 {
                     GetUserInfo(Model);
                     HttpResponseMessage response = await CallGetAPIAsync($"ClinicalAPI/GetClinicalDetailsByPatientId/{Model.PatientID}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string raw = await response.Content.ReadAsStringAsync();
+
+                        var result = JsonConvert.DeserializeObject<JsonResponse>(raw);
+
+                        var data = JsonConvert.DeserializeObject<ClinicalDetails_CM>(result.Data.ToString());
+
+                        return GetDataResponse(data!);
+                    }
+                    else
+                    {
+                        return GetDataResponseException(default!);
+                    }
+                }
+                else
+                {
+                    return GetModelStateIsValidException(ModelState);
+                }
+            }
+            catch (Exception ex)
+            {
+                return GetDataResponseException(ex);
+            }
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> GetClinicalInitailsDetailsByPatientID(Patient_VM Model, string Ass_value)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    GetUserInfo(Model);
+                    HttpResponseMessage response = await CallGetAPIAsync($"ClinicalAPI/GetClinicalInitailsDetailsByPatientID/{Model.PatientID}/{Ass_value}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string raw = await response.Content.ReadAsStringAsync();
+
+                        var result = JsonConvert.DeserializeObject<JsonResponse>(raw);
+
+                        var data = JsonConvert.DeserializeObject<ClinicalDetails_CM>(result.Data.ToString());
+
+                        return GetDataResponse(data!);
+                    }
+                    else
+                    {
+                        return GetDataResponseException(default!);
+                    }
+                }
+                else
+                {
+                    return GetModelStateIsValidException(ModelState);
+                }
+            }
+            catch (Exception ex)
+            {
+                return GetDataResponseException(ex);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> GetClinicalAssetmentsDetailsByPatientID(Patient_VM Model, string Ass_value, int filterType)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    GetUserInfo(Model);
+                    HttpResponseMessage response = await CallGetAPIAsync($"ClinicalAPI/GetClinicalAssetmentsDetailsByPatientID/{Model.PatientID}/{Ass_value}/{filterType}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string raw = await response.Content.ReadAsStringAsync();
+
+                        var result = JsonConvert.DeserializeObject<JsonResponse>(raw);
+
+                        var data = JsonConvert.DeserializeObject<ClinicalDetails_CM>(result.Data.ToString());
+
+                        return GetDataResponse(data!);
+                    }
+                    else
+                    {
+                        return GetDataResponseException(default!);
+                    }
+                }
+                else
+                {
+                    return GetModelStateIsValidException(ModelState);
+                }
+            }
+            catch (Exception ex)
+            {
+                return GetDataResponseException(ex);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<JsonResult> GetClinicalPHMDetailsByPatientID(Patient_VM Model, int filterType)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    GetUserInfo(Model);
+                    HttpResponseMessage response = await CallGetAPIAsync($"ClinicalAPI/GetClinicalPHMDetailsByPatientID/{Model.PatientID}/{filterType}");
 
                     if (response.IsSuccessStatusCode)
                     {
@@ -106,17 +215,21 @@ namespace DocPlus.Controllers
                 if (Model.PAT_ID > 0)
                 {
                     HttpResponseMessage response = await CallPostAPIAsync("ClinicalAPI/SaveInitialDetails", Model);
+                    var jsonString = await response.Content.ReadAsStringAsync();
 
+                    // ✅ CONVERT TO OBJECT
+                    var apiResult = JsonConvert.DeserializeObject<JsonResponse>(jsonString);
                     if (response.IsSuccessStatusCode)
                     {
                         string raw = await response.Content.ReadAsStringAsync();
 
                         var result = JsonConvert.DeserializeObject<JsonResponse>(raw);
 
+                        //return Json(new { Status = true, Message = "Saved Successfully"
                         return Json(new
                         {
-                            Status = result.Status == "1",
-                            Message = result.Message
+                            Status = apiResult.Status == "1",
+                            Message = apiResult.Message
                         });
                     }
                     else
@@ -146,17 +259,21 @@ namespace DocPlus.Controllers
                 if (Model.PAT_ID > 0)
                 {
                     HttpResponseMessage response = await CallPostAPIAsync("ClinicalAPI/SaveAssessmentDetails", Model);
+                    var jsonString = await response.Content.ReadAsStringAsync();
 
+                    // ✅ CONVERT TO OBJECT
+                    var apiResult = JsonConvert.DeserializeObject<JsonResponse>(jsonString);
                     if (response.IsSuccessStatusCode)
                     {
                         string raw = await response.Content.ReadAsStringAsync();
 
                         var result = JsonConvert.DeserializeObject<JsonResponse>(raw);
 
+                        //return Json(new { Status = true, Message = "Saved Successfully"
                         return Json(new
                         {
-                            Status = result.Status == "1",
-                            Message = result.Message
+                            Status = apiResult.Status == "1",
+                            Message = apiResult.Message
                         });
                     }
                     else
@@ -196,13 +313,23 @@ namespace DocPlus.Controllers
 
                 // ✅ SINGLE API CALL (PASS FULL LIST)
                 HttpResponseMessage response = await CallPostAPIAsync("ClinicalAPI/SaveAssessmentPHM", Model);  // 🔥 FULL LIST           
+                                                                                                                // ✅ READ JSON FROM API
+                var jsonString = await response.Content.ReadAsStringAsync();
 
+                // ✅ CONVERT TO OBJECT
+                var apiResult = JsonConvert.DeserializeObject<JsonResponse>(jsonString);
                 if (!response.IsSuccessStatusCode)
                 {
                     return Json(new { Status = false, Message = "API Error" });
                 }
 
-                return Json(new { Status = true, Message = "Saved Successfully" });
+                //return Json(new { Status = true, Message = "Saved Successfully"
+                return Json(new
+                {
+                    Status = apiResult.Status == "1",
+                    Message = apiResult.Message
+                });
+                // });
             }
             catch (Exception ex)
             {

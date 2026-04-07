@@ -1,4 +1,5 @@
-﻿using Dapper;
+﻿using Azure;
+using Dapper;
 using DocPlus.Entities.ClinicalModels;
 using DocPlus.Entities.ViewModels;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -22,7 +23,7 @@ namespace DocPlus.Operations.Repository
                     var param = new DynamicParameters();
                     param.Add("@p_PatientName", model.PAT_FULLNAME);
                     param.Add("@p_AppointmentDate", model.APPT_DATE);
-                    var list = (await connection.QueryAsync<Patient_VM>("AppointmentList", param, commandType: CommandType.StoredProcedure)).ToList();
+                    var list = (await connection.QueryAsync<Appointment_VM>("AppointmentList", param, commandType: CommandType.StoredProcedure)).ToList();
                     return new JsonResponse
                     {
                         Status = "Success",
@@ -42,7 +43,8 @@ namespace DocPlus.Operations.Repository
                 };
             }
         }
-        public async Task<JsonResponse> AddAppointment(Appointment_VM model) {
+        public async Task<JsonResponse> AddUpdateAppointment(Appointment_VM model)
+        {
             try
             {
                 using (var connection = new SqlConnection(ConnectionString))
@@ -57,12 +59,12 @@ namespace DocPlus.Operations.Repository
                     param.Add("@p_APPT_COMMENTS", model.APPT_COMMENTS);
                     param.Add("@p_LAST_UPDATED_BY", model.LAST_UPDATED_BY);
 
-                    await connection.ExecuteAsync("SaveAppointment", param, commandType: CommandType.StoredProcedure);
+                    var result = await connection.QueryFirstOrDefaultAsync<JsonResponse>("SaveAppointment", param, commandType: CommandType.StoredProcedure);
 
                     return new JsonResponse
                     {
-                        Status = "Success",
-                        Message = "Appointment Added Successfully",
+                        Status = result.Status,
+                        Message = result.Message,
                         Data = null!
                     };
                 }
@@ -78,45 +80,9 @@ namespace DocPlus.Operations.Repository
                     Data = null!
                 };
             }
-        }
-        public async Task<JsonResponse> UpdateAppointment(Appointment_VM model) {
-            try
-            {
-                using (var connection = new SqlConnection(ConnectionString))
-                {
-                    await connection.OpenAsync();
-
-                    var param = new DynamicParameters();
-                    param.Add("@p_APPT_ID", model.APPT_ID);
-                    param.Add("@p_PAT_ID", model.PAT_ID);
-                    param.Add("@p_APPT_DATE", model.APPT_DATE);
-                    param.Add("@p_APPT_TIME", model.APPT_TIME);
-                    param.Add("@p_APPT_COMMENTS", model.APPT_COMMENTS);
-                    param.Add("@p_LAST_UPDATED_BY", model.LAST_UPDATED_BY);
-
-                    await connection.ExecuteAsync("SaveAppointment", param, commandType: CommandType.StoredProcedure);
-
-                    return new JsonResponse
-                    {
-                        Status = "Success",
-                        Message = "Appointment Updated Successfully",
-                        Data = null!
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error("UpdateAppointment Error: ", ex);
-
-                return new JsonResponse
-                {
-                    Status = "Error",
-                    Message = "Error occurred",
-                    Data = null!
-                };
-            }
-        }
-        public async Task<JsonResponse> DeleteAppointment(int patId) {
+        }        
+        public async Task<JsonResponse> DeleteAppointment(int patId)
+        {
             try
             {
                 using (var connection = new SqlConnection(ConnectionString))
@@ -131,7 +97,7 @@ namespace DocPlus.Operations.Repository
                     return new JsonResponse
                     {
                         Status = "Success",
-                        Message = "Appointment Deleted Successfully",
+                        Message = "Deleted Successfully",
                         Data = null!
                     };
                 }
@@ -180,7 +146,7 @@ namespace DocPlus.Operations.Repository
                 };
             }
         }
-        public async Task<JsonResponse> GetAppointmentDetailsById(int patId)
+        public async Task<JsonResponse> GetAppointmentDetailsById(int AppointmentID)
         {
             try
             {
@@ -189,9 +155,9 @@ namespace DocPlus.Operations.Repository
                     await connection.OpenAsync();
 
                     var param = new DynamicParameters();
-                    param.Add("@p_PAT_ID", patId);
+                    param.Add("@p_APPT_ID", AppointmentID);
 
-                    var data = await connection.QueryFirstOrDefaultAsync<Patient_VM>(
+                    var data = await connection.QueryFirstOrDefaultAsync<Appointment_VM>(
                         "GetAppointmentDetailsById",
                         param,
                         commandType: CommandType.StoredProcedure);
@@ -220,11 +186,10 @@ namespace DocPlus.Operations.Repository
     public interface IAppointmentRepository
     {
         public Task<JsonResponse> GetAppointmentList(Appointment_VM model);
-        public Task<JsonResponse> AddAppointment(Appointment_VM model);
-        public Task<JsonResponse> UpdateAppointment(Appointment_VM model);
+        public Task<JsonResponse> AddUpdateAppointment(Appointment_VM model);
         public Task<JsonResponse> DeleteAppointment(int patId);
         public Task<JsonResponse> GetPatientDropdown();
-        public Task<JsonResponse> GetAppointmentDetailsById(int patId);
+        public Task<JsonResponse> GetAppointmentDetailsById(int AppointmentID);
 
     }
 }

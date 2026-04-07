@@ -1,5 +1,7 @@
 ﻿using Dapper;
+using DocPlus.Entities.ClinicalModels;
 using DocPlus.Entities.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
@@ -39,7 +41,11 @@ namespace DocPlus.Operations.Repository
                         return new JsonResponse(
                             result.STATUS?.ToString() ?? "0",
                             result.MESSAGE?.ToString() ?? "No message",
-                            null
+                            new
+                            {
+                                PAT_ID = result.PAT_ID,   // ✅ important
+                                REG_NO = result.REG_NO
+                            }
                         );
                     }
                     return new JsonResponse("0", "No response from database", null);
@@ -131,18 +137,179 @@ namespace DocPlus.Operations.Repository
                 {
                     var par = new DynamicParameters();
                     par.Add("@p_PAT_ID", patientId);
-                    var patient = await connection.QueryFirstOrDefaultAsync<Patient_VM>("PatientDataGetByID", par, commandType: CommandType.StoredProcedure);
-                    if (patient != null)
+                    using (var multi = await connection.QueryMultipleAsync("PatientDataGetByID", par, commandType: CommandType.StoredProcedure))
                     {
-                        return new JsonResponse("1", "Success", patient);
+                        // ✅ 1st result → Patient
+                        var patient = multi.ReadFirstOrDefault<Patient_VM>();
+                        if (patient != null)
+                        {
+                            patient.NOKList = (await multi.ReadAsync<PatientNOKDetails>()).ToList();
+                            patient.OPList = (await multi.ReadAsync<PatientOPDetails>()).ToList();
+                            return new JsonResponse("1", "Success", patient);
+                        }
+                        return new JsonResponse("0", "Patient not found", null!);
                     }
-                    return new JsonResponse("0", "Patient not found", null);
                 }
             }
             catch (Exception ex)
             {
                 logger.Error("PatientRepository_GetPatientById Error: ", ex);
-                return new JsonResponse("0", "Error occurred", null);
+                return new JsonResponse("0", "Error occurred", null!);
+            }
+        }
+        public async Task<JsonResponse> DeletePatient(int patientId)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(ConnectionString))
+                {
+                    await connection.OpenAsync();
+
+                    var param = new DynamicParameters();
+                    param.Add("@p_PAT_ID", patientId);
+
+                    await connection.ExecuteAsync("DeletePatient", param, commandType: CommandType.StoredProcedure);
+
+                    return new JsonResponse
+                    {
+                        Status = "Success",
+                        Message = "Patient Deleted Successfully",
+                        Data = null!
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("DeletePatient Error: ", ex);
+
+                return new JsonResponse
+                {
+                    Status = "Error",
+                    Message = "Error occurred",
+                    Data = null!
+                };
+            }
+        }
+        public async Task<JsonResponse> SavePatientNOK(PatientNOKDetails model)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(ConnectionString))
+                {
+                    var par = new DynamicParameters();
+                    par.Add("@p_PAT_ID", model.PAT_ID);
+                    par.Add("@p_NOK_NAME", model.NOK_NAME);
+                    par.Add("@p_NOK_RELATION", model.NOK_RELATION);
+                    par.Add("@p_NOK_ADDR", model.NOK_ADDR);
+                    par.Add("@p_NOK_TELENO", model.NOK_TELENO);
+                    par.Add("@p_NOK_MOBNO", model.NOK_MOBNO);
+                    par.Add("@p_NOK_EMAIL", model.NOK_EMAIL);
+                    par.Add("@p_NOK_REMARKS", model.NOK_REMARKS);
+                    par.Add("@p_LAST_UPDATED_BY", model.LAST_UPDATED_BY);
+                    var result = await connection.QueryFirstOrDefaultAsync<dynamic>("PatientNOK_AddUpdate", par, commandType: CommandType.StoredProcedure);
+                    if (result != null)
+                    {
+                        return new JsonResponse(
+                            result.STATUS?.ToString() ?? "0",
+                            result.MESSAGE?.ToString() ?? "Error",
+                            null
+                        );
+                    }
+                    return new JsonResponse("0", "No response from DB", null!);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("SavePatientNOK Error: ", ex);
+                return new JsonResponse("0", "Error occurred", null!);
+            }
+        }
+        public async Task<JsonResponse> SavePatientOP(PatientOPDetails model)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(ConnectionString))
+                {
+                    var par = new DynamicParameters();
+                    par.Add("@p_PAT_ID", model.PAT_ID);
+                    par.Add("@p_OP_NAME", model.OP_NAME);
+                    par.Add("@p_PROFESSION_NAME", model.PROFESSION_NAME);
+                    par.Add("@p_OP_ADDR", model.OP_ADDR);
+                    par.Add("@p_OP_TELENO", model.OP_TELENO);
+                    par.Add("@p_OP_MOBNO", model.OP_MOBNO);
+                    par.Add("@p_OP_EMAIL", model.OP_EMAIL);
+                    par.Add("@p_OP_REMARKS", model.OP_REMARKS);
+                    par.Add("@p_LAST_UPDATED_BY", model.LAST_UPDATED_BY);
+                    var result = await connection.QueryFirstOrDefaultAsync<dynamic>("PatientOP_AddUpdate", par, commandType: CommandType.StoredProcedure);
+                    if (result != null)
+                    {
+                        return new JsonResponse(
+                            result.STATUS?.ToString() ?? "0",
+                            result.MESSAGE?.ToString() ?? "Error",
+                            null
+                        );
+                    }
+                    return new JsonResponse("0", "No response from DB", null!);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("SavePatientOP Error: ", ex);
+                return new JsonResponse("0", "Error occurred", null!);
+            }
+        }
+        public async Task<JsonResponse> DeletePatientNOK(int nokId, int userId)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(ConnectionString))
+                {
+                    var par = new DynamicParameters();
+                    par.Add("@p_NOK_ID", nokId);
+                    par.Add("@p_LAST_UPDATED_BY", userId);
+                    var result = await connection.QueryFirstOrDefaultAsync<dynamic>("PatientNOK_Delete", par, commandType: CommandType.StoredProcedure);
+                    if (result != null)
+                    {
+                        return new JsonResponse(
+                            result.STATUS?.ToString() ?? "0",
+                            result.MESSAGE?.ToString() ?? "Error",
+                            null
+                        );
+                    }
+                    return new JsonResponse("0", "No response from DB", null!);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("DeletePatientNOK Error: ", ex);
+                return new JsonResponse("0", "Error occurred", null!);
+            }
+        }
+        public async Task<JsonResponse> DeletePatientOP(int opId, int userId)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(ConnectionString))
+                {
+                    var par = new DynamicParameters();
+                    par.Add("@p_OP_ID", opId);
+                    par.Add("@p_LAST_UPDATED_BY", userId);
+                    var result = await connection.QueryFirstOrDefaultAsync<dynamic>("PatientOP_Delete", par, commandType: CommandType.StoredProcedure);
+                    if (result != null)
+                    {
+                        return new JsonResponse(
+                            result.STATUS?.ToString() ?? "0",
+                            result.MESSAGE?.ToString() ?? "Error",
+                            null
+                        );
+                    }
+                    return new JsonResponse("0", "No response from DB", null!);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.Error("DeletePatientOP Error: ", ex);
+                return new JsonResponse("0", "Error occurred", null!);
             }
         }
     }
@@ -150,7 +317,12 @@ namespace DocPlus.Operations.Repository
     {
         public Task<JsonResponse> AddPatient(Patient_VM model);
         public Task<JsonResponse> UpdatePatient(Patient_VM model);
-        Task<List<Patient_VM>> GetAllPatients();
-        Task<JsonResponse> GetPatientById(int patientId);
+        public Task<List<Patient_VM>> GetAllPatients();
+        public Task<JsonResponse> GetPatientById(int patientId);
+        public Task<JsonResponse> DeletePatient(int patientId);
+        public Task<JsonResponse> SavePatientNOK(PatientNOKDetails model);
+        public Task<JsonResponse> SavePatientOP(PatientOPDetails model);
+        public Task<JsonResponse> DeletePatientNOK(int nokId, int userId);
+        public Task<JsonResponse> DeletePatientOP(int opId, int userId);
     }
 }

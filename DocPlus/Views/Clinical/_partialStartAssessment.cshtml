@@ -4,7 +4,6 @@
 @{
     var Localizer = LocalizerFactory.Create("SharedResource", Assembly.GetExecutingAssembly().GetName().Name);
 }
-
 <style>
     #leftMenu a {
         display: block;
@@ -247,6 +246,7 @@
 
     .addPanel {
         display: none;
+        overflow: visible !important;
     }
 
     .note-buttons {
@@ -321,6 +321,61 @@
     #physicalTable thead th.sticky-col {
         z-index: 5;
     }
+
+    .modal {
+        z-index: 1050 !important;
+    }
+
+    .modal-backdrop {
+        z-index: 1040 !important;
+    }
+
+    .note-toolbar {
+        z-index: 9999 !important;
+    }
+
+    .note-editor {
+        z-index: 1 !important;
+    }
+
+    .note-dropdown-menu {
+        z-index: 1060 !important; /* only dropdown above */
+    }
+
+    .note-modal {
+        z-index: 99999 !important;
+    }
+
+        .note-modal .close::before {
+            content: '' !important;
+        }
+
+        .note-modal .close {
+            font-size: 22px;
+            opacity: 1;
+        }
+
+            .note-modal .close span {
+                display: none; /* hide duplicate */
+            }
+
+        .note-modal .modal-header .close {
+            background: none;
+            border: none;
+        }
+
+            .note-modal .modal-header .close::before {
+                content: '' !important;
+            }
+    /* 🔥 Allow dropdown to escape container */
+    .note-editor.note-frame {
+        overflow: visible !important;
+    }
+
+    /* 🔥 Fix dropdown stacking */
+    .note-dropdown-menu {
+        z-index: 9999 !important;
+    }
 </style>
 <div class="kt-subheader kt-grid__item" id="kt_subheader">
     <div class="kt-subheader__main">
@@ -345,7 +400,7 @@
 
             <!-- LEFT SIDE: Patient Details -->
             <div style="font-weight:600; font-size:16px;">
-                <strong>Patient Details:</strong>
+                <strong>@Localizer["Patient_Details"]:</strong>
             </div>
 
             <!-- RIGHT SIDE: Close Button -->
@@ -371,16 +426,16 @@
                 <div class="d-flex align-items-center">
                     <!-- Filter -->
                     <div class="mr-2 d-flex flex-column" style="justify-content:center;">
-                        <label class="mb-2" style="line-height:1;">Filter:</label>
+                        <label class="mb-2" style="line-height:1;">@Localizer["Filter"]:</label>
                         <select id="ddlAssetmentFiler" class="form-control">
-                            <option value="1">Last 1 Year</option>
-                            <option value="2">Last 6 Months</option>
-                            <option value="3">First Contact</option>
+                            <option value="1">@Localizer["Last_1_Year"]</option>
+                            <option value="2">@Localizer["Last_6_Months"]</option>
+                            <option value="3">@Localizer["First_Contact"]</option>
                         </select>
                     </div>
                     <!-- DATE -->
                     <div class="mr-2 d-flex flex-column" style="justify-content:center;">
-                        <label class="mb-2" style="line-height:1;">Date:</label>
+                        <label class="mb-2" style="line-height:1;">@Localizer["Date"]:</label>
                         <div class="input-group input-group-sm" style="width:150px;">
                             <input type="date" id="txtViewDate" class="form-control" placeholder="@Localizer["Date"]" autocomplete="off" />
                         </div>
@@ -394,7 +449,7 @@
 
                 <div class="mr-4">
                     <i class="fa fa-id-card" style="font-size: 15px;"></i>
-                    <span style="font-size:14px;">Reg No: <span id="lblViewRegNo"></span></span>
+                    <span style="font-size:14px;">@Localizer["Reg_No"]: <span id="lblViewRegNo"></span></span>
                 </div>
 
                 <div class="mr-4">
@@ -405,7 +460,7 @@
                 <div class="mr-4">
                     <i class="fa fa-user" style="font-size: 15px;"></i>
                     <span style="font-size:14px;">
-                        Age: <span id="lblViewAge"></span>
+                        @Localizer["Age"]: <span id="lblViewAge"></span>
                     </span>
                 </div>
 
@@ -435,7 +490,7 @@
                             <a class="nav-link active"
                                href="#general"
                                onclick="clinical.showLeftMenu('demographics', '#general')">
-                                <span class="nav-text">Demographics</span>
+                                <span class="nav-text">@Localizer["Demographics"]</span>
                             </a>
                         </li>
 
@@ -444,20 +499,49 @@
                             <a class="nav-link dropdown-toggle"
                                data-toggle="dropdown"
                                href="javascript:void(0);"
-                               role="button">
-                                <span class="nav-text">Initial Assessment</span>
+                               role="button" title="@Localizer["Initial_Assessment"]">
+                                <span class="nav-text">@Localizer["Initial_Assessment"]</span>
                             </a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#presenting" onclick="clinical.showLeftMenu('assessment','#presenting')">Presenting Complaints</a>
-                                <a class="dropdown-item" href="#history" onclick="clinical.showLeftMenu('assessment','#history')">History of Presenting Complaints</a>
-                                <a class="dropdown-item" href="#past" onclick="clinical.showLeftMenu('assessment','#past')">Past Psychiatric History</a>
-                                <a class="dropdown-item" href="#medical" onclick="clinical.showLeftMenu('assessment','#medical')">Medical History</a>
-                                <a class="dropdown-item" href="#family" onclick="clinical.showLeftMenu('assessment','#family')">Family History</a>
-                                <a class="dropdown-item" href="#personal" onclick="clinical.showLeftMenu('assessment','#personal')">Personal History</a>
-                                <a class="dropdown-item" href="#drug" onclick="clinical.showLeftMenu('assessment','#drug')">Drug & Alcohol History</a>
-                                <a class="dropdown-item" href="#forensic" onclick="clinical.showLeftMenu('assessment','#forensic')">Forensic History</a>
-                                <a class="dropdown-item" href="#premorbid" onclick="clinical.showLeftMenu('assessment','#premorbid')">Premorbid Personality</a>
-                                <a class="dropdown-item" href="#mental" onclick="clinical.showLeftMenu('assessment','#mental')">Mental State Examination</a>
+                                <a class="dropdown-item" href="#presenting" onclick="clinical.openInitialsTab('PC','assessment','#presenting')">
+                                    @Localizer["Presenting_Complaints"]
+                                </a>
+                                <a class="dropdown-item" href="#history"
+                                   onclick="clinical.openInitialsTab('HPC','assessment','#history')">
+                                    @Localizer["History_of_Presenting_Complaints"]
+                                </a>
+                                <a class="dropdown-item" href="#past"
+                                   onclick="clinical.openInitialsTab('PPH','assessment','#past')">
+                                    @Localizer["Past_Psychiatric_History"]
+                                </a>
+                                <a class="dropdown-item" href="#medical"
+                                   onclick="clinical.openInitialsTab('MH','assessment','#medical')">
+                                    @Localizer["Medical_History"]
+                                </a>
+                                <a class="dropdown-item" href="#family"
+                                   onclick="clinical.openInitialsTab('FH','assessment','#family')">
+                                    @Localizer["Family_History"]
+                                </a>
+                                <a class="dropdown-item" href="#personal"
+                                   onclick="clinical.openInitialsTab('PH','assessment','#personal')">
+                                    @Localizer["Personal_History"]
+                                </a>
+                                <a class="dropdown-item" href="#drug"
+                                   onclick="clinical.openInitialsTab('DAH','assessment','#drug')">
+                                    @Localizer["Drug_Alcohol_History"]
+                                </a>
+                                <a class="dropdown-item" href="#forensic"
+                                   onclick="clinical.openInitialsTab('FRH','assessment','#forensic')">
+                                    @Localizer["Forensic_History"]
+                                </a>
+                                <a class="dropdown-item" href="#premorbid"
+                                   onclick="clinical.openInitialsTab('PMP','assessment','#premorbid')">
+                                    @Localizer["Premorbid_Personality"]
+                                </a>
+                                <a class="dropdown-item" href="#mental"
+                                   onclick="clinical.openInitialsTab('MSE','assessment','#mental')">
+                                    @Localizer["Mental_State_Examination"]
+                                </a>
                             </div>
                         </li>
 
@@ -465,8 +549,8 @@
                         <li class="nav-item">
                             <a class="nav-link"
                                href="#progressmenu"
-                               onclick="clinical.showLeftMenu('progressmenu','#progressmenu')">
-                                <span class="nav-text">Progress Notes</span>
+                               onclick="clinical.openAssessmentTab('PN','progressmenu','#progressmenu')">
+                                <span class="nav-text">@Localizer["Progress_Notes"]</span>
                             </a>
                         </li>
 
@@ -475,14 +559,14 @@
                             <a class="nav-link dropdown-toggle"
                                data-toggle="dropdown"
                                href="javascript:void(0);"
-                               role="button">
-                                <span class="nav-text">Investigations</span>
+                               role="button" title="@Localizer["Investigations"]">
+                                <span class="nav-text">@Localizer["Investigations"]</span>
                             </a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#physicalMonitoring" onclick="clinical.showLeftMenu('investigations','#physicalMonitoring')">Physical Monitoring</a>
-                                <a class="dropdown-item" href="#scans" onclick="clinical.showLeftMenu('investigations','#scans')">Scans</a>
-                                <a class="dropdown-item" href="#eeg" onclick="clinical.showLeftMenu('investigations','#eeg')">EEG</a>
-                                <a class="dropdown-item" href="#otherInvestigations" onclick="clinical.showLeftMenu('investigations','#otherInvestigations')">Other Investigations</a>
+                                <a class="dropdown-item" href="#physicalMonitoring" onclick="clinical.openPHMTab('investigations','#physicalMonitoring')">@Localizer["Physical_Monitoring"]</a>
+                                <a class="dropdown-item" href="#scans" onclick="clinical.openAssessmentTab('SCAN','investigations','#scans')">@Localizer["Scans"]</a>
+                                <a class="dropdown-item" href="#eeg" onclick="clinical.openAssessmentTab('EEG','investigations','#eeg')">@Localizer["EEG"]</a>
+                                <a class="dropdown-item" href="#otherInvestigations" onclick="clinical.openAssessmentTab('OI','investigations','#otherInvestigations')">@Localizer["Other_Investigations"]</a>
                             </div>
                         </li>
 
@@ -491,14 +575,14 @@
                             <a class="nav-link dropdown-toggle"
                                data-toggle="dropdown"
                                href="javascript:void(0);"
-                               role="button">
-                                <span class="nav-text">Diagnosis</span>
+                               role="button" title="@Localizer["Diagnosis"]">
+                                <span class="nav-text">@Localizer["Diagnosis"]</span>
                             </a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#icd10" onclick="clinical.showLeftMenu('diagnosis','#icd10')">ICD-10</a>
-                                <a class="dropdown-item" href="#dsm5" onclick="clinical.showLeftMenu('diagnosis','#dsm5')">DSM-5</a>
-                                <a class="dropdown-item" href="#differential" onclick="clinical.showLeftMenu('diagnosis','#differential')">Differential Diagnosis</a>
-                                <a class="dropdown-item" href="#medicalDiagnosis" onclick="clinical.showLeftMenu('diagnosis','#medicalDiagnosis')">Medical Diagnosis</a>
+                                <a class="dropdown-item" href="#icd10" onclick="clinical.showLeftMenu('diagnosis','#icd10')">@Localizer["ICD_10"]</a>
+                                <a class="dropdown-item" href="#dsm5" onclick="clinical.showLeftMenu('diagnosis','#dsm5')">@Localizer["DSM_5"]</a>
+                                <a class="dropdown-item" href="#differential" onclick="clinical.openAssessmentTab('DD','diagnosis','#differential')">@Localizer["Differential_Diagnosis"]</a>
+                                <a class="dropdown-item" href="#medicalDiagnosis" onclick="clinical.openAssessmentTab('MD','diagnosis','#medicalDiagnosis')">@Localizer["Medical_Diagnosis"]</a>
                             </div>
                         </li>
 
@@ -507,56 +591,56 @@
                             <a class="nav-link dropdown-toggle"
                                data-toggle="dropdown"
                                href="javascript:void(0);"
-                               role="button">
-                                <span class="nav-text">Risk Assessment</span>
+                               role="button" title="@Localizer["Risk_Assessment"]">
+                                <span class="nav-text">@Localizer["Risk_Assessment"]</span>
                             </a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#riskSummary" onclick="clinical.showLeftMenu('risk','#riskSummary')">Risk Summary</a>
-                                <a class="dropdown-item" href="#riskPlan" onclick="clinical.showLeftMenu('risk','#riskPlan')">Risk Management Plan</a>
-                                <a class="dropdown-item" href="#riskIndicators" onclick="clinical.showLeftMenu('risk','#riskIndicators')">Risk Indicators</a>
+                                <a class="dropdown-item" href="#riskSummary" onclick="clinical.openAssessmentTab('RS','risk','#riskSummary')">@Localizer["Risk_Summary"]</a>
+                                <a class="dropdown-item" href="#riskPlan" onclick="clinical.openAssessmentTab('RMP','risk','#riskPlan')">@Localizer["Risk_Management_Plan"]</a>
+                                <a class="dropdown-item" href="#riskIndicators" onclick="clinical.showLeftMenu('risk','#riskIndicators')">@Localizer["Risk_Indicators"]</a>
                             </div>
                         </li>
 
                         <!-- SINGLE TABS -->
                         <li class="nav-item">
                             <a class="nav-link" href="#prescriptions" onclick="clinical.showLeftMenu('prescriptions','#prescriptions')">
-                                <span class="nav-text">Prescriptions</span>
+                                <span class="nav-text">@Localizer["Prescriptions"]</span>
                             </a>
                         </li>
 
-                        <li class="nav-item">
+                        @* <li class="nav-item">
                             <a class="nav-link" href="#oldprescriptions" onclick="clinical.showLeftMenu('oldprescriptions','#oldprescriptions')">
                                 <span class="nav-text">Old Prescriptions</span>
                             </a>
-                        </li>
+                        </li> *@
 
                         <li class="nav-item">
                             <a class="nav-link" href="#inpatients" onclick="clinical.showLeftMenu('inpatients','#inpatients')">
-                                <span class="nav-text">Inpatients</span>
+                                <span class="nav-text">@Localizer["Inpatients"]</span>
                             </a>
                         </li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="#attachments" onclick="clinical.showLeftMenu('attachments','#attachments')">
-                                <span class="nav-text">Attachments</span>
+                                <span class="nav-text">@Localizer["Attachments"]</span>
                             </a>
                         </li>
 
                         <li class="nav-item">
                             <a class="nav-link" href="#medicalcert" onclick="clinical.showLeftMenu('medicalcert','#medicalcert')">
-                                <span class="nav-text">Medical Certificate</span>
+                                <span class="nav-text">@Localizer["Medical_Certificate"]</span>
                             </a>
                         </li>
 
-                        <li class="nav-item">
+                        @* <li class="nav-item">
                             <a class="nav-link" href="#oldmedicert" onclick="clinical.showLeftMenu('oldmedicert','#oldmedicert')">
                                 <span class="nav-text">Old Certificates</span>
                             </a>
-                        </li>
+                        </li> *@
 
                         <li class="nav-item">
                             <a class="nav-link" href="#psyreport" onclick="clinical.showLeftMenu('psyreport','#psyreport')">
-                                <span class="nav-text">Psychiatric Report</span>
+                                <span class="nav-text">@Localizer["Psychiatric_Report"]</span>
                             </a>
                         </li>
 
@@ -571,53 +655,53 @@
                         <ul class="nav nav-tabs tabs-left left-menu" style="display:inline-grid !important;width: 100%;">
 
                             <!-- DEMOGRAPHICS -->
-                            <li class="menu-group demographics active"><a data-toggle="tab" href="#general">General Information</a></li>
-                            <li class="menu-group demographics"><a data-toggle="tab" href="#nextOfKin">Next of Kin</a></li>
-                            <li class="menu-group demographics"><a data-toggle="tab" href="#otherProfessionals">Other Professionals</a></li>
+                            <li class="menu-group demographics active"><a data-toggle="tab" href="#general">@Localizer["General_Information"]</a></li>
+                            <li class="menu-group demographics"><a data-toggle="tab" href="#nextOfKin">@Localizer["Next_of_Kin"]</a></li>
+                            <li class="menu-group demographics"><a data-toggle="tab" href="#otherProfessionals">@Localizer["Other_Professionals"]</a></li>
                             <!-- INITIAL ASSESSMENT -->
-                            <li class="menu-group assessment"><a data-toggle="tab" href="#presenting">Presenting Complaints</a></li>
-                            <li class="menu-group assessment"><a data-toggle="tab" href="#history">History of Presenting Complaints</a></li>
-                            <li class="menu-group assessment"><a data-toggle="tab" href="#past">Past Psychiatric History</a></li>
-                            <li class="menu-group assessment"><a data-toggle="tab" href="#medical">Medical History</a></li>
-                            <li class="menu-group assessment"><a data-toggle="tab" href="#family">Family History</a></li>
-                            <li class="menu-group assessment"><a data-toggle="tab" href="#personal">Personal History</a></li>
-                            <li class="menu-group assessment"><a data-toggle="tab" href="#drug">Drug & Alcohol History</a></li>
-                            <li class="menu-group assessment"><a data-toggle="tab" href="#forensic">Forensic History</a></li>
-                            <li class="menu-group assessment"><a data-toggle="tab" href="#premorbid">Premorbid Personality</a></li>
-                            <li class="menu-group assessment"><a data-toggle="tab" href="#mental">Mental State Examination</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" onclick="clinical.GetInitialData('PC');" href="#presenting">@Localizer["Presenting_Complaints"]</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" onclick="clinical.GetInitialData('HPC');" href="#history">@Localizer["History_of_Presenting_Complaints"]</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" onclick="clinical.GetInitialData('PPH');" href="#past">@Localizer["Past_Psychiatric_History"]</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" onclick="clinical.GetInitialData('MH');" href="#medical">@Localizer["Medical_History"]</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" onclick="clinical.GetInitialData('FH');" href="#family">@Localizer["Family_History"]</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" onclick="clinical.GetInitialData('PH');" href="#personal">@Localizer["Personal_History"]</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" onclick="clinical.GetInitialData('DAH');" href="#drug">@Localizer["Drug_Alcohol_History"]</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" onclick="clinical.GetInitialData('FRH');" href="#forensic">@Localizer["Forensic_History"]</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" onclick="clinical.GetInitialData('PMP');" href="#premorbid">@Localizer["Premorbid_Personality"]</a></li>
+                            <li class="menu-group assessment"><a data-toggle="tab" onclick="clinical.GetInitialData('MSE');" href="#mental">@Localizer["Mental_State_Examination"]</a></li>
                             <!-- PROGRESS -->
-                            <li class="menu-group progressmenu"><a data-toggle="tab" href="#progressmenu">Progress Notes</a></li>
+                            <li class="menu-group progressmenu"><a data-toggle="tab" onclick="clinical.GetAssetment('PN');" href="#progressmenu">@Localizer["Progress_Notes"]</a></li>
 
                             <!-- INVESTIGATIONS -->
-                            <li class="menu-group investigations"><a data-toggle="tab" href="#physicalMonitoring">Physical Health Monitoring</a></li>
-                            <li class="menu-group investigations"><a data-toggle="tab" href="#scans">Scans</a></li>
-                            <li class="menu-group investigations"><a data-toggle="tab" href="#eeg">EEG</a></li>
-                            <li class="menu-group investigations"><a data-toggle="tab" href="#otherInvestigations">Other Investigations</a></li>
+                            <li class="menu-group investigations"><a data-toggle="tab" onclick="clinical.GetPHM();" href="#physicalMonitoring">@Localizer["Physical_Health_Monitoring"]</a></li>
+                            <li class="menu-group investigations"><a data-toggle="tab" onclick="clinical.GetAssetment('SCAN');" href="#scans">@Localizer["Scans"]</a></li>
+                            <li class="menu-group investigations"><a data-toggle="tab" onclick="clinical.GetAssetment('EEG');" href="#eeg">@Localizer["EEG"]</a></li>
+                            <li class="menu-group investigations"><a data-toggle="tab" onclick="clinical.GetAssetment('OI');" href="#otherInvestigations">@Localizer["Other_Investigations"]</a></li>
 
                             <!-- DIAGNOSIS -->
-                            <li class="menu-group diagnosis"><a data-toggle="tab" href="#icd10">ICD-10 Diagnosis</a></li>
-                            <li class="menu-group diagnosis"><a data-toggle="tab" href="#dsm5">DSM-5 Diagnosis</a></li>
-                            <li class="menu-group diagnosis"><a data-toggle="tab" href="#differential">Differential Diagnosis</a></li>
-                            <li class="menu-group diagnosis"><a data-toggle="tab" href="#medicalDiagnosis">Medical Diagnosis</a></li>
+                            <li class="menu-group diagnosis"><a data-toggle="tab" href="#icd10">@Localizer["ICD_10_Diagnosis"]</a></li>
+                            <li class="menu-group diagnosis"><a data-toggle="tab" href="#dsm5">@Localizer["DSM_5_Diagnosis"]</a></li>
+                            <li class="menu-group diagnosis"><a data-toggle="tab" onclick="clinical.GetAssetment('DD');" href="#differential">@Localizer["Differential_Diagnosis"]</a></li>
+                            <li class="menu-group diagnosis"><a data-toggle="tab" onclick="clinical.GetAssetment('MD');" href="#medicalDiagnosis">@Localizer["Medical_Diagnosis"]</a></li>
 
                             <!-- RISK -->
-                            <li class="menu-group risk"><a data-toggle="tab" href="#riskSummary">Risk Summary</a></li>
-                            <li class="menu-group risk"><a data-toggle="tab" href="#riskPlan">Risk Management Plan</a></li>
-                            <li class="menu-group risk"><a data-toggle="tab" href="#riskIndicators">Risk Indicators</a></li>
+                            <li class="menu-group risk"><a data-toggle="tab" onclick="clinical.GetAssetment('RS');" href="#riskSummary">@Localizer["Risk_Summary"]</a></li>
+                            <li class="menu-group risk"><a data-toggle="tab" onclick="clinical.GetAssetment('RMP');" href="#riskPlan">@Localizer["Risk_Management_Plan"]</a></li>
+                            <li class="menu-group risk"><a data-toggle="tab" href="#riskIndicators">@Localizer["Risk_Indicators"]</a></li>
 
                             <!-- SINGLE TABS -->
-                            <li class="menu-group prescriptions"><a data-toggle="tab" href="#prescriptions">Prescriptions</a></li>
-                            <li class="menu-group oldprescriptions"><a data-toggle="tab" href="#oldprescriptions">Old Prescriptions</a></li>
-                            <li class="menu-group inpatients"><a data-toggle="tab" href="#inpatients">Inpatients</a></li>
-                            <li class="menu-group attachments"><a data-toggle="tab" href="#attachments">Attachments</a></li>
-                            <li class="menu-group medicalcert"><a data-toggle="tab" href="#medicalcert">Medical Certificate</a></li>
-                            <li class="menu-group oldmedicert"><a data-toggle="tab" href="#oldmedicert">Old Certificates</a></li>
-                            <li class="menu-group psyreport"><a data-toggle="tab" href="#psyreport">Psychiatric Report</a></li>
+                            <li class="menu-group prescriptions"><a data-toggle="tab" href="#prescriptions">@Localizer["Prescriptions"]</a></li>
+                            @* <li class="menu-group oldprescriptions"><a data-toggle="tab" href="#oldprescriptions">Old Prescriptions</a></li> *@
+                            <li class="menu-group inpatients"><a data-toggle="tab" href="#inpatients">@Localizer["Inpatients"]</li>
+                            <li class="menu-group attachments"><a data-toggle="tab" href="#attachments">@Localizer["Attachments"]</a></li>
+                            <li class="menu-group medicalcert"><a data-toggle="tab" href="#medicalcert">@Localizer["Medical_Certificate"]</a></li>
+                            @* <li class="menu-group oldmedicert"><a data-toggle="tab" href="#oldmedicert">Old Certificates</a></li> *@
+                            <li class="menu-group psyreport"><a data-toggle="tab" href="#psyreport">@Localizer["Psychiatric_Report"]</a></li>
 
                         </ul>
                     </div>
                     <!-- RIGHT SIDE CONTENT -->
-                    <div class="col-md-10">
+                    <div class="col-md-10" id="rightContent">
                         <div class="tab-content">
 
                             <div id="general" class="tab-pane fade show active" style="border:1px solid #ddd;padding:12px;background:#f9f9f9;">
@@ -625,17 +709,17 @@
                                 <!-- Row 1 -->
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <label>First Name</label><asterisk></asterisk>
+                                        <label>@Localizer["First_Name"]</label><asterisk></asterisk>
                                         <input id="txtAddFirstName" type="text" class="form-control" />
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label>Middle Name</label>
+                                        <label>@Localizer["Middle_Name"]</label>
                                         <input id="txtAddMiddleName" type="text" class="form-control" />
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label>Last Name </label><asterisk></asterisk>
+                                        <label>@Localizer["Last_Name"] </label><asterisk></asterisk>
                                         <input type="text" id="txtAddLastName" class="form-control" />
                                     </div>
                                 </div>
@@ -643,18 +727,18 @@
                                 <!-- Row 3 -->
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <label>DOB </label><asterisk></asterisk>
+                                        <label>@Localizer["DOB"] </label><asterisk></asterisk>
                                         <input type="date" id="txtAddDOB" class="form-control" placeholder="@Localizer["Date"]" autocomplete="off" />
                                     </div>
                                     <div class="col-md-4">
-                                        <label>Marital Status</label>
+                                        <label>@Localizer["Marital_Status"]</label>
                                         <select id="ddlAddMaritalStatus" class="form-control">
                                             <option value="">Select</option>
                                         </select>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label>Occupation</label>
+                                        <label>@Localizer["Occupation"]</label>
                                         <select id="ddlAddOccupation" class="form-control">
                                             <option value="">Select</option>
                                         </select>
@@ -664,17 +748,17 @@
                                 <!-- Row 4 -->
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <label>Tele. No.</label>
+                                        <label>@Localizer["Tele_No"]</label>
                                         <input type="text" id="txtAddTelephone" class="form-control" />
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label>Mobile No. </label><asterisk></asterisk>
+                                        <label>@Localizer["Mobile_No"] </label><asterisk></asterisk>
                                         <input type="text" id="txtAddMobile" class="form-control" />
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label>Email</label>
+                                        <label>@Localizer["Email"]</label>
                                         <input type="text" id="txtAddEmail" class="form-control" />
                                     </div>
                                 </div>
@@ -682,29 +766,29 @@
                                 <!-- Row 5 -->
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <label>Category</label>
+                                        <label>@Localizer["Category"]</label>
                                         <select id="ddlAddCategory" class="form-control">
                                             <option value="">Select</option>
                                         </select>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label>Status</label>
+                                        <label>@Localizer["Status"]</label>
                                         <select id="ddlAddStatus" class="form-control">
                                             <option value="">Select</option>
                                         </select>
                                     </div>
                                     <div class="col-md-4">
-                                        <label>Gender </label><asterisk></asterisk>
+                                        <label>@Localizer["Gender"] </label><asterisk></asterisk>
                                         <div style="margin-top:6px;">
                                             <label class="radio-inline">
-                                                <input type="radio" name="AddGender" value="M"> Male
+                                                <input type="radio" name="AddGender" value="M"> @Localizer["Male"]
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="AddGender" value="F"> Female
+                                                <input type="radio" name="AddGender" value="F"> @Localizer["Female"]
                                             </label>
                                             <label class="radio-inline">
-                                                <input type="radio" name="AddGender" value="O"> Other
+                                                <input type="radio" name="AddGender" value="O"> @Localizer["Other"]
                                             </label>
                                         </div>
                                     </div>
@@ -712,17 +796,17 @@
                                 <!-- Row 2 : Address + Referred -->
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <label>Address</label>
-                                        <textarea type="text" id="txtAddAddress" class="form-control small-box"></textarea>
+                                        <label>@Localizer["Address"]</label>
+                                        <textarea type="text" id="txtAddAddress" placeholder="@Localizer["Address"]" class="form-control small-box"></textarea>
                                     </div>
 
                                     <div class="col-md-4">
-                                        <label>Referred By</label>
+                                        <label>@Localizer["Referred_By"]</label>
                                         <input type="text" id="txtAddReferredBy" class="form-control" />
                                     </div>
                                     <div class="col-md-4">
-                                        <label>Remarks</label>
-                                        <textarea id="txtAddRemarks" class="form-control small-box"></textarea>
+                                        <label>@Localizer["Remarks"]</label>
+                                        <textarea id="txtAddRemarks" placeholder="@Localizer["Remarks"]" class="form-control small-box"></textarea>
                                     </div>
                                 </div>
                                 @* <!-- Row 6 : Remarks Full Width -->
@@ -730,7 +814,7 @@
 
                                 </div> *@
 
-                                <button id="btnAddSave" class="btn btn-success btn-sm">Save</button>
+                                <button id="btnAddSave" class="btn btn-success btn-sm" title="@Localizer["Save"]">@Localizer["Save"]</button>
 
                             </div>
 
@@ -739,17 +823,17 @@
                                 <div class="kt-portlet__body table-responsive">
                                     <table id="tblNOK" class="table table-striped table-hover table-checkable" style="width:100%;">
                                         <template>
-                                            NOK List
+                                            @Localizer["NOK_List"]
                                         </template>
                                         <thead>
                                             <tr>
-                                                <th>Name</th>
-                                                <th>Relation</th>
-                                                <th>Address</th>
-                                                <th>Tele. No.</th>
-                                                <th>Mobile No.</th>
-                                                <th>Email</th>
-                                                <th>Remarks</th>
+                                                <th>@Localizer["Name"]</th>
+                                                <th>@Localizer["Relation"]</th>
+                                                <th>@Localizer["Address"]</th>
+                                                <th>@Localizer["Tele_No"]</th>
+                                                <th>@Localizer["Mobile_No"]</th>
+                                                <th>@Localizer["Email"]</th>
+                                                <th>@Localizer["Remarks"]</th>
                                             </tr>
                                         </thead>
 
@@ -776,17 +860,17 @@
                                 <div class="kt-portlet__body table-responsive">
                                     <table id="tblOP" class="table table-striped table-hover table-checkable" style="width:100%;">
                                         <template>
-                                            OP List
+                                            @Localizer["OP_List"]
                                         </template>
                                         <thead>
                                             <tr>
-                                                <th>Name</th>
-                                                <th>Profession</th>
-                                                <th>Address</th>
-                                                <th>Tele. No.</th>
-                                                <th>Mobile No.</th>
-                                                <th>Email</th>
-                                                <th>Remarks</th>
+                                                <th>@Localizer["Name"]</th>
+                                                <th>@Localizer["Profession"]</th>
+                                                <th>@Localizer["Address"]</th>
+                                                <th>@Localizer["Tele_No"]</th>
+                                                <th>@Localizer["Mobile_No"]</th>
+                                                <th>@Localizer["Email"]</th>
+                                                <th>@Localizer["Remarks"]</th>
                                             </tr>
                                         </thead>
 
@@ -810,9 +894,9 @@
                             </div>
                             <div id="presenting" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnPCQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddPC" type="button" onclick="clinical.AddSection('PC');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnPCQuickInfo" type="button" title="@Localizer["Quick_Information"]" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddPC" type="button" title="@Localizer["Add"]" onclick="clinical.AddSection('PC');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <!-- QUICK INFO PANEL -->
@@ -842,165 +926,165 @@
                                     </div>
                                     <!-- SAVE & CLOSE BUTTONS -->
                                     <div style="margin-top:15px;">
-                                        <button type="button" id="btnSaveQuickInfo" onclick="clinical.SaveQuickInfo();" class="btn btn-success btn-sm">Save</button>
-                                        <button type="button" id="btnCloseQuickInfo" onclick="clinical.CloseQuickInfo();" class="btn btn-danger btn-sm">Close</button>
+                                        <button type="button" id="btnSaveQuickInfo" onclick="clinical.SaveQuickInfo();" class="btn btn-success btn-sm">@Localizer["Save"]</button>
+                                        <button type="button" id="btnCloseQuickInfo" onclick="clinical.CloseQuickInfo();" class="btn btn-danger btn-sm">@Localizer["Close"]</button>
                                     </div>
                                 </div>
                                 <!-- TEXTAREA -->
 
-                                <textarea id="txtPC" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <textarea id="txtPC" readonly placeholder="@Localizer["Enter_the_details"]" class="form-control rich-editor" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
                                 <div id="divPCAction" style="margin-top:15px; display:none;">
-                                    <button type="button" id="btnSavePC" onclick="clinical.SaveSection('PC');" class="btn btn-success btn-sm">Save</button>
-                                    <button type="button" id="btnClosePC" onclick="clinical.CloseSection('PC');" class="btn btn-danger btn-sm">Close</button>
+                                    <button type="button" title="@Localizer["Save"]" id="btnSavePC" onclick="clinical.SaveSection('PC');" class="btn btn-success btn-sm">@Localizer["Save"]</button>
+                                    <button type="button" title="@Localizer["Close"]" id="btnClosePC" onclick="clinical.CloseSection('PC');" class="btn btn-danger btn-sm">@Localizer["Close"]</button>
                                 </div>
                             </div>
                             <div id="history" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnHPCQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddHPC" type="button" onclick="clinical.AddSection('HPC');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnHPCQuickInfo" type="button" title="@Localizer["Quick_Information"]" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddHPC" type="button" title="@Localizer["Add"]" onclick="clinical.AddSection('HPC');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <!-- QUICK INFO PANEL -->
                                 <!-- TEXTAREA -->
-                                <textarea id="txtHPC" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <textarea id="txtHPC" readonly class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
                                 <div id="divHPCAction" style="margin-top:15px; display:none;">
-                                    <button type="button" id="btnSaveHPC" onclick="clinical.SaveSection('HPC');" class="btn btn-success btn-sm">Save</button>
-                                    <button type="button" id="btnCloseHPC" onclick="clinical.CloseSection('HPC');" class="btn btn-danger btn-sm">Close</button>
+                                    <button type="button" title="@Localizer["Add"]" id="btnSaveHPC" onclick="clinical.SaveSection('HPC');" class="btn btn-success btn-sm">@Localizer["Save"]</button>
+                                    <button type="button" title="@Localizer["Add"]" id="btnCloseHPC" onclick="clinical.CloseSection('HPC');" class="btn btn-danger btn-sm">@Localizer["Close"]</button>
                                 </div>
                             </div>
                             <div id="past" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnPPHQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddPPH" type="button" onclick="clinical.AddSection('PPH');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnPPHQuickInfo" title="@Localizer["Quick_Information"]" type="button" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddPPH" title="@Localizer["Add"]" type="button" onclick="clinical.AddSection('PPH');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <!-- QUICK INFO PANEL -->
                                 <!-- TEXTAREA -->
-                                <textarea id="txtPPH" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <textarea id="txtPPH" readonly class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
                                 <div id="divPPHAction" style="margin-top:15px; display:none;">
-                                    <button type="button" id="btnSavePPH" onclick="clinical.SaveSection('PPH');" class="btn btn-success btn-sm">Save</button>
-                                    <button type="button" id="btnClosePPH" onclick="clinical.CloseSection('PPH');" class="btn btn-danger btn-sm">Close</button>
+                                    <button type="button" title="@Localizer["Save"]" id="btnSavePPH" onclick="clinical.SaveSection('PPH');" class="btn btn-success btn-sm">@Localizer["Save"]</button>
+                                    <button type="button" title="@Localizer["Close"]" id="btnClosePPH" onclick="clinical.CloseSection('PPH');" class="btn btn-danger btn-sm">@Localizer["Close"]</button>
                                 </div>
                             </div>
                             <div id="medical" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnMHQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddMH" type="button" onclick="clinical.AddSection('MH');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnMHQuickInfo" type="button" title="@Localizer["Quick_Information"]" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddMH" type="button" title="@Localizer["Add"]" onclick="clinical.AddSection('MH');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <!-- QUICK INFO PANEL -->
                                 <!-- TEXTAREA -->
-                                <textarea id="txtMH" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <textarea id="txtMH" readonly class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
                                 <div id="divMHAction" style="margin-top:15px; display:none;">
-                                    <button type="button" id="btnSaveMH" onclick="clinical.SaveSection('MH');" class="btn btn-success btn-sm">Save</button>
-                                    <button type="button" id="btnCloseMH" onclick="clinical.CloseSection('MH');" class="btn btn-danger btn-sm">Close</button>
+                                    <button type="button" title="@Localizer["Save"]" id="btnSaveMH" onclick="clinical.SaveSection('MH');" class="btn btn-success btn-sm">@Localizer["Save"]</button>
+                                    <button type="button" title="@Localizer["Close"]" id="btnCloseMH" onclick="clinical.CloseSection('MH');" class="btn btn-danger btn-sm">@Localizer["Close"]</button>
                                 </div>
                             </div>
                             <div id="family" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnFHQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddFH" type="button" onclick="clinical.AddSection('FH');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnFHQuickInfo" title="@Localizer["Quick_Information"]" type="button" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddFH" title="@Localizer["Add"]" type="button" onclick="clinical.AddSection('FH');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <!-- QUICK INFO PANEL -->
                                 <!-- TEXTAREA -->
-                                <textarea id="txtFH" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <textarea id="txtFH" readonly class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
                                 <div id="divFHAction" style="margin-top:15px; display:none;">
-                                    <button type="button" id="btnSaveFH" onclick="clinical.SaveSection('FH');" class="btn btn-success btn-sm">Save</button>
-                                    <button type="button" id="btnCloseFH" onclick="clinical.CloseSection('FH');" class="btn btn-danger btn-sm">Close</button>
+                                    <button type="button" title="@Localizer["Save"]" id="btnSaveFH" onclick="clinical.SaveSection('FH');" class="btn btn-success btn-sm">@Localizer["Save"]</button>
+                                    <button type="button" title="@Localizer["Close"]" id="btnCloseFH" onclick="clinical.CloseSection('FH');" class="btn btn-danger btn-sm">@Localizer["Close"]</button>
                                 </div>
                             </div>
                             <div id="personal" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnPHQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddPH" type="button" onclick="clinical.AddSection('PH');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnPHQuickInfo" title="@Localizer["Quick_Information"]" type="button" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddPH" title="@Localizer["Add"]" type="button" onclick="clinical.AddSection('PH');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <!-- QUICK INFO PANEL -->
                                 <!-- TEXTAREA -->
-                                <textarea id="txtPH" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <textarea id="txtPH" readonly class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
                                 <div id="divPHAction" style="margin-top:15px; display:none;">
-                                    <button type="button" id="btnSavePH" onclick="clinical.SaveSection('PH');" class="btn btn-success btn-sm">Save</button>
-                                    <button type="button" id="btnClosePH" onclick="clinical.CloseSection('PH');" class="btn btn-danger btn-sm">Close</button>
+                                    <button type="button" title="@Localizer["Save"]" id="btnSavePH" onclick="clinical.SaveSection('PH');" class="btn btn-success btn-sm">@Localizer["Save"]</button>
+                                    <button type="button" title="@Localizer["Close"]" id="btnClosePH" onclick="clinical.CloseSection('PH');" class="btn btn-danger btn-sm">@Localizer["Close"]</button>
                                 </div>
                             </div>
                             <div id="forensic" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnFRHQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddFRH" type="button" onclick="clinical.AddSection('FRH');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnFRHQuickInfo" title="@Localizer["Quick_Information"]" type="button" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddFRH" title="@Localizer["Add"]" type="button" onclick="clinical.AddSection('FRH');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <!-- QUICK INFO PANEL -->
                                 <!-- TEXTAREA -->
-                                <textarea id="txtFRH" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <textarea id="txtFRH" readonly class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
                                 <div id="divFRHAction" style="margin-top:15px; display:none;">
-                                    <button type="button" id="btnSaveFRH" onclick="clinical.SaveSection('FRH');" class="btn btn-success btn-sm">Save</button>
-                                    <button type="button" id="btnCloseFRH" onclick="clinical.CloseSection('FRH');" class="btn btn-danger btn-sm">Close</button>
+                                    <button type="button" title="@Localizer["Save"]" id="btnSaveFRH" onclick="clinical.SaveSection('FRH');" class="btn btn-success btn-sm">@Localizer["Save"]</button>
+                                    <button type="button" title="@Localizer["Close"]" id="btnCloseFRH" onclick="clinical.CloseSection('FRH');" class="btn btn-danger btn-sm">@Localizer["Close"]</button>
                                 </div>
                             </div>
                             <div id="drug" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnDAHQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddDAH" type="button" onclick="clinical.AddSection('DAH');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnDAHQuickInfo" title="@Localizer["Quick_Information"]" type="button" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddDAH" title="@Localizer["Add"]" type="button" onclick="clinical.AddSection('DAH');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <!-- QUICK INFO PANEL -->
                                 <!-- TEXTAREA -->
-                                <textarea id="txtDAH" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <textarea id="txtDAH" readonly class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
                                 <div id="divDAHAction" style="margin-top:15px; display:none;">
-                                    <button type="button" id="btnSaveDAH" onclick="clinical.SaveSection('DAH');" class="btn btn-success btn-sm">Save</button>
-                                    <button type="button" id="btnCloseDAH" onclick="clinical.CloseSection('DAH');" class="btn btn-danger btn-sm">Close</button>
+                                    <button type="button" title="@Localizer["Save"]" id="btnSaveDAH" onclick="clinical.SaveSection('DAH');" class="btn btn-success btn-sm">@Localizer["Save"]</button>
+                                    <button type="button" title="@Localizer["Close"]" id="btnCloseDAH" onclick="clinical.CloseSection('DAH');" class="btn btn-danger btn-sm">@Localizer["Close"]</button>
                                 </div>
                             </div>
                             <div id="premorbid" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnPMPQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddPMP" type="button" onclick="clinical.AddSection('PMP');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnPMPQuickInfo" title="@Localizer["Quick_Information"]" type="button" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddPMP" title="@Localizer["Add"]" type="button" onclick="clinical.AddSection('PMP');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <!-- QUICK INFO PANEL -->
                                 <!-- TEXTAREA -->
-                                <textarea id="txtPMP" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <textarea id="txtPMP" readonly class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
                                 <div id="divPMPAction" style="margin-top:15px; display:none;">
-                                    <button type="button" id="btnSavePMP" onclick="clinical.SaveSection('PMP');" class="btn btn-success btn-sm">Save</button>
-                                    <button type="button" id="btnClosePMP" onclick="clinical.CloseSection('PMP');" class="btn btn-danger btn-sm">Close</button>
+                                    <button type="button" title="@Localizer["Save"]" id="btnSavePMP" onclick="clinical.SaveSection('PMP');" class="btn btn-success btn-sm">@Localizer["Save"]</button>
+                                    <button type="button" title="@Localizer["Close"]" id="btnClosePMP" onclick="clinical.CloseSection('PMP');" class="btn btn-danger btn-sm">@Localizer["Close"]</button>
                                 </div>
                             </div>
                             <div id="mental" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnMSEQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddMSE" type="button" onclick="clinical.AddSection('MSE');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnMSEQuickInfo" title="@Localizer["Quick_Information"]" type="button" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddMSE" title="@Localizer["Add"]" type="button" onclick="clinical.AddSection('MSE');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <!-- QUICK INFO PANEL -->
                                 <!-- TEXTAREA -->
-                                <textarea id="txtMSE" readonly class="form-control" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
+                                <textarea id="txtMSE" readonly class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="margin-top:10px;height:360px; background-color:#dddd !important;"></textarea>
                                 <div id="divMSEAction" style="margin-top:15px; display:none;">
-                                    <button type="button" id="btnSaveMSE" onclick="clinical.SaveSection('MSE');" class="btn btn-success btn-sm">Save</button>
-                                    <button type="button" id="btnCloseMSE" onclick="clinical.CloseSection('MSE');" class="btn btn-danger btn-sm">Close</button>
+                                    <button type="button" title="@Localizer["Save"]" id="btnSaveMSE" onclick="clinical.SaveSection('MSE');" class="btn btn-success btn-sm">@Localizer["Save"]</button>
+                                    <button type="button" title="@Localizer["Close"]" id="btnCloseMSE" onclick="clinical.CloseSection('MSE');" class="btn btn-danger btn-sm">@Localizer["Close"]</button>
                                 </div>
                             </div>
                             <div id="progressmenu" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnPNQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddPN" type="button" onclick="clinical.AddAssetmentSection('PN');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnPNQuickInfo" title="@Localizer["Quick_Information"]" type="button" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddPN" title="@Localizer["Add"]" type="button" onclick="clinical.AddAssetmentSection('PN');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <div id="divPNPanel" class="addPanel">
-                                    <textarea id="txtPN" class="form-control" placeholder="Write progress note..." style="height:300px;"> </textarea>
+                                    <textarea id="txtPN" class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="height:300px;"> </textarea>
                                     <div id="divPNAction" style="margin-top:15px; display:none;">
-                                        <button type="button" id="btnSavePN" onclick="clinical.SaveAssetmentSection('PN');" class="btn btn-success btn-sm">Save</button>
-                                        <button type="button" id="btnClosePN" onclick="clinical.CloseAssetmentSection('PN');" class="btn btn-danger btn-sm">Close</button>
+                                        <button type="button" title="@Localizer["Save"]" id="btnSavePN" onclick="clinical.SaveAssetmentSection('PN');" class="btn btn-success btn-sm">@Localizer["Save"]</button>
+                                        <button type="button" title="@Localizer["Close"]" id="btnClosePN" onclick="clinical.CloseAssetmentSection('PN');" class="btn btn-danger btn-sm">@Localizer["Close"]</button>
                                     </div>
                                 </div>
                                 <div id="divPNtimeline" class="simpleTimeline" style="display:none;"></div>
@@ -1009,11 +1093,11 @@
 
                             <div id="physicalMonitoring" class="tab-pane fade assessment-section">
                                 <div style="display:flex; gap:8px; margin-bottom:10px;">
-                                    <button class="btn btn-secondary btn-sm" id="btnAddPhysicalMonitoring" type="button" onclick="clinical.AddPhysicalMonitoring();">
-                                        Add
+                                    <button class="btn btn-secondary btn-sm" id="btnAddPhysicalMonitoring" type="button" title="@Localizer["Add"]" onclick="clinical.AddPhysicalMonitoring();">
+                                        @Localizer["Add"]
                                     </button>
-                                    <button type="button" class="btn btn-danger" id="btnClearPhysicalMonitoring" onclick="clinical.ClearPhysicalMonitoring();" style="display:none;">
-                                        Clear
+                                    <button type="button" class="btn btn-danger" id="btnClearPhysicalMonitoring" title="@Localizer["Clear"]" onclick="clinical.ClearPhysicalMonitoring();" style="display:none;">
+                                        @Localizer["Clear"]
                                     </button>
                                 </div>
                                 <div style="overflow-x:auto; background:#fff;">
@@ -1024,7 +1108,8 @@
                                             </template>
                                             <thead>
                                                 <tr>
-                                                    <th class="sticky-col" style="min-width:250px; background: #9d9c9c !important; color:#fff;">Parameter</th>
+                                                    <th class="sticky-col" style="min-width:250px; background: #9d9c9c !important; color:#fff;">
+                                                    <th>@Localizer["Parameter"]</th></th>
                                                 </tr>
                                             </thead>
                                             <tbody id="physicalTableBody"></tbody>
@@ -1032,27 +1117,27 @@
                                     </div>
                                 </div>
                                 <div style="margin-top:10px; ">
-                                    <button type="button" style="display:none;" class="btn btn-success btn-sm " id="btnSavePHM" onclick="clinical.SaveAssetmentPHMData();">
-                                        Save
+                                    <button type="button" style="display:none;" title="@Localizer["Save"]" class="btn btn-success btn-sm " id="btnSavePHM" onclick="clinical.SaveAssetmentPHMData();">
+                                        @Localizer["Save"]
                                     </button>
                                 </div>
                             </div>
                             <div id="scans" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnScanQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddSCAN" type="button" onclick="clinical.AddAssetmentSection('SCAN');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnScanQuickInfo" type="button" title="@Localizer["Quick_Information"]" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddSCAN" type="button" title="@Localizer["Add"]" onclick="clinical.AddAssetmentSection('SCAN');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <div id="divSCANPanel" class="addPanel">
-                                    <textarea id="txtSCAN" class="form-control" placeholder="Write scan details..." style="height:300px;"></textarea>
+                                    <textarea id="txtSCAN" class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="height:300px;"></textarea>
 
                                     <div id="divSCANAction" style="margin-top:15px; display:none;">
-                                        <button type="button" onclick="clinical.SaveAssetmentSection('SCAN');" class="btn btn-success btn-sm">
-                                            Save
+                                        <button type="button" title="@Localizer["Save"]" onclick="clinical.SaveAssetmentSection('SCAN');" class="btn btn-success btn-sm">
+                                            @Localizer["Save"]
                                         </button>
-                                        <button type="button" onclick="clinical.CloseAssetmentSection('SCAN');" class="btn btn-danger btn-sm">
-                                            Close
+                                        <button type="button" title="@Localizer["Close"]" onclick="clinical.CloseAssetmentSection('SCAN');" class="btn btn-danger btn-sm">
+                                            @Localizer["Close"]
                                         </button>
                                     </div>
                                 </div>
@@ -1060,20 +1145,20 @@
                             </div>
                             <div id="eeg" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnEEGQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddEEG" type="button" onclick="clinical.AddAssetmentSection('EEG');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnEEGQuickInfo" title="@Localizer["Quick_Information"]" type="button" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddEEG" title="@Localizer["Add"]" type="button" onclick="clinical.AddAssetmentSection('EEG');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <div id="divEEGPanel" class="addPanel">
-                                    <textarea id="txtEEG" class="form-control" placeholder="Write EEG details..." style="height:300px;"></textarea>
+                                    <textarea id="txtEEG" class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="height:300px;"></textarea>
 
                                     <div id="divEEGAction" style="margin-top:15px; display:none;">
-                                        <button type="button" onclick="clinical.SaveAssetmentSection('EEG');" class="btn btn-success btn-sm">
-                                            Save
+                                        <button type="button" title="@Localizer["Save"]" onclick="clinical.SaveAssetmentSection('EEG');" class="btn btn-success btn-sm">
+                                            @Localizer["Save"]
                                         </button>
-                                        <button type="button" onclick="clinical.CloseAssetmentSection('EEG');" class="btn btn-danger btn-sm">
-                                            Close
+                                        <button type="button" title="@Localizer["Close"]" onclick="clinical.CloseAssetmentSection('EEG');" class="btn btn-danger btn-sm">
+                                            @Localizer["Close"]
                                         </button>
                                     </div>
                                 </div>
@@ -1081,20 +1166,20 @@
                             </div>
                             <div id="otherInvestigations" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnOIQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddOI" type="button" onclick="clinical.AddAssetmentSection('OI');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnOIQuickInfo" title="@Localizer["Quick_Information"]" type="button" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddOI" title="@Localizer["Add"]" type="button" onclick="clinical.AddAssetmentSection('OI');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <div id="divOIPanel" class="addPanel">
-                                    <textarea id="txtOI" class="form-control" placeholder="Write OI details..." style="height:300px;"></textarea>
+                                    <textarea id="txtOI" class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="height:300px;"></textarea>
 
                                     <div id="divOIAction" style="margin-top:15px; display:none;">
-                                        <button type="button" onclick="clinical.SaveAssetmentSection('OI');" class="btn btn-success btn-sm">
-                                            Save
+                                        <button type="button" title="@Localizer["Save"]" onclick="clinical.SaveAssetmentSection('OI');" class="btn btn-success btn-sm">
+                                            @Localizer["Save"]
                                         </button>
-                                        <button type="button" onclick="clinical.CloseAssetmentSection('OI');" class="btn btn-danger btn-sm">
-                                            Close
+                                        <button type="button" title="@Localizer["Close"]" onclick="clinical.CloseAssetmentSection('OI');" class="btn btn-danger btn-sm">
+                                            @Localizer["Close"]
                                         </button>
                                     </div>
                                 </div>
@@ -1106,12 +1191,12 @@
 
                                 <!-- Top Buttons -->
                                 <div style="display:flex; gap:8px; margin-bottom:10px;">
-                                    <button class="btn btn-primary btn-sm btnQuickInfo">
-                                        Quick Information
+                                    <button class="btn btn-primary btn-sm btnQuickInfo" title="@Localizer["Quick_Information"]">
+                                        @Localizer["Quick_Information"]
                                     </button>
 
-                                    <button class="btn btn-secondary btn-sm" id="btnAddICDOpen">
-                                        Add
+                                    <button class="btn btn-secondary btn-sm" id="btnAddICDOpen" title="@Localizer["Add"]">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
 
@@ -1147,13 +1232,13 @@
                                         </div>
                                     </div>
 
-                                    <!-- Add Remove Buttons -->
+                                    <!-- @Localizer["Add"] Remove Buttons -->
                                     <div style="margin-bottom:10px;">
-                                        <button class="btn btn-secondary btn-sm" id="btnAddICD">
-                                            Add >>
+                                        <button class="btn btn-secondary btn-sm" id="btnAddICD" title="@Localizer["Add"]">
+                                            @Localizer["Add"] >>
                                         </button>
 
-                                        <button class="btn btn-danger btn-sm" id="btnRemoveICD">
+                                        <button class="btn btn-danger btn-sm" id="btnRemoveICD" title="@Localizer["Remove"]">
                                             << Remove
                                         </button>
                                     </div>
@@ -1163,10 +1248,10 @@
                                         <select id="selectedICD" class="form-control" size="6" multiple></select>
                                     </div>
 
-                                    <!-- Save Close -->
+                                    <!-- @Localizer["Save"] @Localizer["Close"] -->
                                     <div style="text-align:center; margin-top:15px;">
-                                        <button class="btn btn-success btn-sm" id="btnSaveICD">Save</button>
-                                        <button class="btn btn-danger btn-sm" id="btnCloseICD">Close</button>
+                                        <button class="btn btn-success btn-sm" title="@Localizer["Save"]" id="btnSaveICD">@Localizer["Save"]</button>
+                                        <button class="btn btn-danger btn-sm" title="@Localizer["Close"]" id="btnCloseICD">@Localizer["Close"]</button>
                                     </div>
 
                                 </div>
@@ -1177,12 +1262,12 @@
 
                                 <!-- Top Buttons -->
                                 <div style="display:flex; gap:8px; margin-bottom:10px;">
-                                    <button class="btn btn-primary btn-sm btnQuickInfoDSM">
-                                        Quick Information
+                                    <button class="btn btn-primary btn-sm btnQuickInfoDSM" title="@Localizer["Quick_Information"]">
+                                        @Localizer["Quick_Information"]
                                     </button>
 
-                                    <button class="btn btn-secondary btn-sm" id="btnAddDSMOpen">
-                                        Add
+                                    <button class="btn btn-secondary btn-sm" id="btnAddDSMOpen" title="@Localizer["Add"]">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
 
@@ -1218,10 +1303,10 @@
                                         </div>
                                     </div>
 
-                                    <!-- Add Remove Buttons -->
+                                    <!-- @Localizer["Add"] Remove Buttons -->
                                     <div style="margin-bottom:10px;">
-                                        <button class="btn btn-secondary btn-sm" id="btnAddDSM">Add >></button>
-                                        <button class="btn btn-danger btn-sm" id="btnRemoveDSM"><< Remove</button>
+                                        <button class="btn btn-secondary btn-sm" title="@Localizer["Add"]" id="btnAddDSM">@Localizer["Add"] >></button>
+                                        <button class="btn btn-danger btn-sm" title="@Localizer["Remove"]" id="btnRemoveDSM"><< Remove</button>
                                     </div>
 
                                     <!-- Selected List -->
@@ -1229,10 +1314,10 @@
                                         <select id="selectedDSM" class="form-control" size="6" multiple></select>
                                     </div>
 
-                                    <!-- Save Close -->
+
                                     <div style="text-align:center; margin-top:15px;">
-                                        <button class="btn btn-success btn-sm" id="btnSaveDSM">Save</button>
-                                        <button class="btn btn-danger btn-sm" id="btnCloseDSM">Close</button>
+                                        <button class="btn btn-success btn-sm" title="@Localizer["Save"]" id="btnSaveDSM">@Localizer["Save"]</button>
+                                        <button class="btn btn-danger btn-sm" title="@Localizer["Close"]" id="btnCloseDSM">@Localizer["Close"]</button>
                                     </div>
 
                                 </div>
@@ -1240,20 +1325,20 @@
                             </div>
                             <div id="differential" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnDDQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddDD" type="button" onclick="clinical.AddAssetmentSection('DD');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnDDQuickInfo" type="button" title="@Localizer["Quick_Information"]" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddDD" type="button" title="@Localizer["Add"]" onclick="clinical.AddAssetmentSection('DD');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <div id="divDDPanel" class="addPanel">
-                                    <textarea id="txtDD" class="form-control" placeholder="Write DD details..." style="height:300px;"></textarea>
+                                    <textarea id="txtDD" class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="height:300px;"></textarea>
 
                                     <div id="divDDAction" style="margin-top:15px; display:none;">
-                                        <button type="button" onclick="clinical.SaveAssetmentSection('DD');" class="btn btn-success btn-sm">
-                                            Save
+                                        <button type="button" title="@Localizer["Save"]" onclick="clinical.SaveAssetmentSection('DD');" class="btn btn-success btn-sm">
+                                            @Localizer["Save"]
                                         </button>
-                                        <button type="button" onclick="clinical.CloseAssetmentSection('DD');" class="btn btn-danger btn-sm">
-                                            Close
+                                        <button type="button" title="@Localizer["Close"]" onclick="clinical.CloseAssetmentSection('DD');" class="btn btn-danger btn-sm">
+                                            @Localizer["Close"]
                                         </button>
                                     </div>
                                 </div>
@@ -1261,20 +1346,20 @@
                             </div>
                             <div id="medicalDiagnosis" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnMDQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddMD" type="button" onclick="clinical.AddAssetmentSection('MD');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnMDQuickInfo" title="@Localizer["Quick_Information"]" type="button" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddMD" title="@Localizer["Add"]" type="button" onclick="clinical.AddAssetmentSection('MD');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <div id="divMDPanel" class="addPanel">
-                                    <textarea id="txtMD" class="form-control" placeholder="Write MD details..." style="height:300px;"></textarea>
+                                    <textarea id="txtMD" class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="height:300px;"></textarea>
 
                                     <div id="divMDAction" style="margin-top:15px; display:none;">
-                                        <button type="button" onclick="clinical.SaveAssetmentSection('MD');" class="btn btn-success btn-sm">
-                                            Save
+                                        <button type="button" title="@Localizer["Save"]" onclick="clinical.SaveAssetmentSection('MD');" class="btn btn-success btn-sm">
+                                            @Localizer["Save"]
                                         </button>
-                                        <button type="button" onclick="clinical.CloseAssetmentSection('MD');" class="btn btn-danger btn-sm">
-                                            Close
+                                        <button type="button" title="@Localizer["Close"]" onclick="clinical.CloseAssetmentSection('MD');" class="btn btn-danger btn-sm">
+                                            @Localizer["Close"]
                                         </button>
                                     </div>
                                 </div>
@@ -1286,20 +1371,20 @@
                             @*---------------------------------------------Risk Assessment----------------------------------------*@
                             <div id="riskSummary" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnRSQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddRS" type="button" onclick="clinical.AddAssetmentSection('RS');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnRSQuickInfo" title="@Localizer["Quick_Information"]" type="button" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddRS" title="@Localizer["Add"]" type="button" onclick="clinical.AddAssetmentSection('RS');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <div id="divRSPanel" class="addPanel">
-                                    <textarea id="txtRS" class="form-control" placeholder="Write RS details..." style="height:300px;"></textarea>
+                                    <textarea id="txtRS" class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="height:300px;"></textarea>
 
                                     <div id="divRSAction" style="margin-top:15px; display:none;">
-                                        <button type="button" onclick="clinical.SaveAssetmentSection('RS');" class="btn btn-success btn-sm">
-                                            Save
+                                        <button type="button" title="@Localizer["Save"]" onclick="clinical.SaveAssetmentSection('RS');" class="btn btn-success btn-sm">
+                                            @Localizer["Save"]
                                         </button>
-                                        <button type="button" onclick="clinical.CloseAssetmentSection('RS');" class="btn btn-danger btn-sm">
-                                            Close
+                                        <button type="button" title="@Localizer["Close"]" onclick="clinical.CloseAssetmentSection('RS');" class="btn btn-danger btn-sm">
+                                            @Localizer["Close"]
                                         </button>
                                     </div>
                                 </div>
@@ -1309,20 +1394,20 @@
                             @*---------------------------------------------------------------------*@
                             <div id="riskPlan" class="tab-pane fade assessment-section">
                                 <div class="button-header">
-                                    <button id="btnRMPQuickInfo" type="button" class="btn btn-primary btn-sm">Quick Information</button>
-                                    <button id="btnAddRMP" type="button" onclick="clinical.AddAssetmentSection('RMP');" class="btn btn-secondary btn-sm">
-                                        Add
+                                    <button id="btnRMPQuickInfo" title="@Localizer["Quick_Information"]" type="button" class="btn btn-primary btn-sm">@Localizer["Quick_Information"]</button>
+                                    <button id="btnAddRMP" title="@Localizer["Add"]" type="button" onclick="clinical.AddAssetmentSection('RMP');" class="btn btn-secondary btn-sm">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
                                 <div id="divRMPPanel" class="addPanel">
-                                    <textarea id="txtRMP" class="form-control" placeholder="Write RMP details..." style="height:300px;"></textarea>
+                                    <textarea id="txtRMP" class="form-control rich-editor" placeholder="@Localizer["Enter_the_details"]" style="height:300px;"></textarea>
 
                                     <div id="divRMPAction" style="margin-top:15px; display:none;">
-                                        <button type="button" onclick="clinical.SaveAssetmentSection('RMP');" class="btn btn-success btn-sm">
-                                            Save
+                                        <button type="button" title="@Localizer["Save"]" onclick="clinical.SaveAssetmentSection('RMP');" class="btn btn-success btn-sm">
+                                            @Localizer["Save"]
                                         </button>
-                                        <button type="button" onclick="clinical.CloseAssetmentSection('RMP');" class="btn btn-danger btn-sm">
-                                            Close
+                                        <button type="button" title="@Localizer["Close"]" onclick="clinical.CloseAssetmentSection('RMP');" class="btn btn-danger btn-sm">
+                                            @Localizer["Close"]
                                         </button>
                                     </div>
                                 </div>
@@ -1334,12 +1419,12 @@
 
                                     <!-- Left Side Buttons -->
                                     <div style="display:flex; gap:8px;">
-                                        <button class="btn btn-primary btn-sm btnQuickInfo">
-                                            Quick Information
+                                        <button class="btn btn-primary btn-sm btnQuickInfo" title="@Localizer["Quick_Information"]">
+                                            @Localizer["Quick_Information"]
                                         </button>
 
-                                        <button class="btn btn-secondary btn-sm ">
-                                            Add
+                                        <button class="btn btn-secondary btn-sm " title="@Localizer["Add"]">
+                                            @Localizer["Add"]
                                         </button>
                                     </div>
 
@@ -1518,8 +1603,8 @@
                                 </div>
 
                                 <div id="riskActionButtons" style="text-align:center; margin-top:20px; display:none;">
-                                    <button class="btn btn-success btn-sm" id="btnSaveRisk">Save</button>
-                                    <button class="btn btn-danger btn-sm" id="btnCloseRisk">Close</button>
+                                    <button class="btn btn-success btn-sm" title="@Localizer["Save"]" id="btnSaveRisk">@Localizer["Save"]</button>
+                                    <button class="btn btn-danger btn-sm" title="@Localizer["Close"]" id="btnCloseRisk">@Localizer["Close"]</button>
                                 </div>
 
                             </div>
@@ -1527,8 +1612,8 @@
                             <div id="prescriptions" class="tab-pane fade assessment-section">
 
                                 <div style="margin-bottom:10px;">
-                                    <button class="btn btn-secondary btn-sm" id="btnOpenPrescription">
-                                        Add
+                                    <button class="btn btn-secondary btn-sm" id="btnOpenPrescription" title="@Localizer["Add"]">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
 
@@ -1560,14 +1645,14 @@
                                         </tbody>
                                     </table>
 
-                                    <a href="javascript:void(0);" id="btnAddRow">Add New</a> |
+                                    <a href="javascript:void(0);" id="btnAddRow">@Localizer["Add"] New</a> |
                                     <a href="javascript:void(0);" id="btnDeleteRow">Delete Last</a>
 
                                     <br><br>
 
-                                    <button class="btn btn-success btn-sm" id="btnSavePrescription">Save</button>
-                                    <button class="btn btn-info btn-sm" id="btnSavePrint">Save & Print</button>
-                                    <button class="btn btn-danger btn-sm" id="btnClosePrescription">Close</button>
+                                    <button class="btn btn-success btn-sm" id="btnSavePrescription" title="@Localizer["Save"]">@Localizer["Save"]</button>
+                                    <button class="btn btn-info btn-sm" id="btnSavePrint" title="@Localizer["Save_Print"]">@Localizer["Save_Print"]</button>
+                                    <button class="btn btn-danger btn-sm" id="btnClosePrescription" title="@Localizer["Close"]">@Localizer["Close"]</button>
 
                                 </div>
 
@@ -1590,7 +1675,7 @@
                                         </select>
                                     </div>
 
-                                    <button type="button"
+                                    <button type="button" title="@Localizer["Proceed"]"
                                             class="btn btn-success btn-sm"
                                             id="btnProceedOldPrescription">
                                         Proceed
@@ -1603,8 +1688,8 @@
 
                                 <!-- TOP BUTTON -->
                                 <div class="ipTopButtons" style="margin-bottom:10px;">
-                                    <button class="btn btn-secondary btn-sm" id="btnAddIP">
-                                        Add
+                                    <button class="btn btn-secondary btn-sm" id="btnAddIP" title="@Localizer["Add"]">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
 
@@ -1688,12 +1773,12 @@
                                         <!-- Buttons -->
                                         <div style="margin-top:10px;">
 
-                                            <button class="btn btn-success btn-sm" id="btnSaveIP">
-                                                Save
+                                            <button class="btn btn-success btn-sm" id="btnSaveIP" title="@Localizer["Save"]">
+                                                @Localizer["Save"]
                                             </button>
 
-                                            <button class="btn btn-danger btn-sm" id="btnCloseIP">
-                                                Close
+                                            <button class="btn btn-danger btn-sm" id="btnCloseIP" title="@Localizer["Close"]">
+                                                @Localizer["Close"]
                                             </button>
 
                                         </div>
@@ -1707,8 +1792,8 @@
                             <div id="attachments" class="tab-pane fade assessment-section">
 
                                 <div style="margin-bottom:10px;">
-                                    <button class="btn btn-secondary btn-sm" id="btnOpenAttachment">
-                                        Add Attachment
+                                    <button class="btn btn-secondary btn-sm" id="btnOpenAttachment" title="@Localizer["Add"]">
+                                        @Localizer["Add"] Attachment
                                     </button>
                                 </div>
 
@@ -1741,12 +1826,12 @@
                                         <!-- BUTTONS -->
                                         <div style="margin-top:10px;display:flex;justify-content:flex-start;gap:8px;">
 
-                                            <button class="btn btn-success btn-sm" id="btnSaveAttachment">
-                                                <i class="fa fa-save"></i> Save
+                                            <button class="btn btn-success btn-sm" id="btnSaveAttachment" title="@Localizer["Save"]">
+                                                <i class="fa fa-save"></i> @Localizer["Save"]
                                             </button>
 
-                                            <button class="btn btn-danger btn-sm" id="btnCloseAttachment">
-                                                Close
+                                            <button class="btn btn-danger btn-sm" id="btnCloseAttachment" title="@Localizer["Close"]">
+                                                @Localizer["Close"]
                                             </button>
 
                                         </div>
@@ -1761,12 +1846,12 @@
 
                                 <!-- TOP BUTTONS -->
                                 <div class="topButtons" style="display:flex; gap:8px; margin-bottom:10px;">
-                                    <button class="btn btn-primary btn-sm btnQuickInfo">
-                                        Quick Information
+                                    <button class="btn btn-primary btn-sm btnQuickInfo" title="@Localizer["Quick_Information"]">
+                                        @Localizer["Quick_Information"]
                                     </button>
 
-                                    <button class="btn btn-secondary btn-sm ">
-                                        Add
+                                    <button class="btn btn-secondary btn-sm " title="@Localizer["Add"]">
+                                        @Localizer["Add"]
                                     </button>
                                 </div>
 
@@ -1849,16 +1934,16 @@
 
                                             <div class="text-center" style="margin-top:20px;">
 
-                                                <button class="btn btn-success btn-sm" id="btnSaveMC">
-                                                    Save
+                                                <button class="btn btn-success btn-sm" id="btnSaveMC" title="@Localizer["Save"]">
+                                                    @Localizer["Save"]
                                                 </button>
 
-                                                <button class="btn btn-info btn-sm" id="btnSavePrintMC">
-                                                    Save & Print
+                                                <button class="btn btn-info btn-sm" id="btnSavePrintMC" title="@Localizer["Save_Print"]">
+                                                    @Localizer["Save_Print"]"
                                                 </button>
 
-                                                <button class="btn btn-danger btn-sm" id="btnCloseMC">
-                                                    Close
+                                                <button class="btn btn-danger btn-sm" id="btnCloseMC" title="@Localizer["Close"]">
+                                                    @Localizer["Close"]
                                                 </button>
 
                                             </div>
@@ -1884,7 +1969,7 @@
                                         </select>
                                     </div>
 
-                                    <button type="button"
+                                    <button type="button" title="@Localizer["Proceed"]"
                                             class="btn btn-success btn-sm"
                                             id="btnProceedOldCertificate">
                                         Proceed
@@ -1904,3 +1989,17 @@
         </div>
     </form>
 </div>
+<script>
+             $('.rich-editor').summernote({
+        height: 300,
+        dialogsInBody: true,
+
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline']],
+            ['font', ['fontsize', 'fontname']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']]
+            // ❌ removed link, image, video, code, help
+        ]
+    });
+</script>
