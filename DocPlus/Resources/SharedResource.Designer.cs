@@ -97,11 +97,29 @@ namespace DocPlus.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add New.
+        /// </summary>
+        public static string Add_New {
+            get {
+                return ResourceManager.GetString("Add_New", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add Patient.
         /// </summary>
         public static string Add_Patient {
             get {
                 return ResourceManager.GetString("Add_Patient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Address.
+        /// </summary>
+        public static string Address {
+            get {
+                return ResourceManager.GetString("Address", resourceCulture);
             }
         }
         
@@ -214,6 +232,15 @@ namespace DocPlus.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Category.
+        /// </summary>
+        public static string Category {
+            get {
+                return ResourceManager.GetString("Category", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Clear.
         /// </summary>
         public static string Clear {
@@ -277,6 +304,15 @@ namespace DocPlus.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delete Last.
+        /// </summary>
+        public static string Delete_Last {
+            get {
+                return ResourceManager.GetString("Delete_Last", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Demographics.
         /// </summary>
         public static string Demographics {
@@ -318,6 +354,15 @@ namespace DocPlus.Resources {
         public static string Doctor {
             get {
                 return ResourceManager.GetString("Doctor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dosage.
+        /// </summary>
+        public static string Dosage {
+            get {
+                return ResourceManager.GetString("Dosage", resourceCulture);
             }
         }
         
@@ -511,6 +556,24 @@ namespace DocPlus.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Formulation.
+        /// </summary>
+        public static string Formulation {
+            get {
+                return ResourceManager.GetString("Formulation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Frequency.
+        /// </summary>
+        public static string Frequency {
+            get {
+                return ResourceManager.GetString("Frequency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Full Name.
         /// </summary>
         public static string Full_Name {
@@ -691,6 +754,15 @@ namespace DocPlus.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Medicine List.
+        /// </summary>
+        public static string Medicine_List {
+            get {
+                return ResourceManager.GetString("Medicine_List", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Mental State Examination.
         /// </summary>
         public static string Mental_State_Examination {
@@ -745,6 +817,15 @@ namespace DocPlus.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Occupation.
+        /// </summary>
+        public static string Occupation {
+            get {
+                return ResourceManager.GetString("Occupation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to OP List.
         /// </summary>
         public static string OP_List {
@@ -777,6 +858,15 @@ namespace DocPlus.Resources {
         public static string Other_Professionals {
             get {
                 return ResourceManager.GetString("Other_Professionals", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Others.
+        /// </summary>
+        public static string Others {
+            get {
+                return ResourceManager.GetString("Others", resourceCulture);
             }
         }
         
@@ -867,6 +957,15 @@ namespace DocPlus.Resources {
         public static string Presenting_Complaints {
             get {
                 return ResourceManager.GetString("Presenting_Complaints", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Proceed.
+        /// </summary>
+        public static string Proceed {
+            get {
+                return ResourceManager.GetString("Proceed", resourceCulture);
             }
         }
         
@@ -1006,11 +1105,29 @@ namespace DocPlus.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Route.
+        /// </summary>
+        public static string Route {
+            get {
+                return ResourceManager.GetString("Route", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Save.
         /// </summary>
         public static string Save {
             get {
                 return ResourceManager.GetString("Save", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save &amp; Print.
+        /// </summary>
+        public static string Save_Print {
+            get {
+                return ResourceManager.GetString("Save_Print", resourceCulture);
             }
         }
         
@@ -1033,11 +1150,29 @@ namespace DocPlus.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select.
+        /// </summary>
+        public static string Select {
+            get {
+                return ResourceManager.GetString("Select", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select Date.
         /// </summary>
         public static string Select_Date {
             get {
                 return ResourceManager.GetString("Select_Date", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sr. No..
+        /// </summary>
+        public static string Sr_No {
+            get {
+                return ResourceManager.GetString("Sr_No", resourceCulture);
             }
         }
         

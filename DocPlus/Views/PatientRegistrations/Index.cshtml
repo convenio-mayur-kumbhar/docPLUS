@@ -1,335 +1,570 @@
-﻿@{
-    ViewData["Title"] = "Patient Registrations";
+﻿@using System.Reflection
+@inject IStringLocalizerFactory LocalizerFactory
+
+@{
+    var Localizer = LocalizerFactory.Create("SharedResource", Assembly.GetExecutingAssembly().GetName().Name);
 }
-<div class="kt-subheader__main">
+@{
+    ViewData["Title"] = @Localizer["Patient_Registration"];
+    //ViewData["Title"] = "Patient Registrations";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href="~/Assets/css/chosen.min.css?" />
 
-    <h3 class="kt-subheader__title">
-        Patient Management
-    </h3>
-
-    <span class="kt-subheader__separator kt-hidden"></span>
-
-    <div class="kt-subheader__breadcrumbs">
-
-        <a asp-controller="Dashboard"
-           asp-action="Index"
-           class="kt-subheader__breadcrumbs-home">
-            <i class="flaticon2-shelter"></i>
-        </a>
-
-        <span class="kt-subheader__breadcrumbs-separator"></span>
-
-        <a href="javascript:;"
-           class="kt-subheader__breadcrumbs-link">
-            Patient Management
-        </a>
-
-        <span class="kt-subheader__breadcrumbs-separator"></span>
-
-        <a asp-controller="PatientRegistrations"
-           asp-action="Index"
-           class="kt-subheader__breadcrumbs-link">
-            Patient Registrations
-        </a>
-
-    </div>
-
-</div>
-<div class="form-group row">
-
-    <div class="col-md-3">
-
-        <label>First Name</label>
-
-        <input type="text"
-               id="txtFirstNameSearch"
-               class="form-control" />
-
-    </div>
-
-    <div class="col-md-3">
-
-        <label>Mobile</label>
-
-        <input type="text"
-               id="txtMobileSearch"
-               class="form-control" />
-
-    </div>
-
-    <div class="col-md-3">
-
-        <label>Email</label>
-
-        <input type="text"
-               id="txtEmailSearch"
-               class="form-control" />
-
-    </div>
-
-    <div class="col-md-3">
-
-        <label>Status</label>
-
-        <select id="ddlStatusSearch"
-                class="form-control">
-
-            <option value="">All</option>
-            <option>Active</option>
-            <option>Inactive</option>
-
-        </select>
-
-    </div>
-
-</div>
+<link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="~/js/Chart.bundle.min.js"></script>
+@*<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>*@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 
+@* <link href="~/assets/css/dataTables.bootstrap.min.css" rel="stylesheet" /> *@
+
+<style>
+    body,
+    .page-content,
+    .form-control,
+    .table,
+    .btn,
+    label,
+    select,
+    input {
+        font-size: 13px !important;
+        font-family: 'Open Sans','Segoe UI',Arial !important;
+    }
+
+    .card-panel {
+        background: #fff;
+        border: 1px solid #dcdcdc;
+        border-radius: 6px;
+        padding: 20px;
+        margin-top: 10px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .tabs-left {
+        border: 1px solid #e5e5e5;
+    }
+
+        .tabs-left li {
+            float: none;
+        }
+
+            .tabs-left li a {
+                display: block;
+                padding: 6px 8px;
+                color: #333 !important;
+                border-bottom: 1px solid #e5e5e5;
+            }
+
+            .tabs-left li:last-child a {
+                border-bottom: none;
+            }
+
+    /* #leftMenu a.active { */
+    /*     background: #006989; */
+    /*     color: #fff !important; */
+    /*     border-left: 4px solid #fd397a; */
+    /* } */
+
+    #leftMenu .nav-link.active {
+        background: #006989;
+        color: #fff !important;
+        border-left: 4px solid #fd397a;
+    }
+</style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.14.1/themes/base/jquery-ui.min.css" rel="stylesheet" />
 
 
-<div class="kt-portlet__head kt-portlet__head--lg">
-
-    <div class="kt-portlet__head-label">
-
-        <h3 class="kt-portlet__head-title">
-            Patient List
-        </h3>
-
-    </div>
-
-    <div class="kt-portlet__head-toolbar">
-
-        <div class="kt-portlet__head-actions">
-
-            <input type="button"
-                   class="btn btn-primary"
-                   value="Search"
-                   onclick="PatientRegistration.Search();" />
-
-            <button type="button"
-                    class="btn btn-danger"
-                    onclick="PatientRegistration.Reset();">
-
-                Reset
-
-            </button>
-
-            <span>
-
-                <a href="javascript:;"
-                   class="btn btn-brand btn-elevate btn-icon-sm"
-                   onclick="PatientRegistration.OpenAddModal();">
-
-                    <i class="fas fa-plus-circle"></i>
-                    Add Patient
-
-                </a>
-
-            </span>
-
+<!-- SUBHEADER -->
+<div class="kt-subheader kt-grid__item">
+    <div class="kt-subheader__main">
+        <div class="kt-subheader__breadcrumbs">
+            <a asp-controller="Dashboard" asp-action="Index" class="kt-subheader__breadcrumbs-home">
+                <i class="flaticon2-shelter"></i>
+            </a>
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+            <a href="javascript:;" class="kt-subheader__breadcrumbs-link">
+                Admin Settings
+            </a>
+            <span class="kt-subheader__breadcrumbs-separator"></span>
+            <a asp-controller="Patient_Registrations" asp-action="Index" class="kt-subheader__breadcrumbs-link">
+                Patient Registrations
+            </a>
         </div>
-
     </div>
-
 </div>
 
+<!-- SEARCH -->
+<div id="divGrid">
+    <form id="frm_PatientSearch">
+        <div class="kt-portlet kt-portlet--mobile p-3 mb-2">
+            <div class="form-group row align-items-end">
+
+                <div class="col-md-3">
+                    <label>@Localizer["FirstName"]:</label>
+                    <input type="text" id="txtFirstNameSearch" class="form-control" placeholder="@Localizer["EnterFirstName"]">
+                </div>
+
+                <div class="col-md-3">
+                    <label>@Localizer["MobileNo"]:</label>
+                    <input type="text" id="txtMobileSearch" class="form-control" placeholder="@Localizer["MobileNo"]:">
+                </div>
+
+                <div class="col-md-3">
+                    <label>@Localizer["Email"]:</label>
+                    <input type="text" id="txtEmailSearch" class="form-control" placeholder="@Localizer["Email"]:">
+                </div>
+
+                <div class="col-md-3">
+                    <label>@Localizer["Status"]:</label>
+                    <select id="ddlStatusSearch" class="form-control">
+                        <option value="">@Localizer["All"]</option>
+                        <option>@Localizer["Active"]</option>
+                        <option>@Localizer["Inactive"]</option>
+                    </select>
+                </div>
+
+                <div class="col-md-12 mt-3">
+                    <button class="btn btn-primary mr-2" onclick="patientRegistration.Search();">
+                        @Localizer["Search"]
+                    </button>
+                    <button class="btn btn-danger mr-2" onclick="patientRegistration.Reset();">
+                        @Localizer["Reset"]
+                    </button>
+                    <button class="btn btn-secondary" onclick="patientRegistration.Export();">
+                        <i class="la la-download"></i> @Localizer["Export"]
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+<!-- GRID -->
+<div class="kt-portlet kt-portlet--mobile">
+    <div class="kt-portlet__head kt-portlet__head--lg">
+        <div class="kt-portlet__head-label">
+            <h3 class="kt-portlet__head-title">Patient List</h3>
+        </div>
+        <div class="kt-portlet__head-toolbar">
+            <a href="javascript:;" class="btn btn-brand btn-elevate btn-icon-sm" onclick="patientRegistration.OpenAdd();">
+                <i class="fas fa-plus-circle" onclick="OpenAdd();"></i>@Localizer["Add_Patient"]
+            </a>
+        </div>
+    </div>
 
 
-<div class="kt-portlet__body table-responsive">
 
-    <table class="table table-striped table-hover table-checkable"
-           id="tblPatient">
+    <div class="kt-portlet__body table-responsive">
+        <table class="table table-striped table-hover table-checkable" id="tblPatient">
+            <thead>
+                <tr>
+                    <th>@Localizer["FirstName"]</th>
+                    <th>@Localizer["LastName"]</th>
+                    <th>@Localizer["MobileNo"]</th>
+                    <th>@Localizer["Email"]</th>
+                    <th>@Localizer["Gender"]</th>
+                    <th>@Localizer["Status"]</th>
+                    <th>@Localizer["Edit"]</th>
+                    <th>@Localizer["Delete"]</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <script id="Grid_Data_Template_tblPatient" type="text/x-jquery-tmpl">
+            <tr data-id="${patientID}">
+                <td>${firstName}</td>
+                <td>${lastName}</td>
+                <td>${mobileNo}</td>
+                <td>${emailID}</td>
+                <td>${gender}</td>
+                <td>${statusName}</td>
 
-        <thead>
-
-            <tr>
-
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Mobile</th>
-                <th>Email</th>
-                <th>Gender</th>
-                <th>Status</th>
-                <th>Edit</th>
-                <th>Delete</th>
-
+                <td class="Edit">
+                    <a href="javascript:;" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Edit" onclick="patientRegistration.SetForUpdate('${patientID}')">
+                        <i class="far fa-edit"></i>
+                    </a>
+                </td>
+                <td class="Delete">
+                    <a href="javascript:;" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Delete" onclick="patientRegistration.Delete('${patientID}')">
+                        <i class="fas fa-trash-alt text-red"></i>
+                    </a>
+                </td>
             </tr>
-
-        </thead>
-
-        <tbody></tbody>
-
-    </table>
-
+        </script>
+    </div>
 </div>
 
+<!-- MODAL -->
+<div class="modal fade" id="PatientModal" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 850px" ;>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="PatientModelTitle">@Localizer["Patient_Details"]</h5>
+                <button type="button" class="close" data-dismiss="modal"></button>
+            </div>
 
+            <div class="card card-custom gutter-b" style="margin-bottom:.5rem;">
+                <div class="card-header card-header-tabs-line">
+                    <div class="card-toolbar">
+                        <ul class="nav nav-light-success nav-bold nav-pills" style="margin: 0 !important;">
 
+                            <li class="nav-item" style="flex:1; text-align:center;">
+                                <a class="nav-link active" data-toggle="tab" href="#general">
+                                    @Localizer["General_Information"]
+                                </a>
+                            </li>
 
-<div class="modal-dialog modal-dialog-centered">
+                            <li class="nav-item" style="flex:1; text-align:center;background:#f9f9f9;">
+                                <a class="nav-link" data-toggle="tab" href="#nextOfKin">
+                                    @Localizer["Next_of_Kin"]
+                                </a>
+                            </li>
 
-    <div class="modal-content">
+                            <li class="nav-item" style="flex:1; text-align:center;background:#f9f9f9;">
+                                <a class="nav-link" data-toggle="tab" href="#otherProfessionals">
+                                    @Localizer["Other_Professionals"]
+                                </a>
+                            </li>
 
-        <div class="modal-header">
-
-            <h5 class="modal-title">
-                Add Patient
-            </h5>
-
-            <button type="button"
-                    class="close"
-                    data-dismiss="modal">
-            </button>
-
-        </div>
-
-
-        <div class="modal-body">
-
-            <form id="frmPatient">
-
-                <div class="row">
-
-                    <div class="col-md-4">
-
-                        <div class="form-group">
-
-                            <label>First Name</label>
-
-                            <input type="text"
-                                   id="txtFirstName"
-                                   class="form-control" />
-
-                        </div>
-
+                        </ul>
                     </div>
+                </div>
+            </div>
 
-                    <div class="col-md-4">
 
-                        <div class="form-group">
+            <div class="tab-content mt-3">
+                <!-- GENERAL FORM -->
+                <div id="general" class="tab-pane fade show active col-md-12" style="border:1px solid #ddd;padding:20px;background:#f9f9f9;">
+                    <form id="frmGeneral">
+                        <div class="row">
+                            <div> <input type="hidden" id="patientID" /> </div>
+                            <div class="col-md-4">
+                                <label>@Localizer["First_Name"]</label><asterisk></asterisk>
+                                <input type="text" class="form-control" id="txtFirstName" value="@ViewBag.FirstName" />
+                            </div>
 
-                            <label>Last Name</label>
+                            <div class="col-md-4">
+                                <label>@Localizer["Middle_Name"]</label>
+                                <input type="text" class="form-control" id="txtMiddleName" />
+                            </div>
 
-                            <input type="text"
-                                   id="txtLastName"
-                                   class="form-control" />
+                            <div class="col-md-4">
+                                <label>@Localizer["Last_Name"]</label><asterisk></asterisk>
+                                <input type="text" class="form-control" id="txtLastName" value="@ViewBag.LastName" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>@Localizer["DOB"]</label><asterisk></asterisk>
+                                <input type="date" class="form-control" id="txtDOB" value="@ViewBag.DOB" />
+                            </div>
+                            <div class="col-md-4">
+                                <label>@Localizer["Marital_Status"]</label>
+                                <select class="form-control" id="ddlMaritalStatus">
+                                    <option value="">Select</option>
+                                </select>
+                            </div>
 
+                            <div class="col-md-4">
+                                <label>@Localizer["Occupation"]</label>
+                                <select class="form-control" id="ddlOccupation">
+                                    <option>Select</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>@Localizer["Tele_No"]</label>
+                                <input type="text" class="form-control" id="txtTeleNo" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label>@Localizer["MobileNo"]</label><asterisk></asterisk>
+                                <input type="text" class="form-control" id="txtMobileNo" value="@ViewBag.Mobile" />
+                            </div>
+
+                            <div class="col-md-4">
+                                <label>@Localizer["Email"]</label>
+                                <input type="text" class="form-control" id="txtEmail" value="@ViewBag.Email" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>@Localizer["Category"]</label>
+                                <select class="form-control" id="ddlCategory">
+                                    <option>Select</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label>@Localizer["Status"]</label>
+                                <select class="form-control" id="ddlStatus">
+                                    <option>Select</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label>@Localizer["Gender"]</label><asterisk></asterisk>
+                                <div style="margin-top:6px;" id="radioGender">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="Gender" value="M"> @Localizer["Male"]
+                                    </label>
+                                    <label class="radio-inline mx-1">
+                                        <input type="radio" name="Gender" value="F"> @Localizer["Female"]
+                                    </label>
+                                    <label class="radio-inline mx-1">
+                                        <input type="radio" name="Gender" value="O"> @Localizer["Other"]
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>@Localizer["Address"]</label>
+                                <input type="text" class="form-control" id="txtAddress" />
+                            </div>
+
+                            <div class="col-md-6">
+                                <label>@Localizer["Referred_By"]</label>
+                                <input type="text" class="form-control" id="txtReferredBy" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>@Localizer["Remarks"]</label>
+                                <textarea class="form-control small-box" id="txtRemarks"></textarea>
+                            </div>
                         </div>
 
+                        <button type="button" class="btn btn-primary mt-3" id="txtSave" onclick="patientRegistration.SaveGeneralInfo();">@Localizer["Save"]</button>
+                        <button type="button" class="btn btn-danger mt-3 mx-2" onclick="patientRegistration.ResetForm();">@Localizer["Reset"]</button>
+                    </form>
+                </div>
+
+                <!-- NEXT OF KIN FORM -->
+                <div id="nextOfKin" class="tab-pane fade" style="border:1px solid #ddd;padding:12px;background:#f9f9f9;">
+                    <form id="frmKin">
+                        <div style="border:1px solid #ddd;padding:12px;background:#f9f9f9;">
+                            <div> <input type="hidden" id="NOK_ID" /> </div>
+                            @* <div> <input type="hidden" id="patientID" /> </div> *@
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>@Localizer["Name"]</label><asterisk></asterisk>
+                                    <input type="text" class="form-control" id="kinName">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>@Localizer["Relation"]</label><asterisk></asterisk>
+                                    <input type="text" class="form-control" id="kinRelation">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>@Localizer["TeleNo"]</label>
+                                    <input type="text" class="form-control" id="kinTeleNo">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label>@Localizer["MobileNo"]</label><asterisk></asterisk>
+                                    <input type="text" class="form-control" id="kinMobileNo">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label>@Localizer["Email"]</label>
+                                    <input type="text" class="form-control" id="kinEmail">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>@Localizer["Address"]</label><asterisk></asterisk>
+                                    <textarea class="form-control" id="kinAddress"></textarea>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>@Localizer["Remarks"]</label>
+                                    <textarea class="form-control" id="kinRemarks"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- ADD BUTTON -->
+
+                            <button id="btnAddKin" type="button" class="btn btn-success btn-xs" style="margin-top:8px;" onclick="patientRegistration.AddKin();">
+                                <i class="fa fa-plus"></i> @Localizer["Add"]
+                            </button>
+
+                        </div>
+                    </form>
+                    <!-- TABLE SECTION -->
+                    @* <div style="overflow-x:auto;margin-top:12px;">  *@
+                    @*      <table id="tblKin" class="table table-bordered table-condensed" style="width:100%;">  *@
+
+                    @*          <thead style="background:#f9f9f9;">  *@
+                    @*              <tr > *@
+
+                    <div class="kt-portlet__body table-responsive">
+                        <table class="table table-striped table-hover table-checkable" id="tblKin">
+                            <thead>
+                                <tr>
+                                    <th>@Localizer["Name"]</th>
+                                    <th>@Localizer["Relation"]</th>
+                                    <th>@Localizer["Address"]</th>
+                                    <th>@Localizer["TelePhoneNo"]</th>
+                                    <th>@Localizer["MobileNo"]</th>
+                                    <th>@Localizer["Email"]</th>
+                                    <th>@Localizer["Remarks"]</th>
+                                    <th width="80">@Localizer["Edit"]</th>
+                                    <th width="80">@Localizer["Delete"]</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="tblKinBody"></tbody>
+
+                        </table>
+                        <script id="Grid_Data_Template_tblKin" type="text/x-jquery-tmpl">
+                            <tr data-id="${nok_ID}">
+                            <td>${noK_NAME}</td>
+                            <td>${noK_RELATION}</td>
+                            <td>${noK_ADDR}</td>
+                            <td>${noK_TELENO}</td>
+                            <td>${noK_MOBNO}</td>
+                            <td>${noK_EMAIL}</td>
+                            <td>${noK_REMARKS}</td>
+
+                                <td class="Edit">
+                                    <a href="javascript:;" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Edit" onclick="patientRegistration.SetNOKUpdate('${noK_ID}','${noK_NAME}', '${noK_RELATION}', '${noK_ADDR}','${noK_TELENO}', '${noK_MOBNO}',' ${noK_EMAIL}', '${noK_REMARKS}');">
+                                        <i class="far fa-edit"></i>
+                                    </a>
+                                </td>
+                                <td class="Delete">
+                                    <a href="javascript:;" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Delete" onclick="patientRegistration.DeleteNOK('${noK_ID}')">
+                                        <i class="fas fa-trash-alt text-red"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </script>
                     </div>
+                </div>
 
-                    <div class="col-md-4">
+                <!-- OTHER PROFESSIONALS FORM -->
+                <div id="otherProfessionals" class="tab-pane fade" style="border:1px solid #ddd;padding:12px;background:#f9f9f9;">
+                    <form id="frmProfessional">
+                        <div style="border:1px solid #ddd;padding:12px;background:#f9f9f9;">
 
-                        <div class="form-group">
+                            <div class="row">
+                                <div> <input type="hidden" id="OP_ID" /> </div>
+                                <div class="col-md-8">
+                                    <label>@Localizer["Name"]</label><asterisk></asterisk>
+                                    <input type="text" class="form-control" id="otherProfName" />
+                                </div>
 
-                            <label>Mobile</label>
+                                <div class="col-md-4">
+                                    <label>@Localizer["Profession"]</label><asterisk></asterisk>
+                                    <select class="form-control" id="ddlProfession">
+                                        <option>Select</option>
+                                    </select>
+                                </div>
+                            </div>
 
-                            <input type="text"
-                                   id="txtMobile"
-                                   class="form-control" />
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>@Localizer["TeleNo"]</label>
+                                    <input type="text" class="form-control" id="otherProfTeleNo" />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label>@Localizer["MobileNo"]</label><asterisk></asterisk>
+                                    <input type="text" class="form-control" id="otherProfMobileNo" />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label>@Localizer["Email"]</label><asterisk></asterisk>
+                                    <input type="email" class="form-control" id="otherProfEmailID" />
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>@Localizer["Address"]</label><asterisk></asterisk>
+                                    <textarea class="form-control" id="otherProfAddress"></textarea>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>@Localizer["Remarks"]</label>
+                                    <textarea class="form-control" id="otherProfRemarks"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- BUTTON -->
+                            <button id="btnAddProf" type="button" class="btn btn-success btn-xs" style="margin-top:8px;" onclick="patientRegistration.AddOtherProf();">
+                                <i class="fa fa-plus"></i> @Localizer["Add"]
+                            </button>
 
                         </div>
+                    </form>
+                    <div class="kt-portlet__body table-responsive">
+                        <table class="table table-striped table-hover table-checkable" id="tblOtherProf">
+                            <thead>
+                                <tr>
+                                    <th>@Localizer["Name"]</th>
+                                    <th>@Localizer["Profession"]</th>
+                                    <th>@Localizer["TelePhoneNo"]</th>
+                                    <th>@Localizer["MobileNo"]</th>
+                                    <th>@Localizer["Email"]</th>
+                                    <th>@Localizer["Address"]</th>
+                                    <th>@Localizer["Remarks"]</th>
+                                    <th width="80">@Localizer["Edit"]</th>
+                                    <th width="80">@Localizer["Delete"]</th>
+                                </tr>
+                            </thead>
 
+                            <tbody id="tblOPBody"></tbody>
+
+                        </table>
+                        <script id="Grid_Data_Template_tblOtherProf" type="text/x-jquery-tmpl">
+                            <tr data-id="${oP_ID}" >
+                                <td>${oP_NAME}</td>
+                                <td>${professioN_NAME}</td>
+                                <td>${oP_TELENO}</td>
+                                <td>${oP_MOBNO}</td>
+                                <td>${oP_EMAIL}</td>
+                                <td>${oP_ADDR}</td>
+                                <td>${oP_REMARKS}</td>
+
+                                <td class="Edit">
+                                    <a href="javascript:;" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Edit" onclick="patientRegistration.UpdateOP('${op_ID}','${oP_NAME}','${professioN_NAME}','${oP_TELENO}','${oP_MOBNO}','${oP_EMAIL}','${oP_ADDR}','${oP_REMARKS}')">
+                                        <i class="far fa-edit"></i>
+                                    </a>
+                                </td>
+                                <td class="Delete">
+                                    <a href="javascript:;" class="btn btn-sm btn-clean btn-icon btn-icon-md" title="Delete" onclick="patientRegistration.DeleteOP('${op_ID}')">
+                                        <i class="fas fa-trash-alt text-red"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </script>
                     </div>
 
                 </div>
 
+            </div>
 
+            <div class="modal-footer">
+                @* <button class="btn btn-primary" onclick="patientRegistration.Save();">@Localizer["Save"]</button> *@
 
-                <div class="row">
-
-                    <div class="col-md-4">
-
-                        <div class="form-group">
-
-                            <label>Email</label>
-
-                            <input type="text"
-                                   id="txtEmail"
-                                   class="form-control" />
-
-                        </div>
-
-                    </div>
-
-                    <div class="col-md-4">
-
-                        <div class="form-group">
-
-                            <label>Gender</label>
-
-                            <select id="ddlGender"
-                                    class="form-control">
-
-                                <option>Male</option>
-                                <option>Female</option>
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-                    <div class="col-md-4">
-
-                        <div class="form-group">
-
-                            <label>Status</label>
-
-                            <select id="ddlStatus"
-                                    class="form-control">
-
-                                <option>Active</option>
-                                <option>Inactive</option>
-
-                            </select>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </form>
-
+                <button class="btn btn-secondary" data-dismiss="modal" onclick="patientRegistration.SetForClose();">@Localizer["Close"]</button>
+            </div>
         </div>
-
-
-
-        <div class="modal-footer">
-
-            <button type="button"
-                    class="btn btn-primary"
-                    onclick="PatientRegistration.Save();">
-
-                Save
-
-            </button>
-
-            <button type="button"
-                    class="btn btn-danger"
-                    onclick="PatientRegistration.ResetForm();">
-
-                Reset
-
-            </button>
-
-            <button type="button"
-                    class="btn btn-secondary"
-                    data-dismiss="modal">
-
-                Close
-
-            </button>
-
-        </div>
-
     </div>
-
 </div>
 
 @section Scripts {
-
-    <script src="~/js/PatientRegistration.js"></script>
-
+    <script src="~/assets/js/jquery.dataTables.min.js"></script>
+    <script src="~/assets/js/dataTables.bootstrap.min.js"></script>
+    <script src="~/scripts/patientregistrations.js"></script>
 }
+
+
