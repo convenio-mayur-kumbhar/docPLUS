@@ -1,10 +1,37 @@
 ﻿var xhr_GetData;
 var form = $('#__AjaxAntiForgeryForm');
 var token = $('input[name="__RequestVerificationToken"]', form).val();
+let typingTimer;
+let doneTypingInterval = 500; // debounce
 $(document).ready(function () {
     clinical.BindGrid();
     $('#tblPatientList').on('draw.dt', function () {
         clinical.ScreenAccessPermission();
+    });
+
+    $(document).on("keyup", ".medicine", function () {
+        let input = $(this);
+        let query = input.val();
+        clearTimeout(typingTimer);
+        if (query.length < 3) {
+            $(".medicine-suggestions").remove();
+            return;
+        }
+        typingTimer = setTimeout(function () { clinical.searchMedicineAPI(query, input); }, doneTypingInterval);
+    });
+    $(document).on("click", ".suggestion-item", function () {
+
+        let value = $(this).text();
+        let input = $(this).closest("td").find(".medicine");
+
+        input.val(value);
+
+        $(".medicine-suggestions").remove();
+    });
+    $(document).click(function (e) {
+        if (!$(e.target).closest(".medicine").length) {
+            $(".medicine-suggestions").remove();
+        }
     });
 });
 var clinical = {
@@ -34,7 +61,7 @@ var clinical = {
             });
             clinical.GetDemographicsData(patientID);
         });
-    },  
+    },
     GetDemographicsData: function (PatientID) {
         GetAjaxData("/Clinical/GetClinicalDetailsByPatientId",
             { PatientID: PatientID, __RequestVerificationToken: token },
@@ -213,46 +240,6 @@ var clinical = {
                 }
             });
     },
-    //loadAssessment: function (section, res) {
-    //    let assessment = res.assessmentDetails.filter(x =>
-    //        (x.ASS_FIELD || x.asS_FIELD) === section
-    //    );
-    //    let lastDate = "";
-    //    let container = $("#div" + section + "timeline");
-    //    if (assessment && assessment.length > 0) {
-    //        container.empty().show();
-    //        assessment.forEach(function (item) {
-    //            let text = item.ASS_VALUE || item.asS_VALUE;
-    //            let dateVal = item.ASS_DATE || item.asS_DATE;
-    //            if (!text || !dateVal) return;
-    //            let d = new Date(dateVal);
-    //            let time = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    //            let displayDate = clinical.formatDateLabel(d);
-    //            if (lastDate !== displayDate) {
-    //                container.append(`<div class="timelineRow dateRow">
-    //                                    <div></div>
-    //                                    <div class="timelineMiddle">
-    //                                        <span class="timelineDateHeader">${displayDate}</span>
-    //                                    </div>
-    //                                    <div></div>
-    //                                </div>`);
-    //                lastDate = displayDate;
-    //            }
-    //            container.append(`<div class="timelineRow">
-    //                                <div class="timelineTime">${time}</div>
-    //                                <div class="timelineMiddle">
-    //                                    <div class="timelineDot"></div>
-    //                                </div>
-    //                                <div class="timelineContent">
-    //                                    <div class="timelineCard">${text}</div>
-    //                                </div>
-    //                            </div>`);
-    //        });
-
-    //    } else {
-    //        container.empty().hide();
-    //    }
-    //},
     formatDateLabel: function (date) {
         let today = new Date();
         let yesterday = new Date();
@@ -1103,4 +1090,158 @@ var clinical = {
                 }
             });
     },
+    //Prescription
+    AddNewPrescription: function () {
+
+        // Show panel
+        $("#prescriptionPanel").slideDown();
+
+        // Get tbody
+        var table = $("#tblNewPrescription tbody");
+
+        // Clear all rows
+        table.empty();
+
+        // Add single fresh row
+        var newRow = `
+        <tr>
+            <td class="srno">1</td>
+            <td><input type="text" class="form-control formulation" /></td>
+            <td><input type="text" class="form-control medicine" autocomplete="off" /></td>
+            <td><input type="text" class="form-control dosage" /></td>
+            <td><input type="text" class="form-control route" /></td>
+            <td><input type="text" class="form-control frequency" /></td>
+            <td><input type="text" class="form-control others" /></td>
+        </tr>
+    `;
+
+        table.append(newRow);
+    },
+    SavePrescription: function () {
+
+        var prescriptionList = [];
+
+        $("#tblNewPrescription tbody tr").each(function () {
+
+            var row = $(this);
+
+            var item = {
+                Formulation: row.find(".formulation").val(),
+                MedicineName: row.find(".medicine").val(),
+                Dosage: row.find(".dosage").val(),
+                Route: row.find(".route").val(),
+                Frequency: row.find(".frequency").val(),
+                Others: row.find(".others").val()
+            };
+
+            // Optional: skip empty rows
+            if (item.MedicineName) {
+                prescriptionList.push(item);
+            }
+        });
+
+        console.log(prescriptionList);
+
+        // Call API
+        clinical.SavePrescriptionAPI(prescriptionList);
+    },
+    SavePrescriptionAPI: function (data) {
+
+        $.ajax({
+            url: "/Clinical/SavePrescription",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (res) {
+                alert("Saved Successfully");
+                console.log(res);
+            },
+            error: function (err) {
+                alert("Error while saving");
+                console.log(err);
+            }
+        });
+    },
+    SaveAdnPrintPrescription: function () {
+
+    },
+    ClosePrescription: function () {
+        $("#prescriptionPanel").slideUp();
+    },
+    AddNewPrescriptionRow: function () {
+
+        var table = $("#tblNewPrescription tbody");
+        var rowCount = table.find("tr").length + 1;
+
+        var newRow = `
+        <tr>
+            <td class="srno">${rowCount}</td>
+            <td><input type="text" class="form-control formulation" /></td>
+            <td><input type="text" class="form-control medicine" /></td>
+            <td><input type="text" class="form-control dosage" /></td>
+            <td><input type="text" class="form-control route" /></td>
+            <td><input type="text" class="form-control frequency" /></td>
+            <td><input type="text" class="form-control others" /></td>
+        </tr>
+    `;
+
+        table.append(newRow);
+    },
+    DeletePrescriptionRow: function () {
+
+        var table = $("#tblNewPrescription tbody");
+        var rowCount = table.find("tr").length;
+
+        if (rowCount > 1) {
+            table.find("tr:last").remove();
+        }
+
+        // Reorder Sr No
+        table.find("tr").each(function (index) {
+            $(this).find(".srno").text(index + 1);
+        });
+    },
+    searchMedicineAPI: function (query, input) {
+
+        $.ajax({
+            url: "/Clinical/SearchMedicine",
+            type: "POST",
+            data: { SearchName: query, __RequestVerificationToken: token },
+            success: function (res) {
+
+                if (typeof res === "string") {
+                    res = JSON.parse(res);
+                }
+
+                let data = res.data || res.Data || [];
+
+                if (!Array.isArray(data)) {
+                    data = [];
+                }
+
+                clinical.showSuggestions(input, data);
+            }
+        });
+    },
+    showSuggestions: function (input, data) {
+
+        $(".medicine-suggestions").remove();
+
+        if (!data || data.length === 0) return;
+
+        let list = `<ul class="medicine-suggestions list-group" 
+                style="position:absolute; z-index:9999; width:${input.outerWidth()}px;">`;
+
+        data.forEach(item => {
+
+            // ✅ FIX: item is now string
+            let name = item;
+
+            list += `<li class="list-group-item suggestion-item">${name}</li>`;
+        });
+
+        list += "</ul>";
+
+        input.after(list);
+    }
 }

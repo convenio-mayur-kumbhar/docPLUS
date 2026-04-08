@@ -337,27 +337,7 @@ namespace DocPlus.Controllers
                 return Json(new { Status = false, Message = "Exception occurred" });
             }
         }
-        public ActionResult StartAssessment(string reg, string name, string age,
-                                         string contact, string gender,
-                                         string email, string address)
-        {
-            ViewBag.RegNo = reg;
-            ViewBag.Name = name;
-            ViewBag.Age = age;
-            ViewBag.Contact = contact;
-            ViewBag.Gender = gender;
-            ViewBag.Email = email;
-            ViewBag.Address = address;
+        
 
-            // 👇 Split First & Last Name
-            if (!string.IsNullOrEmpty(name))
-            {
-                var parts = name.Split(' ');
-                ViewBag.FirstName = parts[0];
-                ViewBag.LastName = parts.Length > 1 ? parts[1] : "";
-            }
-
-            return PartialView("_partialStartAssessment");
-        }
     }
 }

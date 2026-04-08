@@ -1,4 +1,5 @@
 ﻿using DocPlus.Entities.ViewModels;
+using DocPlus.Entities.ViewModels;
 using DocPlus.Operations.Repository;
 using DocPlus.WebAPI.Controllers;
 using Microsoft.AspNetCore.Authorization;
@@ -68,7 +69,7 @@ namespace DocPlus.API.Controllers
             return Ok(result);
         }
         [Authorize]
-        [HttpDelete("DeletePatientNOK")]
+        [HttpDelete("DeletePatientNOK/{id}/{userId}")]
         public async Task<IActionResult> DeletePatientNOK(int id, int userId)
         {
             var result = await _PatientRepo.DeletePatientNOK(id, userId);

@@ -229,5 +229,14 @@ namespace DocPlus.Entities.ClinicalModels
         public string? PROLACTIN { get; set; }    
         public int LAST_UPDATED_BY { get; set; }
     }
-
+    public class Prescription_CM
+    {
+        public string? Formulation { get; set; }
+        public string? MedicineName { get; set; }
+        public string? Dosage { get; set; }
+        public string? Route { get; set; }
+        public string? Frequency { get; set; }
+        public string? Others { get; set; }
+    }
+    
 }

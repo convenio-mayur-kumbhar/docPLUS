@@ -48,5 +48,13 @@ namespace DocPlus.API.Controllers
             var data = await _AjaxCommonRepo.GetOccupationMaster();
             return Ok(data);
         }
+
+        [Authorize]
+        [HttpGet("GetProfessionMaster")]
+        public async Task<IActionResult> GetProfessionMaster()
+        {
+            var data = await _AjaxCommonRepo.GetProfessionMaster();
+            return Ok(data);
+        }
     }
 }

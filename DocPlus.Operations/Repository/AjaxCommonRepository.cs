@@ -191,6 +191,50 @@ namespace DocPlus.Operations.Repository
                 };
             }
         }
+
+        public async Task<JsonResponse> GetProfessionMaster()
+        {
+            try
+            {
+                var result = new List<MasterDropdownDto>();
+
+                using (SqlConnection con = new SqlConnection(ConnectionString))
+                {
+                    using (SqlCommand cmd = new SqlCommand("GetProfessionMaster", con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure; // ✅ FIX
+                        await con.OpenAsync();
+                        using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                result.Add(new MasterDropdownDto
+                                {
+                                    ID = Convert.ToInt32(reader["ID"]),
+                                    DisplayText = reader["DisplayText"].ToString()
+                                });
+                            }
+                        }
+                    }
+                }
+                return new JsonResponse
+                {
+                    Status = "Success",
+                    Message = "Success",
+                    Data = result
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.Error("GetDSM4_ICD10MasterData Error: ", ex);
+                return new JsonResponse
+                {
+                    Status = "Error",
+                    Message = "Error occurred",
+                    Data = null!
+                };
+            }
+        }
     }
     public interface IAjaxCommonRepository
     {
@@ -198,6 +242,6 @@ namespace DocPlus.Operations.Repository
         public Task<JsonResponse> GetMaritalStatusMaster();
         public Task<JsonResponse> GetStatusMaster();
         public Task<JsonResponse> GetOccupationMaster();
-
+        public Task<JsonResponse> GetProfessionMaster(); 
     }
 }

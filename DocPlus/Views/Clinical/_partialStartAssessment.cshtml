@@ -1610,78 +1610,58 @@
                             </div>
                             @*--------------------------------------------PRESCRIPTIONS----------------------------------------------------------*@
                             <div id="prescriptions" class="tab-pane fade assessment-section">
-
                                 <div style="margin-bottom:10px;">
-                                    <button class="btn btn-secondary btn-sm" id="btnOpenPrescription" title="@Localizer["Add"]">
+                                    <button class="btn btn-secondary btn-sm" type="button" onclick="clinical.AddNewPrescription();" id="btnPrescription" title="@Localizer["Add"]">
                                         @Localizer["Add"]
                                     </button>
                                 </div>
-
                                 <div id="prescriptionPanel" style="display:none; border:1px solid #ccc; padding:15px;">
-
-
-                                    <table class="table table-bordered" id="prescriptionTable">
+                                    <table class="table table-striped table-hover table-checkable" id="tblNewPrescription">
                                         <thead>
+                                            <template>@Localizer["Medicine_List"]</template>
                                             <tr>
-                                                <th style="width:60px;">Sr No.</th>
-                                                <th>Formulation</th>
-                                                <th>Medicine Name</th>
-                                                <th>Dosage</th>
-                                                <th>Route</th>
-                                                <th>Frequency</th>
-                                                <th>Others</th>
+                                                <th style="width:60px;">@Localizer["Sr_No"]</th>
+                                                <th>@Localizer["Formulation"]</th>
+                                                <th>@Localizer["Medicine_Name"]</th>
+                                                <th>@Localizer["Dosage"]</th>
+                                                <th>@Localizer["Route"]</th>
+                                                <th>@Localizer["Frequency"]</th>
+                                                <th>@Localizer["Others"]</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
                                                 <td class="srno">1</td>
-                                                <td><input type="text" class="form-control" /></td>
-                                                <td><input type="text" class="form-control" /></td>
-                                                <td><input type="text" class="form-control" /></td>
-                                                <td><input type="text" class="form-control" /></td>
-                                                <td><input type="text" class="form-control" /></td>
-                                                <td><input type="text" class="form-control" /></td>
+                                                <td><input type="text" class="form-control formulation" autocomplete="off" /></td>
+                                                <td><input type="text" class="form-control medicine" autocomplete="off"/></td>
+                                                <td><input type="text" class="form-control dosage" autocomplete="off" /></td>
+                                                <td><input type="text" class="form-control route" autocomplete="off" /></td>
+                                                <td><input type="text" class="form-control frequency" autocomplete="off"/></td>
+                                                <td><input type="text" class="form-control others" autocomplete="off" /></td>
                                             </tr>
                                         </tbody>
                                     </table>
-
-                                    <a href="javascript:void(0);" id="btnAddRow">@Localizer["Add"] New</a> |
-                                    <a href="javascript:void(0);" id="btnDeleteRow">Delete Last</a>
+                                    <a href="javascript:void(0);" onclick="clinical.AddNewPrescriptionRow();" title="@Localizer["Add_New"]" id="btnAddRow">@Localizer["Add_New"]</a> |
+                                    <a href="javascript:void(0);" onclick="clinical.DeletePrescriptionRow();" title="@Localizer["Delete_Last"]" id="btnDeleteRow">@Localizer["Delete_Last"]</a>
 
                                     <br><br>
 
-                                    <button class="btn btn-success btn-sm" id="btnSavePrescription" title="@Localizer["Save"]">@Localizer["Save"]</button>
-                                    <button class="btn btn-info btn-sm" id="btnSavePrint" title="@Localizer["Save_Print"]">@Localizer["Save_Print"]</button>
-                                    <button class="btn btn-danger btn-sm" id="btnClosePrescription" title="@Localizer["Close"]">@Localizer["Close"]</button>
+                                    <button class="btn btn-success btn-sm" type="button" onclick="clinical.SavePrescription();" id="btnSavePrescription" title="@Localizer["Save"]">@Localizer["Save"]</button>
+                                    <button class="btn btn-info btn-sm" type="button" id="btnSavePrint" onclick="clinical.SaveAdnPrintPrescription();" title="@Localizer["Save_Print"]">@Localizer["Save_Print"]</button>
+                                    <button class="btn btn-danger btn-sm" type="button" id="btnClosePrescription" onclick="clinical.ClosePrescription();" title="@Localizer["Close"]">@Localizer["Close"]</button>
 
                                 </div>
-
-                            </div>
-                            @*----------------------------------------Old Prescription---------------------------------------*@
-                            <div id="oldprescriptions" class="tab-pane fade assessment-section">
-
-                                <div class="oldPrescriptionPanel">
-
-                                    @*  <div style="font-weight:600; margin-bottom:15px;">
-                                    | Old Prescription |
-                                </div> *@
+                                <div class="oldPrescriptionPanel" style="display:none;">
                                     <div style="margin-bottom:15px;">
-                                        <label style="margin-right:15px;">Select Date:</label>
-
-                                        <select id="ddlOldPrescriptionDate"
-                                                class="form-control"
-                                                style="width:200px; display:inline-block;">
-                                            <option value="">-- Select Date --</option>
+                                        <label style="margin-right:15px;">@Localizer["Select_Date"]:</label>
+                                        <select id="ddlOldPrescriptionDate" class="form-control" style="width:200px; display:inline-block;">
+                                            <option value="">-- @Localizer["Select"] --</option>
                                         </select>
                                     </div>
-
-                                    <button type="button" title="@Localizer["Proceed"]"
-                                            class="btn btn-success btn-sm"
-                                            id="btnProceedOldPrescription">
-                                        Proceed
+                                    <button type="button" title="@Localizer["Proceed"]" class="btn btn-success btn-sm" id="btnProceedOldPrescription">
+                                        @Localizer["Proceed"]
                                     </button>
                                 </div>
-
                             </div>
                             @*--------------------------------IN Ptient-----------------------------------------*@
                             <div id="inpatients" class="tab-pane fade assessment-section">
