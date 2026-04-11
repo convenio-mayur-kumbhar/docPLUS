@@ -5,24 +5,112 @@
     var Localizer = LocalizerFactory.Create("SharedResource", Assembly.GetExecutingAssembly().GetName().Name);
     ViewData["Title"] = @Localizer["Dashboard"];
 }
-
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
-    .kt-widget17 .kt-widget17__stats {
-        margin: 0;
+    .dashboard-card {
+        padding: 5px;
+        border-radius: 14px;
+        background: #ffffff;
+        border: 1px solid #e4e6ef;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
     }
 
-    .ActiveMonth {
-        background-color: #555 !important;
-        border-color: #555 !important;
+        /* Hover Effect */
+        .dashboard-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+    /* Icon */
+    .card-icon {
+        font-size: 30px;
+        margin-bottom: 10px;
     }
 
-    .dashboard-body {
-        min-height: 700px; /* optional base height */
-        height: auto;
+    /* Title */
+    .card-title {
+        font-size: 13px;
+        color: #888;
+        margin-bottom: 5px;
     }
 
-    .kt-portlet {
-        overflow: auto;
+    /* Value */
+    .card-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #2c2c2c;
+    }
+
+    /* LEFT BORDER COLORS (Professional Look) */
+    .bg-primary-light {
+        border-left: 5px solid #4e73df;
+        background: #f4f6ff;
+    }
+
+    .bg-success-light {
+        border-left: 5px solid #1cc88a;
+        background: #f2fbf7;
+    }
+
+    .bg-warning-light {
+        border-left: 5px solid #f6c23e;
+        background: #fffaf0;
+    }
+
+    .bg-danger-light {
+        border-left: 5px solid #e74a3b;
+        background: #fff5f5;
+    }
+
+    .card-icon i {
+        padding: 12px;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.05);
+    }
+
+    .kt-widget17__item {
+        padding: 18px;
+        border-radius: 10px;
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
+        text-align: center;
+        transition: 0.3s;
+    }
+
+        .kt-widget17__item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+        }
+
+    .kt-widget17__icon {
+        font-size: 26px;
+        margin-bottom: 8px;
+    }
+
+    .kt-widget17__subtitle {
+        font-size: 13px;
+        color: #777;
+    }
+
+    .kt-widget17__desc {
+        font-size: 26px;
+        font-weight: 700;
+        margin-top: 5px;
+    }
+
+    .danger-card {
+        border-left: 4px solid #f4516c;
+    }
+
+    .chart-container {
+        height: 300px;
+        position: relative;
+    }
+
+    .kt-portlet .kt-portlet__head {
+        min-height: 35px !important;
     }
 </style>
 <script src="~/js/loader.js"></script>
@@ -31,7 +119,7 @@
     <div class="kt-subheader__main">
         <span class="kt-subheader__separator kt-hidden"></span>
         <div class="kt-subheader__breadcrumbs">
-            <a asp-controller="DataValidations" asp-action="Index" class="kt-subheader__breadcrumbs-home"><i class="flaticon2-shelter"></i></a>           
+            <a asp-controller="DataValidations" asp-action="Index" class="kt-subheader__breadcrumbs-home"><i class="flaticon2-shelter"></i></a>
             <span class="kt-subheader__breadcrumbs-separator"></span>
             <a asp-controller="Dashboard" asp-action="Index" class="kt-subheader__breadcrumbs-link">
                 Dashboard
@@ -42,15 +130,236 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="kt-portlet">          
-            <div class="kt-portlet__body dashboard-body" style="padding: 15px 25px;">
+        <div class="kt-portlet">
+            <div class="kt-portlet__body dashboard-body" style="padding:15px 25px;">
+
+                <!-- SUMMARY CARDS -->
+
+                <div class="row mb-4">
+
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="dashboard-card bg-primary-light">
+                            <div class="card-icon">
+                                <i class="fas fa-users text-primary"></i>
+                            </div>
+                            <div class="card-title">Total Patients</div>
+                            <div class="card-value">@Model.TotalPatients.ToString("N0")</div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="dashboard-card bg-success-light">
+                            <div class="card-icon">
+                                <i class="fas fa-calendar-check text-success" style="color: #a7a7a7 !important;"></i>
+                            </div>
+                            <div class="card-title">Today's Appointments</div>
+                            <div class="card-value">@Model.TodayAppointments</div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="dashboard-card bg-warning-light">
+                            <div class="card-icon">
+                                <i class="fas fa-user-plus text-warning"></i>
+                            </div>
+                            <div class="card-title">New Patients</div>
+                            <div class="card-value">@Model.NewPatients</div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="dashboard-card bg-danger-light">
+                            <div class="card-icon">
+                                <i class="fa-solid fa-triangle-exclamation text-danger"></i>
+                            </div>
+                            <div class="card-title">Emergency Cases</div>
+                            <div class="card-value">@Model.EmergencyCases</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- CHARTS -->
+
+                <div class="row mt-4">
+
+                    <div class="col-md-6">
+
+                        <div class="kt-portlet">
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <h3 class="kt-portlet__head-title">
+                                        Appointments Overview
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div class="kt-portlet__body chart-container">
+                                <canvas id="appointmentChart"></canvas>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="kt-portlet">
+
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <h3 class="kt-portlet__head-title">
+                                        Top Diseases (ICD10)
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div class="kt-portlet__body chart-container">
+                                <canvas id="diseaseChart"></canvas>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- ACTIVITY + QUICK ACTION -->
+
+                <div class="row mt-4">
+
+                    <div class="col-md-8">
+
+                        <div class="kt-portlet">
+
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <h3 class="kt-portlet__head-title">
+                                        Recent Activity
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div class="kt-portlet__body">
+
+                                <ul class="kt-list kt-list--badge kt-list--borderless">
+
+                                    @foreach (var item in Model.RecentActivities)
+                                    {
+                                        <li class="kt-list__item">
+                                            <span class="kt-list__badge kt-badge kt-badge--success"></span>
+                                            @item
+                                        </li>
+                                    }
+
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="kt-portlet">
+
+                            <div class="kt-portlet__head">
+                                <div class="kt-portlet__head-label">
+                                    <h3 class="kt-portlet__head-title">
+                                        Quick Actions
+                                    </h3>
+                                </div>
+                            </div>
+
+                            <div class="kt-portlet__body">
+
+                                <a class="btn btn-primary btn-block mb-2">Add Patient</a>
+                                <a class="btn btn-success btn-block mb-2">Book Appointment</a>
+                                <a class="btn btn-warning btn-block mb-2">Add Prescription</a>
+                                <a class="btn btn-info btn-block">View Reports</a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
 
             </div>
         </div>
     </div>
 </div>
-@section Scripts {
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.min.js"></script>
 
+@section Scripts {
+
+    <!-- 1. Load Chart.js FIRST -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- 2. Then your script -->
     <script src="~/Scripts/Dashboard.js" asp-append-version="true"></script>
+
 }
+
+<script type="text/javascript">
+        var appointmentLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AppointmentLabels));
+    var appointmentData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AppointmentData));
+
+    var diseaseLabels = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DiseaseLabels));
+    var diseaseData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DiseaseData));
+         var ctx1 = document.getElementById("appointmentChart");
+
+       $(document).ready(function () {
+
+        if (typeof Chart === "undefined") {
+            console.error("Chart.js not loaded");
+            return;
+        }
+
+        var ctx1 = document.getElementById("appointmentChart");
+
+        if (ctx1 && appointmentLabels.length > 0) {
+                new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: appointmentLabels,
+            datasets: [{
+                label: "Appointments",
+                data: appointmentData,
+                backgroundColor: "#5867dd"
+            }]
+        },
+        options: {
+            maintainAspectRatio: false
+        }
+    });
+        }
+
+        var ctx2 = document.getElementById("diseaseChart");
+
+        if (ctx2 && diseaseLabels.length > 0) {
+               new Chart(ctx2, {
+        type: 'pie',
+        data: {
+            labels: diseaseLabels,
+            datasets: [{
+                data: diseaseData,
+                backgroundColor: [
+                    "#5867dd",
+                    "#34bfa3",
+                    "#ffb822",
+                    "#f4516c"
+                ]
+            }]
+        },
+        options: {
+            maintainAspectRatio: false
+        }
+    });
+        }
+
+    });
+</script>
+
+

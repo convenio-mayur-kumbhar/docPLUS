@@ -33990,13 +33990,13 @@ select.select2 {
 }
 
     .select2-container--default .select2-selection--multiple .select2-selection__rendered .select2-selection__choice {
-        color: #a7abc3;
-        background: #f7f8fa;
-        border: 1px solid #ebedf2
+        color: #000;
+        background: #f1f1f1;
+        border: 1px solid #d3d3d3;
     }
 
         .select2-container--default .select2-selection--multiple .select2-selection__rendered .select2-selection__choice .select2-selection__choice__remove {
-            color: #a7abc3
+            color: #0a0a0a;
         }
 
     .select2-container--default .select2-selection--multiple .select2-selection__rendered .select2-search__field::-moz-placeholder {

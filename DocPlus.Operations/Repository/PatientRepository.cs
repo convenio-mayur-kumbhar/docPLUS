@@ -168,12 +168,26 @@ namespace DocPlus.Operations.Repository
                     var param = new DynamicParameters();
                     param.Add("@p_PAT_ID", patientId);
 
-                    await connection.ExecuteAsync("DeletePatient", param, commandType: CommandType.StoredProcedure);
+                    var result = await connection.QueryFirstOrDefaultAsync(
+                        "DeletePatient",
+                        param,
+                        commandType: CommandType.StoredProcedure
+                    );
+
+                    if (result != null)
+                    {
+                        return new JsonResponse
+                        {
+                            Status = result.Status,
+                            Message = result.Message,
+                            Data = null!
+                        };
+                    }
 
                     return new JsonResponse
                     {
-                        Status = "Success",
-                        Message = "Patient Deleted Successfully",
+                        Status = "0",
+                        Message = "Delete failed",
                         Data = null!
                     };
                 }
@@ -184,8 +198,8 @@ namespace DocPlus.Operations.Repository
 
                 return new JsonResponse
                 {
-                    Status = "Error",
-                    Message = "Error occurred",
+                    Status = "0",
+                    Message = ex.Message,
                     Data = null!
                 };
             }

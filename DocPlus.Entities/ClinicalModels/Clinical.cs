@@ -10,6 +10,7 @@ namespace DocPlus.Entities.ClinicalModels
         public InitialAssessment_CM? InitialDetails { get; set; }
         public List<PatientAssessmentDetails>? AssessmentDetails { get; set; }
         public List<PatientAssessmentPHM_CM>? PHMDetails { get; set; }
+        public List<PatientInpatient_CM>? InpatientDetails { get; set; }
     }
     public class NOK_CM
     {
@@ -38,7 +39,7 @@ namespace DocPlus.Entities.ClinicalModels
     {
         public int PAT_ID { get; set; }
         public string? ASS_PC { get; set; }
-        public string? ASS_Value { get; set; }        
+        public string? ASS_Value { get; set; }
         public string? ASS_HPC { get; set; }
         public string? ASS_PPH { get; set; }
         public string? ASS_MH { get; set; }
@@ -81,7 +82,7 @@ namespace DocPlus.Entities.ClinicalModels
         public int? LAST_UPDATED_BY { get; set; }
         public DateTime? LAST_UPDATED_ON { get; set; }
     }
-    public class PatientICD10_CM
+    public class PatientICD10_CM : Base_VM
     {
         public int PAT_ID { get; set; }
         public DateTime? ASS_DATE { get; set; }
@@ -94,7 +95,12 @@ namespace DocPlus.Entities.ClinicalModels
     {
         public int ICD10_ID { get; set; }
     }
-    public class PatientDSM4_CM
+    public class PatientICD10Timeline_CM
+    {
+        public DateTime ASS_DATE { get; set; }
+        public string? ASS_VALUE { get; set; }
+    }
+    public class PatientDSM4_CM : Base_VM
     {
         public int PAT_ID { get; set; }
         public DateTime? ASS_DATE { get; set; }
@@ -106,7 +112,11 @@ namespace DocPlus.Entities.ClinicalModels
     public class DSM4_List
     {
         public int DSM4_ID { get; set; }
-        public string? DSM4_REMARKS { get; set; }
+    }
+    public class PatientDSM4Timeline_CM
+    {
+        public DateTime ASS_DATE { get; set; }
+        public string? ASS_VALUE { get; set; }
     }
     public class RiskGroup_CM
     {
@@ -147,17 +157,19 @@ namespace DocPlus.Entities.ClinicalModels
         public string? TR_FREQ { get; set; }
         public string? TR_OTHERS { get; set; }
     }
-    public class PatientInpatient_CM
+    public class PatientInpatient_CM : Base_VM
     {
         public int PAT_INPATIENT_ID { get; set; }
         public int PAT_ID { get; set; }
         public DateTime? INPT_ADM_DATE { get; set; }
+        public string INPT_ADM_DATECustom { get { return INPT_ADM_DATE == null ? string.Empty : DateFormat(INPT_ADM_DATE); } }
         public DateTime? INPT_DISCH_DATE { get; set; }
+        public string INPT_DISCH_DATECustom { get { return INPT_DISCH_DATE == null ? string.Empty : DateFormat(INPT_DISCH_DATE); } }
         public string? INPT_DIAGNOSIS { get; set; }
         public string? INPT_NOTES { get; set; }
         public int? LAST_UPDATED_BY { get; set; }
     }
-    public class PatientAttachment_CM
+    public class PatientAttachment_CM 
     {
         public int ASS_ATTACH_ID { get; set; }
         public int PAT_ID { get; set; }
@@ -226,7 +238,7 @@ namespace DocPlus.Entities.ClinicalModels
         public string? URINALYSIS { get; set; }
         public string? LUNSERS { get; set; }
         public string? QTC { get; set; }
-        public string? PROLACTIN { get; set; }    
+        public string? PROLACTIN { get; set; }
         public int LAST_UPDATED_BY { get; set; }
     }
     public class Prescription_CM
@@ -238,5 +250,6 @@ namespace DocPlus.Entities.ClinicalModels
         public string? Frequency { get; set; }
         public string? Others { get; set; }
     }
-    
+
+
 }

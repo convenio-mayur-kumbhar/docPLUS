@@ -24,6 +24,12 @@ namespace DocPlus.App_Start
             services.AddSingleton<IAjaxCommonRepository, AjaxCommonRepository>();   
             services.AddSingleton<IAppointmentRepository, AppointmentRepository>();
             services.AddSingleton<IProfessionMasterRepository, ProfessionMasterRepository>();
+            services.AddSingleton<ICategoryMasterRepository, CategoryMasterRepository>();
+            services.AddSingleton<IStatusMasterRepository, StatusMasterRepository>();
+            services.AddSingleton<IOccupationMasterRepository, OccupationMasterRepository>();
+            services.AddSingleton<IICD10MasterRepository, ICD10MasterRepository>();
+            services.AddSingleton<IDSM4MasterRepository, DSM4MasterRepository>();
+            services.AddSingleton<IDoctorMasterRepository, DoctorMasterRepository>();
         }
 
 

@@ -1,15 +1,36 @@
-﻿@{
-    ViewData["Title"] = "Status Master";
-}
+﻿@using System.Reflection
+@inject IStringLocalizerFactory LocalizerFactory
 
+@{
+    var Localizer = LocalizerFactory.Create("SharedResource", Assembly.GetExecutingAssembly().GetName().Name);
+    ViewData["Title"] = @Localizer["Status_Master"];
+}
 <style>
     .modal-dialog {
         max-width: 600px !important;
     }
+
+    #tblStatus th:nth-child(2),
+    #tblStatus th:nth-child(3),
+    #tblStatus td:nth-child(2),
+    #tblStatus td:nth-child(3) {
+        text-align: center !important;
+        white-space: nowrap;
+        width: 1%; /* 👈 important: extra space remove */
+    }
+
+
+    #tblStatus td:nth-child(3) {
+        padding-right: 5px !important; /* 👈  spacing */
+    }
+
+    #tblStatus td:nth-child(2) {
+        padding-right: 8px !important;
+    }
 </style>
 
-<!-- Subheader -->
 
+<!-- Subheader -->
 <div class="kt-subheader kt-grid__item" id="kt_subheader">
 
     <div class="kt-subheader__main">
@@ -23,132 +44,59 @@
             <span class="kt-subheader__breadcrumbs-separator"></span>
 
             <a href="javascript:;" class="kt-subheader__breadcrumbs-link">
-                Basic Settings
+                @Localizer["Basic_Settings"]
             </a>
 
             <span class="kt-subheader__breadcrumbs-separator"></span>
 
             <a asp-controller="StatusMaster" asp-action="Index" class="kt-subheader__breadcrumbs-link">
-                Status Master
+                @Localizer["Status_Master"]
             </a>
 
         </div>
+    </div>
+    <!-- RIGHT SIDE → Buttons -->
+    <div class="kt-subheader__toolbar d-flex">
+
+        <button ="javascript:;" id="btnAddStatus"
+                class="btn btn-brand btn-elevate btn-icon-sm mr-2"
+                onclick="StatusMaster.SetForAdd();" title="@Localizer["Add_Status"]">
+            <i class="fas fa-plus-circle"></i> @Localizer["Add_Status"]
+        </button>
+
+        <div id="divExport">
+            <button type="button"
+                    class="btn btn-default btn-icon-sm"
+                    onclick="StatusMaster.Export();" title="@Localizer["Export"]">
+                <i class="la la-download"></i> Export
+            </button>
+        </div>
 
     </div>
-
 
 </div>
-
 <!-- Main Grid -->
-
 <div class="kt-portlet kt-portlet--mobile">
 
-    <div class="kt-portlet__head kt-portlet__head--lg">
-
-        <div class="kt-portlet__head-label">
-
-            <span class="kt-portlet__head-icon">
-                <i class="kt-font-brand fas fa-check-square"></i>
-            </span>
-
-            <h3 class="kt-portlet__head-title">
-                Status Master
-            </h3>
-
-        </div>
-
-
-        <div class="kt-portlet__head-toolbar">
-
-            <div class="kt-portlet__head-wrapper">
-
-                <div class="kt-portlet__head-actions">
-
-                    <!-- Export -->
-                    <button type="button"
-                            class="btn btn-default btn-icon-sm"
-                            onclick="ExportToExcelGrid('#tblStatus','excel')">
-
-                        <i class="la la-download"></i>
-                        Export
-
-                    </button>
-
-                    &nbsp;
-
-                    <!-- Add -->
-                    <a href="javascript:;"
-                       class="btn btn-brand btn-elevate btn-icon-sm"
-                       onclick="showAddModal()">
-
-                        <i class="fas fa-plus-circle"></i>
-
-                        Add Status
-
-                    </a>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <div class="kt-portlet__body table-responsive">
-
+    <div class="kt-portlet__body table-responsive" id="divIDViewStatus" style="display:none;">
+        <!--begin: Datatable -->
         <table class="table table-striped table-hover table-checkable" id="tblStatus">
 
             <thead>
                 <tr>
-                    <th>Status</th>
-                    <th style="width:120px;">Action</th>
+                    <th> @Localizer["Status"]</th>
+                    <th style="text-align:center;"> @Localizer["Edit"]</th>
+                    <th style="text-align:center;"> @Localizer["Delete"]</th>
                 </tr>
             </thead>
-
-            <tbody>
-
-                <tr>
-                    <td>Active</td>
-                    <td>
-                        <a href="#" class="btn btn-sm btn-clean btn-icon btn-icon-md btnDelete">
-                            <i class="fas fa-trash-alt text-danger"></i>
-                        </a>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Inactive</td>
-                    <td>
-                        <a href="#" class="btn btn-sm btn-clean btn-icon btn-icon-md btnDelete">
-                            <i class="fas fa-trash-alt text-danger"></i>
-                        </a>
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>Pending</td>
-                    <td>
-                        <a href="#" class="btn btn-sm btn-clean btn-icon btn-icon-md btnDelete">
-                            <i class="fas fa-trash-alt text-danger"></i>
-                        </a>
-                    </td>
-                </tr>
-
-            </tbody>
+            <tbody></tbody>
 
         </table>
-
     </div>
 
-
 </div>
-
 <!-- Add Status Modal -->
-
-<div class="modal fade" id="AddStatusModal">
+<div class="modal fade" id="StatusModal">
 
     <div class="modal-dialog modal-dialog-centered">
 
@@ -156,98 +104,74 @@
 
             <div class="modal-header">
 
-                <h5 class="modal-title">Add Status</h5>
+                <h5 class="modal-title">@Localizer["Add_Status"]</h5>
 
-                <button type="button" class="close" data-dismiss="modal"></button>
+                <button type="button" class="close"
+                        data-dismiss="modal"
+                        onclick="StatusMaster.SetForClose();" title="@Localizer["Close"]"></button>
 
             </div>
 
             <div class="modal-body">
 
-                <input type="text"
-                       id="txtStatus"
-                       class="form-control"
-                       placeholder="Enter Status" />
+                <form id="frmStatus">
+
+                    <input type="text"
+                           id="txtStatus"
+                           class="form-control"
+                           title="@Localizer["Enter_Status"]"
+                           placeholder="@Localizer["Enter_Status"]" />
+
+                </form>
 
             </div>
 
             <div class="modal-footer">
 
-                <button class="btn btn-primary" onclick="saveStatus()">Save</button>
+                <button class="btn btn-success" title="  @Localizer["Save"]"
+                        onclick="StatusMaster.AddUpdate();">
+                    @Localizer["Save"]
+                </button>
 
-                <button class="btn btn-danger" onclick="resetStatus()">Reset</button>
+                <button type="button"
+                        class="btn btn-warning" title="@Localizer["Reset"]"
+                        onclick="StatusMaster.ResetData();">
+                    @Localizer["Reset"]
+                </button>
 
-                <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button class="btn btn-danger" title="  @Localizer["Close"]"
+                        onclick="StatusMaster.SetForClose();">
+                    @Localizer["Close"]
+                </button>
 
             </div>
 
         </div>
 
     </div>
- 
 
 </div>
+<form id="__AjaxAntiForgeryForm">
+    @Html.AntiForgeryToken()
+</form>
+<input type="hidden" id="hdnStatusID" value="0" />
+<script id="Grid_Data_Template_tblStatus" type="text/x-jquery-tmpl">
+    <tr>
+        <td>${statuS_NAME}</td>
 
-@section Scripts {
+        <!-- Edit -->
+        <td>
+            <i class="fa fa-edit text-primary action-icon "
+               onclick="StatusMaster.Edit(${statuS_ID})" title="Edit" style="cursor:pointer;"></i>
+        </td>
 
-    <script>
-
-        $(document).ready(function () {
-
-            $('#tblStatus').DataTable({
-                pageLength:10,
-                ordering:false
-            });
-
-        });
-
-
-        function showAddModal()
-        {
-            $("#txtStatus").val("");
-            $("#AddStatusModal").modal("show");
-        }
-
-
-        function saveStatus()
-        {
-
-            var status = $("#txtStatus").val().trim();
-
-            if(status=="")
-            {
-                alert("Enter Status");
-                return;
-            }
-
-            $('#tblStatus').DataTable().row.add([
-                status,
-                "<a href='#' class='btn btn-sm btn-clean btn-icon btn-icon-md btnDelete'><i class='fas fa-trash-alt text-danger'></i></a>"
-            ]).draw();
-
-            $("#AddStatusModal").modal("hide");
-
-        }
+        <!-- Delete -->
+        <td>
+            <i class="fa fa-trash text-danger action-icon"
+               onclick="StatusMaster.Delete(${statuS_ID},'${statuS_NAME}')" title="Delete" style="cursor:pointer;"></i>
+        </td>
+    </tr>
+</script>
+<script src="~/scripts/StatusMaster.js"></script>
 
 
-        function resetStatus()
-        {
-            $("#txtStatus").val("");
-        }
-
-
-        $(document).on("click",".btnDelete",function(){
-
-            $('#tblStatus').DataTable().row($(this).parents('tr')).remove().draw();
-
-        });
-
-
-        function ExportToExcelGrid(tableId,type)
-        {
-            alert("Export Called for " + tableId);
-        }
-
-    </script>
-
-}

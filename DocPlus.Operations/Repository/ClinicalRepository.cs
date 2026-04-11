@@ -4,6 +4,7 @@ using DocPlus.Entities.ViewModels;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 using System.Data;
 
 namespace DocPlus.Operations.Repository
@@ -340,13 +341,56 @@ namespace DocPlus.Operations.Repository
                 };
             }
         }
+        public async Task<JsonResponse> GetPatientICD10Timeline(int patientId)
+        {
+            try
+            {
+                List<PatientICD10Timeline_CM> list = new List<PatientICD10Timeline_CM>();
+
+                using SqlConnection con = new SqlConnection(ConnectionString);
+                using SqlCommand cmd = new SqlCommand("GetPatientICD10Timeline", con);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@PAT_ID", patientId);
+
+                await con.OpenAsync();
+
+                using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    list.Add(new PatientICD10Timeline_CM
+                    {
+                        ASS_DATE = Convert.ToDateTime(reader["ASS_DATE"]),
+                        ASS_VALUE = reader["ASS_VALUE"]?.ToString()
+                    });
+                }
+
+                return new JsonResponse
+                {
+                    Status = "1",
+                    Message = "Success",
+                    Data = list
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.Error("GetPatientICD10Timeline Error", ex);
+
+                return new JsonResponse
+                {
+                    Status = "0",
+                    Message = "Error fetching ICD10 data"
+                };
+            }
+        }
         public async Task<JsonResponse> SaveDSM4Details(PatientDSM4_CM model)
         {
             try
             {
                 using (SqlConnection con = new SqlConnection(ConnectionString))
                 {
-                    using (SqlCommand cmd = new SqlCommand("AddPatientDSM4Details", con))
+                    using (SqlCommand cmd = new SqlCommand("AddPatientDSM4_Details", con))
                     {
                         cmd.CommandType = CommandType.StoredProcedure;
 
@@ -356,12 +400,11 @@ namespace DocPlus.Operations.Repository
                         // 🔥 Create DataTable
                         DataTable dt = new DataTable();
                         dt.Columns.Add("DSM4_ID", typeof(int));
-                        dt.Columns.Add("DSM4_REMARKS", typeof(string));
                         if (model.DSM4_List != null)
                         {
                             foreach (var item in model.DSM4_List)
                             {
-                                dt.Rows.Add(item.DSM4_ID, item.DSM4_REMARKS ?? "");
+                                dt.Rows.Add(item.DSM4_ID);
                             }
                         }
                         // 🔥 Pass as TVP
@@ -389,6 +432,48 @@ namespace DocPlus.Operations.Repository
                     Status = "0",
                     Message = "Error saving DSM4",
                     Data = null!
+                };
+            }
+        }
+        public async Task<JsonResponse> GetPatientDSM4Timeline(int patientId)
+        {
+            try
+            {
+                List<PatientDSM4Timeline_CM> list = new List<PatientDSM4Timeline_CM>();
+                using SqlConnection con = new SqlConnection(ConnectionString);
+                using SqlCommand cmd = new SqlCommand("GetPatientDSM4Timeline", con);
+
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@PAT_ID", patientId);
+
+                await con.OpenAsync();
+
+                using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                while (await reader.ReadAsync())
+                {
+                    list.Add(new PatientDSM4Timeline_CM
+                    {
+                        ASS_DATE = Convert.ToDateTime(reader["ASS_DATE"]),
+                        ASS_VALUE = reader["ASS_VALUE"]?.ToString()
+                    });
+                }
+
+                return new JsonResponse
+                {
+                    Status = "1",
+                    Message = "Success",
+                    Data = list
+                };
+            }
+            catch (Exception ex)
+            {
+                logger.Error("GetPatientDSM4Timeline Error", ex);
+
+                return new JsonResponse
+                {
+                    Status = "0",
+                    Message = "Error fetching DSM4 data"
                 };
             }
         }
@@ -646,12 +731,22 @@ namespace DocPlus.Operations.Repository
                 cmd.Parameters.AddWithValue("@LAST_UPDATED_BY", model.LAST_UPDATED_BY);
 
                 await con.OpenAsync();
-                await cmd.ExecuteNonQueryAsync();
+
+                using SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                if (await reader.ReadAsync())
+                {
+                    return new JsonResponse
+                    {
+                        Status = reader["Status"].ToString(),
+                        Message = reader["Message"].ToString()
+                    };
+                }
 
                 return new JsonResponse
                 {
-                    Status = "1",
-                    Message = "Saved successfully"
+                    Status = "0",
+                    Message = "Unknown response from server"
                 };
             }
             catch (Exception ex)
@@ -669,23 +764,17 @@ namespace DocPlus.Operations.Repository
         {
             try
             {
-                using SqlConnection con = new SqlConnection(ConnectionString);
-                using SqlCommand cmd = new SqlCommand("GetPatientInpatientDetails", con);
-
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@PAT_ID", patId);
-
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                DataTable dt = new DataTable();
-
-                await Task.Run(() => da.Fill(dt));
-
-                return new JsonResponse
+                using (var connection = new SqlConnection(ConnectionString))
                 {
-                    Status = "1",
-                    Message = "Success",
-                    Data = dt
-                };
+                    var par = new DynamicParameters();
+                    par.Add("@PAT_ID", patId);
+                    using (var multi = await connection.QueryMultipleAsync("GetPatientInpatientDetails", par, commandType: CommandType.StoredProcedure))
+                    {
+                        var result = new ClinicalDetails_CM();
+                        result.InpatientDetails = (await multi.ReadAsync<PatientInpatient_CM>()).ToList();
+                        return new JsonResponse { Status = "1", Message = "Success", Data = result };
+                    }
+                }                
             }
             catch (Exception ex)
             {
@@ -987,7 +1076,6 @@ namespace DocPlus.Operations.Repository
                 return new JsonResponse { Status = "0", Message = "Error occurred" };
             }
         }
-
         public DataTable ConvertToPHMDataTable(List<PatientAssessmentPHM_CM> list)
         {
             DataTable dt = new DataTable();
@@ -1069,7 +1157,7 @@ namespace DocPlus.Operations.Repository
             }
 
             return dt;
-        }
+        }        
     }
     public interface IClinicalRepository
     {
@@ -1082,7 +1170,9 @@ namespace DocPlus.Operations.Repository
         public Task<JsonResponse> SaveInitialDetails(PatientInitialDetails_CM model);
         public Task<JsonResponse> SaveAssessmentDetail(PatientAssessmentDetails model);
         public Task<JsonResponse> SaveICD10Details(PatientICD10_CM model);
+        public Task<JsonResponse> GetPatientICD10Timeline(int patientId);
         public Task<JsonResponse> SaveDSM4Details(PatientDSM4_CM model);
+        public Task<JsonResponse> GetPatientDSM4Timeline(int patientId);
         public Task<JsonResponse> GetRiskIndicators(int patId);
         public Task<JsonResponse> SaveRiskDetails(PatientRiskSave_CM model);
         public Task<JsonResponse> GetRiskMaster();

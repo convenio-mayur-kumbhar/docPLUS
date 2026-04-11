@@ -20,8 +20,30 @@ namespace DocPlus.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var model = new DashboardVM
+            {
+                TotalPatients = 12540,
+                TodayAppointments = 210,
+                NewPatients = 45,
+                EmergencyCases = 6,
+
+                AppointmentLabels = new List<string> { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" },
+                AppointmentData = new List<int> { 120, 150, 180, 200, 170, 140 },
+
+                DiseaseLabels = new List<string> { "Hypertension", "Diabetes", "Cold", "Fever" },
+                DiseaseData = new List<int> { 120, 90, 70, 50 },
+
+                RecentActivities = new List<string>
+        {
+            "Patient Registered – John Smith",
+            "Prescription Added – Dr Patel",
+            "Appointment Booked – Maria",
+            "Lab Result Uploaded"
         }
-       
+            };
+
+            return View(model);
+        }
+
     }
 }

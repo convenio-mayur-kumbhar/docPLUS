@@ -53,7 +53,7 @@ namespace DocPlus.API.Controllers
             return Ok(result);
         }
         [Authorize]
-        [HttpGet("GetDSM4_ICD10MasterData")]
+        [HttpGet("GetDSM4_ICD10MasterData/{type}")]
         public async Task<IActionResult> GetDSM4_ICD10MasterData(string type)
         {
             var data = await _ClinicalRepo.GetDSM4_ICD10MasterData(type);
@@ -81,11 +81,25 @@ namespace DocPlus.API.Controllers
             return Ok(result);
         }
         [Authorize]
+        [HttpGet("GetPatientICD10Timeline/{patId}")]
+        public async Task<IActionResult> GetPatientICD10Timeline(int patId)
+        {
+            var res = await _ClinicalRepo.GetPatientICD10Timeline(patId);
+            return Ok(res);
+        }
+        [Authorize]
         [HttpPost("SaveDSM4Details")]
         public async Task<IActionResult> SaveDSM4Details(PatientDSM4_CM model)
         {
             var result = await _ClinicalRepo.SaveDSM4Details(model);
             return Ok(result);
+        }
+        [Authorize]
+        [HttpGet("GetPatientDSM4Timeline/{patId}")]
+        public async Task<IActionResult> GetPatientDSM4Timeline(int patId)
+        {
+            var res = await _ClinicalRepo.GetPatientDSM4Timeline(patId);
+            return Ok(res);
         }
         [Authorize]
         [HttpGet("GetRiskIndicatorsMasterData")]
@@ -202,7 +216,6 @@ namespace DocPlus.API.Controllers
             var result = await _ClinicalRepo.SaveAssessmentPHMBulk(models);
             return Ok(result);
 
-        }
-        
+        }     
     }
 }

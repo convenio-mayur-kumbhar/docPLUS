@@ -76,7 +76,7 @@ namespace DocPlus.API.Controllers
             return Ok(result);
         }
         [Authorize]
-        [HttpDelete("DeletePatientOP")]
+        [HttpDelete("DeletePatientOP/{id}/{userId}")]
         public async Task<IActionResult> DeletePatientOP(int id, int userId)
         {
             var result = await _PatientRepo.DeletePatientOP(id, userId);

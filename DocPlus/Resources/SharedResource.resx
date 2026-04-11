@@ -122,8 +122,8 @@
   </data>
   <data name="Active" xml:space="preserve">
     <value>Active</value>
-  </data>		 
-				<data name="Address" xml:space="preserve">
+  </data>
+  <data name="Address" xml:space="preserve">
     <value>Address</value>
   </data>
   <data name="Add" xml:space="preserve">
@@ -132,11 +132,26 @@
   <data name="Add_Appointment" xml:space="preserve">
     <value>Add Appointment</value>
   </data>
+  <data name="Add_Category" xml:space="preserve">
+    <value>Add Category</value>
+  </data>
+  <data name="Add_Doctor" xml:space="preserve">
+    <value>Add Doctor</value>
+  </data>
+  <data name="Add_Occupation" xml:space="preserve">
+    <value>Add Occupation</value>
+  </data>
   <data name="Add_New" xml:space="preserve">
     <value>Add New</value>
   </data>
   <data name="Add_Patient" xml:space="preserve">
     <value>Add Patient</value>
+  </data>
+  <data name="Add_Profession" xml:space="preserve">
+    <value>Add Profession</value>
+  </data>
+  <data name="Add_Status" xml:space="preserve">
+    <value>Add Status</value>
   </data>
   <data name="Admin_Settings" xml:space="preserve">
     <value>Admin Settings</value>
@@ -152,10 +167,13 @@
   </data>
   <data name="All_Status" xml:space="preserve">
     <value>All Status</value>
-  </data>	 
-<data name="Category" xml:space="preserve">
+  </data>
+  <data name="Category" xml:space="preserve">
     <value>Category</value>
-</data>
+  </data>
+  <data name="Appointment" xml:space="preserve">
+    <value>Appointment</value>
+  </data>
   <data name="Appointment_Comments" xml:space="preserve">
     <value>Appointment Comments</value>
   </data>
@@ -176,6 +194,12 @@
   </data>
   <data name="Attachments" xml:space="preserve">
     <value>Attachments</value>
+  </data>
+  <data name="Basic_Settings" xml:space="preserve">
+    <value>Basic Settings</value>
+  </data>
+  <data name="Category_Master" xml:space="preserve">
+    <value>Category Master</value>
   </data>
   <data name="Clear" xml:space="preserve">
     <value>Clear</value>
@@ -219,6 +243,12 @@
   <data name="Dosage" xml:space="preserve">
     <value>Dosage</value>
   </data>
+  <data name="Doctor_Master" xml:space="preserve">
+    <value>Doctor Master</value>
+  </data>
+  <data name="Doctor_Name" xml:space="preserve">
+    <value>Doctor Name</value>
+  </data>
   <data name="Drug_Alcohol_History" xml:space="preserve">
     <value>Drug &amp; Alcohol History</value>
   </data>
@@ -240,6 +270,15 @@
   <data name="Enter_Comments" xml:space="preserve">
     <value>Enter the Comments</value>
   </data>
+  <data name="Enter_Category" xml:space="preserve">
+    <value>Enter Category</value>
+  </data>
+  <data name="Enter_Doctor_Name" xml:space="preserve">
+    <value>Enter Doctor Name</value>
+  </data>
+  <data name="Enter_Email" xml:space="preserve">
+    <value>Enter Email</value>
+  </data>
   <data name="Enter_First_Name" xml:space="preserve">
     <value>Enter First Name</value>
   </data>
@@ -249,8 +288,14 @@
   <data name="Enter_Mobile_No" xml:space="preserve">
     <value>Enter Mobile No</value>
   </data>
+  <data name="Enter_Occupation" xml:space="preserve">
+    <value>Enter Occupation</value>
+  </data>
   <data name="Enter_Patient_Name" xml:space="preserve">
     <value>Enter Patient Name</value>
+  </data>
+  <data name="Enter_Profession" xml:space="preserve">
+    <value>Enter Profession</value>
   </data>
   <data name="Enter_Reg_No" xml:space="preserve">
     <value>Enter Reg No</value>
@@ -260,6 +305,9 @@
   </data>
   <data name="Enter_the_details" xml:space="preserve">
     <value>Enter the details</value>
+  </data>
+  <data name="Enter_Status" xml:space="preserve">
+    <value>Enter Status</value>
   </data>
   <data name="Export" xml:space="preserve">
     <value>Export</value>
@@ -359,13 +407,13 @@
   </data>
   <data name="Mobile_No" xml:space="preserve">
     <value>Mobile No</value>
-  </data>	
-<data name="Occupation" xml:space="preserve">
+  </data>
+  <data name="Occupation" xml:space="preserve">
     <value>Occupation</value>
-</data>		 
-<data name="Category" xml:space="preserve">
-    <value>Category</value>		
-</data>	
+  </data>
+  <data name="Occupation_Master" xml:space="preserve">
+    <value>Occupation Master</value>
+  </data>
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>
@@ -401,6 +449,9 @@
   </data>
   <data name="Patient_Name" xml:space="preserve">
     <value>Patient Name</value>
+  </data>
+  <data name="Profession_Master" xml:space="preserve">
+    <value>Profession Master</value>
   </data>
   <data name="Personal_History" xml:space="preserve">
     <value>Personal History</value>
@@ -453,6 +504,9 @@
   <data name="Remove" xml:space="preserve">
     <value>Remove</value>
   </data>
+  <data name="Reports" xml:space="preserve">
+    <value>Reports</value>
+  </data>
   <data name="Reset" xml:space="preserve">
     <value>Reset</value>
   </data>
@@ -492,6 +546,9 @@
   <data name="Sr_No" xml:space="preserve">
     <value>Sr. No.</value>
   </data>
+  <data name="Shortcode" xml:space="preserve">
+    <value>Shortcode</value>
+  </data>
   <data name="Start_Assessment" xml:space="preserve">
     <value>Start Assessment</value>
   </data>
@@ -506,5 +563,32 @@
   </data>
   <data name="View" xml:space="preserve">
     <value>View</value>
+  </data>
+  <data name="Medicine_Name" xml:space="preserve">
+    <value>Medicine Name</value>
+  </data>
+  <data name="Patient_Registration" xml:space="preserve">
+    <value>Patient Registration</value>
+  </data>
+  <data name="Date_of_Admission" xml:space="preserve">
+    <value>Date of Admission</value>
+  </data>
+  <data name="Date_of_Discharge" xml:space="preserve">
+    <value>Date of Discharge</value>
+  </data>
+	  <data name="Doctor_Master" xml:space="preserve">
+    <value>Doctor Master</value>
+  </data>
+  <data name="Add_Doctor" xml:space="preserve">
+    <value>Add Doctor</value>
+  </data>
+  <data name="Doctor_Name" xml:space="preserve">
+    <value>Doctor Name</value>
+  </data>
+  <data name="Doctor_Details" xml:space="preserve">
+    <value>Doctor Details</value>
+  </data>
+  <data name="Notes" xml:space="preserve">
+    <value>Notes</value>
   </data>
 </root>

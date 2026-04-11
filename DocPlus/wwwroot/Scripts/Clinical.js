@@ -52,7 +52,6 @@ var clinical = {
             Reload_ddl_GlobalWithPost(null, "#ddlAddCategory", "/AjaxCommon/GetCategoryMaster", {}, "Select", function () { $("#ddlAddCategory").select2(); });
             Reload_ddl_GlobalWithPost(null, "#ddlAddMaritalStatus", "/AjaxCommon/GetMaritalStatusMaster", {}, "Select", function () { $("#ddlAddMaritalStatus").select2(); });
             Reload_ddl_GlobalWithPost(null, "#ddlAddOccupation", "/AjaxCommon/GetOccupationMaster", {}, "Select", function () { $("#ddlAddOccupation").select2(); });
-
             Reload_ddl_GlobalWithPost(null, "#ddlAddStatus", "/AjaxCommon/GetStatusMaster", {}, "Select", function () { $("#ddlAddStatus").select2(); });
             $('.date-picker').datepicker({
                 autoclose: true,
@@ -1243,5 +1242,328 @@ var clinical = {
         list += "</ul>";
 
         input.after(list);
-    }
+    },
+    //InPatient
+    GetInPatients: function () {
+        var patientID = $("#hf_PatientID").val();
+        GetAjaxData("/Clinical/GetGetInpatientByPatientID",
+            { PatientID: patientID, __RequestVerificationToken: token },
+            function (data) {
+                if (data && data.status === "Success") {
+                    var inpatientDetails = data.data.inpatientDetails;
+                    if ($.fn.DataTable.isDataTable('#tblInPatients')) { $('#tblInPatients').DataTable().destroy(); }
+                    $("#tblInPatients tbody").empty();
+                    if (inpatientDetails && inpatientDetails.length > 0) {
+                        $("#Grid_Data_Template_tblInPatients").tmpl(inpatientDetails).appendTo("#tblInPatients tbody");
+                        $('#tblInPatients').DataTable({
+                            paging: true,
+                            searching: true,
+                            ordering: true
+                        });
+                    } else {
+                        var colCount = $("#tblInPatients thead th").length;
+                        $("#tblInPatients tbody").append("<tr><td colspan='" + colCount + "' class='text-center'>No Records Found</td></tr>");
+                    }
+
+                }
+            });
+
+    },
+    AddInPatient: function () {
+        $("#divtblInPatients").hide();
+        $("#ipPanel").show();
+        $(".ipPanel").slideDown();
+    },
+    CloseInPatients: function () {
+        $("#divtblInPatients").show();
+        $("#ipPanel").hide();
+        $(".ipPanel").slideUp();
+    },
+    SaveInPatients: function () {
+        Reset_Form_Errors();
+        var FormData = clinical.GetInPatientsData();
+        if (clinical.ValidateInPatientsData(FormData)) {
+            AddUpdateData("/Clinical/SaveInPatients", { Model: FormData, __RequestVerificationToken: token },
+                function (data) {
+                    if (data.status === true || data.status === 'Success') {
+                        showSweetAlert("Success", data.Message || data.message, 'success', null);
+                        clinical.GetInPatients();
+                        clinical.CloseInPatients();
+                    } else {
+                        showSweetAlert("Failed", data.Message || data.message, 'error', null);
+                    }
+                },
+                function (response_data) { showSweetAlert("Error", response_data.message || "Something went wrong", 'error', null); }
+            );
+        }
+    },
+    GetInPatientsData: function () {
+        return {
+            PAT_ID: $("#hf_PatientID").val(),
+            INPT_ADM_DATE: $("#txtDateofAdmission").val(),
+            INPT_DISCH_DATE: $("#txtDateofDischarge").val(),
+            INPT_DIAGNOSIS: $("#txtDiagnosis").val(),
+            INPT_NOTES: $("#txtNotes").val(),
+            LAST_UPDATED_BY: UserID
+        };
+    },
+    ValidateInPatientsData: function (data) {
+        if (!data.PAT_ID || data.PAT_ID == 0) {
+            showSweetAlert("Error", "Invalid Patient", "error");
+            return false;
+        }
+        if (!data.INPT_ADM_DATE || data.INPT_ADM_DATE.trim() === "") {
+            showSweetAlert("Error", "Date of Admission is required", "error");
+            return false;
+        }
+        if (!data.INPT_DISCH_DATE || data.INPT_DISCH_DATE.trim() === "") {
+            showSweetAlert("Error", "Date of Discharge is required", "error");
+            return false;
+        }
+        if (!data.INPT_DIAGNOSIS || data.INPT_DIAGNOSIS.trim() === "") {
+            showSweetAlert("Error", "Diagnosis is required", "error");
+            return false;
+        }
+        if (!data.INPT_NOTES || data.INPT_NOTES.trim() === "") {
+            showSweetAlert("Error", "Notes are required", "error");
+            return false;
+        }
+        var admDate = new Date(data.INPT_ADM_DATE);
+        var disDate = new Date(data.INPT_DISCH_DATE);
+
+        if (disDate < admDate) {
+            showSweetAlert("Error", "Discharge date cannot be before Admission date", "error");
+            return false;
+        }
+        return true;
+    },
+    //ICD10
+    LoadTimeline: function (apiUrl, containerId) {
+        var patientID = $("#hf_PatientID").val();
+        GetAjaxData(apiUrl,
+            { PatientID: patientID, __RequestVerificationToken: token },
+            function (data) {
+                if (!data || data.status !== "Success") {
+                    alert("Failed to load data");
+                    return;
+                }
+                var details = data.data || [];
+                let container = $(containerId);
+                let lastDate = "";
+                if (details.length === 0) {
+                    container.empty().hide();
+                    return;
+                }
+                container.empty().show();
+                details.forEach(function (item) {
+                    let text = item.asS_VALUE || item.ass_VALUE;
+                    let dateVal = item.asS_DATE || item.ass_DATE;
+                    if (!text || !dateVal) return;
+                    let d = new Date(dateVal);
+                    let time = d.toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    let displayDate = clinical.formatDateLabel(d);
+                    if (lastDate !== displayDate) {
+                        container.append(`
+                        <div class="timelineRow dateRow">
+                            <div></div>
+                            <div class="timelineMiddle">
+                                <span class="timelineDateHeader">${displayDate}</span>
+                            </div>
+                            <div></div>
+                        </div>`);
+                        lastDate = displayDate;
+                    }
+                    let bulletHtml = "";
+                    text.split(';').forEach(function (val) {
+                        val = val.trim();
+                        if (val !== "") {
+                            bulletHtml += `<div class="timelineBullet">• ${val}</div>`;
+                        }
+                    });
+                    container.append(`
+                    <div class="timelineRow">
+                        <div class="timelineTime">${time}</div>
+                        <div class="timelineMiddle">
+                            <div class="timelineDot"></div>
+                        </div>
+                        <div class="timelineContent">
+                            <div class="timelineCard">
+                                ${bulletHtml}
+                            </div>
+                        </div>
+                    </div>`);
+                });
+            });
+    },
+    GetICD10: function () {
+        clinical.LoadTimeline("/Clinical/GetICD10DetailsByID", "#divICD10timeline");
+    },
+    openDSM4_ICD10Tab: function (type, group, targetId, ddlId) {
+        clinical.showLeftMenu(group, targetId);
+        $('.nav-tabs a[href="' + targetId + '"]').tab('show');
+        clinical.GetDSM4_ICD10MasterData(type, ddlId);
+    },
+    GetDSM4_ICD10MasterData: function (Type, ddlId) {
+       
+        Reload_ddl_GlobalWithPost(null, ddlId, "/Clinical/GetDSM4_ICD10MasterData", { type: Type, __RequestVerificationToken: token }, "", function () { $(ddlId).select2(); });
+        if (Type == "ICD10") {
+            clinical.GetICD10();
+        } else { clinical.GetDSM4(); }
+    },
+    OpenICD10: function () {
+        $("#icd10Panel").slideDown();
+        $("#icd10Panel").show();
+        $("#divICD10timeline").hide();
+        $("#btnAddICDOpen").hide();
+    },
+    CloseICD10: function () {
+        $("#ddlICD10").val('').trigger("change");
+        $("#icd10Panel").hide();
+        $("#btnAddICDOpen").show();
+        $("#divICD10timeline").show();
+        $("#icd10Panel").slideUp();
+    },
+    GetICD10Data: function () {
+        let dateVal = $("#txtViewDate").val();
+        let now = new Date();
+        let hours = String(now.getHours()).padStart(2, '0');
+        let minutes = String(now.getMinutes()).padStart(2, '0');
+        let seconds = String(now.getSeconds()).padStart(2, '0');
+        let finalDateTime = `${dateVal} ${hours}:${minutes}:${seconds}`;
+        var icdIds = $("#ddlICD10").val(); // array of selected ICD10 IDs
+        var list = [];
+        if (icdIds && icdIds.length > 0) {
+            icdIds.forEach(function (id) {
+                list.push({
+                    ICD10_ID: parseInt(id)
+                });
+            });
+        }
+        return {
+            PAT_ID: $("#hf_PatientID").val(),
+            ASS_DATE: finalDateTime,
+            ICD10_List: list,
+            LAST_UPDATED_BY: UserID
+        };
+    },
+    ValidateICD10Data: function (data) {
+        if (!data.PAT_ID || data.PAT_ID == 0) {
+            showSweetAlert("Error", "Invalid Patient", "error");
+            return false;
+        }
+        if (!data.ASS_DATE || data.ASS_DATE.trim() === "") {
+            showSweetAlert("Error", "Assessment Date is required", "error");
+            return false;
+        }
+        if (!data.ICD10_List || data.ICD10_List.length === 0) {
+            showSweetAlert("Error", "Please select at least one ICD10-Code", "error");
+            return false;
+        }
+
+        return true;
+    },
+    SaveICD10: function () {
+        Reset_Form_Errors();
+        var FormData = clinical.GetICD10Data();
+        if (clinical.ValidateICD10Data(FormData)) {
+            AddUpdateData("/Clinical/SaveICD10Details", { Model: FormData, __RequestVerificationToken: token },
+                function (data) {
+                    if (data.status === true || data.status === 'Success') {
+                        showSweetAlert("Success", data.Message || data.message, 'success', null);
+                        clinical.GetDSM4_ICD10MasterData('ICD10', '#ddlICD10');
+                        clinical.CloseICD10();
+                    } else {
+                        showSweetAlert("Failed", data.Message || data.message, 'error', null);
+                    }
+                },
+                function (response_data) { showSweetAlert("Error", response_data.message || "Something went wrong", 'error', null); }
+            );
+        }
+    },
+    //DSM4  
+    GetDSM4: function () {
+        clinical.LoadTimeline("/Clinical/GetDSM4DetailsByID", "#divDSM4timeline");
+    },
+    openDSM4_DSM4Tab: function (type, group, targetId, ddlId) {
+        clinical.showLeftMenu(group, targetId);
+        $('.nav-tabs a[href="' + targetId + '"]').tab('show');
+        clinical.GetDSM4_DSM4MasterData(type, ddlId);
+    },
+    GetDSM4_DSM4MasterData: function (Type, ddlId) {
+        Reload_ddl_GlobalWithPost(null, ddlId, "/Clinical/GetDSM4_ICD10MasterData", { type: Type, __RequestVerificationToken: token }, "", function () { $(ddlId).select2(); });
+        clinical.GetDSM4();
+    },
+    OpenDSM4: function () {
+        $("#dsm5Panel").slideDown();
+        $("#dsm5Panel").show();
+        $("#divDSM4timeline").hide();
+        $("#btnAddDSMOpen").hide();
+    },
+    CloseDSM4: function () {
+        $("#ddlDSM4").val('').trigger("change");
+        $("#dsm5Panel").hide();
+        $("#btnAddDSMOpen").show();
+        $("#divDSM4timeline").show();
+        $("#dsm5Panel").slideUp();
+    },
+    GetDSM4Data: function () {
+        let dateVal = $("#txtViewDate").val();
+        let now = new Date();
+        let hours = String(now.getHours()).padStart(2, '0');
+        let minutes = String(now.getMinutes()).padStart(2, '0');
+        let seconds = String(now.getSeconds()).padStart(2, '0');
+        let finalDateTime = `${dateVal} ${hours}:${minutes}:${seconds}`;
+        var dsmIds = $("#ddlDSM4").val(); // array of selected DSM4 IDs
+        var list = [];
+        if (dsmIds && dsmIds.length > 0) {
+            dsmIds.forEach(function (id) {
+                list.push({
+                    DSM4_ID: parseInt(id)
+                });
+            });
+        }
+        return {
+            PAT_ID: $("#hf_PatientID").val(),
+            ASS_DATE: finalDateTime,
+            DSM4_List: list,
+            LAST_UPDATED_BY: UserID
+        };
+    },
+    ValidateDSM4Data: function (data) {
+        if (!data.PAT_ID || data.PAT_ID == 0) {
+            showSweetAlert("Error", "Invalid Patient", "error");
+            return false;
+        }
+        if (!data.ASS_DATE || data.ASS_DATE.trim() === "") {
+            showSweetAlert("Error", "Assessment Date is required", "error");
+            return false;
+        }
+        if (!data.DSM4_List || data.DSM4_List.length === 0) {
+            showSweetAlert("Error", "Please select at least one DSM4-Code", "error");
+            return false;
+        }
+
+        return true;
+    },
+    SaveDSM4: function () {
+        Reset_Form_Errors();
+        var FormData = clinical.GetDSM4Data();
+        if (clinical.ValidateDSM4Data(FormData)) {
+            AddUpdateData("/Clinical/SaveDSM4Details", { Model: FormData, __RequestVerificationToken: token },
+                function (data) {
+                    if (data.status === true || data.status === 'Success') {
+                        showSweetAlert("Success", data.Message || data.message, 'success', null);
+                        clinical.GetDSM4_ICD10MasterData('DSM4', '#ddlDSM4');
+                        clinical.CloseDSM4();
+                    } else {
+                        showSweetAlert("Failed", data.Message || data.message, 'error', null);
+                    }
+                },
+                function (response_data) { showSweetAlert("Error", response_data.message || "Something went wrong", 'error', null); }
+            );
+        }
+    },
 }
