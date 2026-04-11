@@ -95,7 +95,7 @@
         /// <summary>
         /// ScreenID: 20 ScreenName: Occupation Master "
         /// </summary>
-        public const string OccupationMaster = "OccupationMaster";
+        public const string OccupationMaster = "Occupation Master";
 
         /// <summary>
         /// ScreenID: 20 ScreenName: PatientReports "

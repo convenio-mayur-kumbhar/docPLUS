@@ -236,7 +236,10 @@
         white-space: nowrap;
     }
 
-
+    .timelineBullet {
+        margin-left: 5px;
+        padding: 2px 0;
+    }
 
     /* ================= UTILITY CLASSES ================= */
 
@@ -579,8 +582,8 @@
                                 <span class="nav-text">@Localizer["Diagnosis"]</span>
                             </a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="#icd10" onclick="clinical.showLeftMenu('diagnosis','#icd10')">@Localizer["ICD_10"]</a>
-                                <a class="dropdown-item" href="#dsm5" onclick="clinical.showLeftMenu('diagnosis','#dsm5')">@Localizer["DSM_5"]</a>
+                                <a class="dropdown-item" href="#icd10" onclick="clinical.openDSM4_ICD10Tab('ICD10','diagnosis','#icd10','#ddlICD10')">@Localizer["ICD_10"]</a>
+                                <a class="dropdown-item" href="#dsm5" onclick="clinical.openDSM4_DSM4Tab('DSM4','diagnosis','#dsm5','#ddlDSM4')">@Localizer["DSM_5"]</a>
                                 <a class="dropdown-item" href="#differential" onclick="clinical.openAssessmentTab('DD','diagnosis','#differential')">@Localizer["Differential_Diagnosis"]</a>
                                 <a class="dropdown-item" href="#medicalDiagnosis" onclick="clinical.openAssessmentTab('MD','diagnosis','#medicalDiagnosis')">@Localizer["Medical_Diagnosis"]</a>
                             </div>
@@ -615,7 +618,7 @@
                         </li> *@
 
                         <li class="nav-item">
-                            <a class="nav-link" href="#inpatients" onclick="clinical.showLeftMenu('inpatients','#inpatients')">
+                            <a class="nav-link" href="#inpatients" onclick="clinical.GetInPatients();">
                                 <span class="nav-text">@Localizer["Inpatients"]</span>
                             </a>
                         </li>
@@ -679,8 +682,8 @@
                             <li class="menu-group investigations"><a data-toggle="tab" onclick="clinical.GetAssetment('OI');" href="#otherInvestigations">@Localizer["Other_Investigations"]</a></li>
 
                             <!-- DIAGNOSIS -->
-                            <li class="menu-group diagnosis"><a data-toggle="tab" href="#icd10">@Localizer["ICD_10_Diagnosis"]</a></li>
-                            <li class="menu-group diagnosis"><a data-toggle="tab" href="#dsm5">@Localizer["DSM_5_Diagnosis"]</a></li>
+                            <li class="menu-group diagnosis"><a data-toggle="tab" href="#icd10" onclick="clinical.GetDSM4_ICD10MasterData('ICD10','#ddlICD10');">@Localizer["ICD_10_Diagnosis"]</a></li>
+                            <li class="menu-group diagnosis"><a data-toggle="tab" href="#dsm5" onclick="clinical.GetDSM4_DSM4MasterData('DSM4','#ddlDSM4');">@Localizer["DSM_5_Diagnosis"]</a></li>
                             <li class="menu-group diagnosis"><a data-toggle="tab" onclick="clinical.GetAssetment('DD');" href="#differential">@Localizer["Differential_Diagnosis"]</a></li>
                             <li class="menu-group diagnosis"><a data-toggle="tab" onclick="clinical.GetAssetment('MD');" href="#medicalDiagnosis">@Localizer["Medical_Diagnosis"]</a></li>
 
@@ -692,7 +695,7 @@
                             <!-- SINGLE TABS -->
                             <li class="menu-group prescriptions"><a data-toggle="tab" href="#prescriptions">@Localizer["Prescriptions"]</a></li>
                             @* <li class="menu-group oldprescriptions"><a data-toggle="tab" href="#oldprescriptions">Old Prescriptions</a></li> *@
-                            <li class="menu-group inpatients"><a data-toggle="tab" href="#inpatients">@Localizer["Inpatients"]</li>
+                            <li class="menu-group inpatients"><a data-toggle="tab" onclick="clinical.GetInPatients();" href="#inpatients">@Localizer["Inpatients"]</li>
                             <li class="menu-group attachments"><a data-toggle="tab" href="#attachments">@Localizer["Attachments"]</a></li>
                             <li class="menu-group medicalcert"><a data-toggle="tab" href="#medicalcert">@Localizer["Medical_Certificate"]</a></li>
                             @* <li class="menu-group oldmedicert"><a data-toggle="tab" href="#oldmedicert">Old Certificates</a></li> *@
@@ -1188,140 +1191,52 @@
 
                             @*--------------------------------------------Daignosis---------------------------------------------*@
                             <div id="icd10" class="tab-pane fade assessment-section">
-
                                 <!-- Top Buttons -->
                                 <div style="display:flex; gap:8px; margin-bottom:10px;">
-                                    <button class="btn btn-primary btn-sm btnQuickInfo" title="@Localizer["Quick_Information"]">
+                                    <button class="btn btn-primary btn-sm" type="button" title="@Localizer["Quick_Information"]">
                                         @Localizer["Quick_Information"]
                                     </button>
 
-                                    <button class="btn btn-secondary btn-sm" id="btnAddICDOpen" title="@Localizer["Add"]">
+                                    <button class="btn btn-secondary btn-sm" type="button" onclick="clinical.OpenICD10();" id="btnAddICDOpen" title="@Localizer["Add"]">
                                         @Localizer["Add"]
                                     </button>
                                 </div>
-
+                                <div id="divICD10timeline"></div>
                                 <!-- ICD PANEL -->
-                                <div id="icd10Panel"
-                                     style="display:none; border:1px solid #ccc; padding:15px; background:#f9f9f9;">
-
-                                    <!-- Custom Dropdown -->
+                                <div id="icd10Panel" style="display:none; border:1px solid #ccc; padding:15px; background:#f9f9f9;">
                                     <div style="position:relative; margin-bottom:10px;">
-
                                         <label><b>ICD-10 Code</b></label>
-
-                                        <!-- Dropdown Button -->
-                                        <div id="dropdownBtn"
-                                             style="border:1px solid #ccc; padding:6px; background:#fff; cursor:pointer;">
-                                            Select ICD Code ▼
-                                        </div>
-
-                                        <!-- Dropdown List -->
-                                        <div id="checkboxDropdown"
-                                             style="display:none; border:1px solid #ccc;
-                 position:absolute; width:100%;
-                 background:#fff; max-height:150px;
-                 overflow-y:auto; padding:8px; z-index:1000;">
-
-                                            <label><input type="checkbox" value="F00"> F00 - Dementia in Alzheimer's disease</label><br>
-                                            <label><input type="checkbox" value="F01"> F01 - Vascular dementia</label><br>
-                                            <label><input type="checkbox" value="F02"> F02 - Dementia in other diseases</label><br>
-                                            <label><input type="checkbox" value="F03"> F03 - Unspecified dementia</label><br>
-                                            <label><input type="checkbox" value="F05"> F05 - Delirium</label><br>
-                                            <label><input type="checkbox" value="F06"> F06 - Other mental disorders</label>
-
-                                        </div>
+                                        <select id="ddlICD10" class="form-control" multiple="multiple" style="width:100%"></select>
                                     </div>
-
-                                    <!-- @Localizer["Add"] Remove Buttons -->
-                                    <div style="margin-bottom:10px;">
-                                        <button class="btn btn-secondary btn-sm" id="btnAddICD" title="@Localizer["Add"]">
-                                            @Localizer["Add"] >>
-                                        </button>
-
-                                        <button class="btn btn-danger btn-sm" id="btnRemoveICD" title="@Localizer["Remove"]">
-                                            << Remove
-                                        </button>
+                                    <div style="margin-top:15px;">
+                                        <button class="btn btn-success btn-sm" title="@Localizer["Save"]" type="button" onclick="clinical.SaveICD10();" id="btnSaveICD">@Localizer["Save"]</button>
+                                        <button class="btn btn-danger btn-sm" title="@Localizer["Close"]" type="button" onclick="clinical.CloseICD10();" id="btnCloseICD">@Localizer["Close"]</button>
                                     </div>
-
-                                    <!-- Selected List -->
-                                    <div>
-                                        <select id="selectedICD" class="form-control" size="6" multiple></select>
-                                    </div>
-
-                                    <!-- @Localizer["Save"] @Localizer["Close"] -->
-                                    <div style="text-align:center; margin-top:15px;">
-                                        <button class="btn btn-success btn-sm" title="@Localizer["Save"]" id="btnSaveICD">@Localizer["Save"]</button>
-                                        <button class="btn btn-danger btn-sm" title="@Localizer["Close"]" id="btnCloseICD">@Localizer["Close"]</button>
-                                    </div>
-
                                 </div>
-
                             </div>
-
                             <div id="dsm5" class="tab-pane fade assessment-section">
-
                                 <!-- Top Buttons -->
                                 <div style="display:flex; gap:8px; margin-bottom:10px;">
-                                    <button class="btn btn-primary btn-sm btnQuickInfoDSM" title="@Localizer["Quick_Information"]">
+                                    <button class="btn btn-primary btn-sm" type="button" title="@Localizer["Quick_Information"]">
                                         @Localizer["Quick_Information"]
                                     </button>
 
-                                    <button class="btn btn-secondary btn-sm" id="btnAddDSMOpen" title="@Localizer["Add"]">
+                                    <button class="btn btn-secondary btn-sm" type="button" onclick="clinical.OpenDSM4();" id="btnAddDSMOpen" title="@Localizer["Add"]">
                                         @Localizer["Add"]
                                     </button>
                                 </div>
-
-                                <!-- DSM PANEL -->
-                                <div id="dsm5Panel"
-                                     style="display:none; border:1px solid #ccc; padding:15px; background:#f9f9f9;">
-
-                                    <!-- Custom Dropdown -->
+                                <div id="divDSM4timeline"></div>
+                                <!-- ICD PANEL -->
+                                <div id="dsm5Panel" style="display:none; border:1px solid #ccc; padding:15px; background:#f9f9f9;">
                                     <div style="position:relative; margin-bottom:10px;">
-
                                         <label><b>DSM-5 Code</b></label>
-
-                                        <!-- Dropdown Button -->
-                                        <div id="dropdownBtnDSM"
-                                             style="border:1px solid #ccc; padding:6px; background:#fff; cursor:pointer;">
-                                            Select DSM Code ▼
-                                        </div>
-
-                                        <!-- Dropdown List -->
-                                        <div id="checkboxDropdownDSM"
-                                             style="display:none; border:1px solid #ccc;
-                 position:absolute; width:100%;
-                 background:#fff; max-height:150px;
-                 overflow-y:auto; padding:8px; z-index:1000;">
-
-                                            <label><input type="checkbox" value="296.21"> 296.21 - Major Depressive Disorder</label><br>
-                                            <label><input type="checkbox" value="300.02"> 300.02 - Generalized Anxiety Disorder</label><br>
-                                            <label><input type="checkbox" value="314.01"> 314.01 - ADHD Combined Type</label><br>
-                                            <label><input type="checkbox" value="309.81"> 309.81 - PTSD</label><br>
-                                            <label><input type="checkbox" value="295.90"> 295.90 - Schizophrenia</label><br>
-                                            <label><input type="checkbox" value="301.83"> 301.83 - Borderline Personality Disorder</label>
-
-                                        </div>
+                                        <select id="ddlDSM4" class="form-control" multiple="multiple" style="width:100%"></select>
                                     </div>
-
-                                    <!-- @Localizer["Add"] Remove Buttons -->
-                                    <div style="margin-bottom:10px;">
-                                        <button class="btn btn-secondary btn-sm" title="@Localizer["Add"]" id="btnAddDSM">@Localizer["Add"] >></button>
-                                        <button class="btn btn-danger btn-sm" title="@Localizer["Remove"]" id="btnRemoveDSM"><< Remove</button>
+                                    <div style="margin-top:15px;">
+                                        <button class="btn btn-success btn-sm" title="@Localizer["Save"]" type="button" onclick="clinical.SaveDSM4();" id="btnSaveDSM">@Localizer["Save"]</button>
+                                        <button class="btn btn-danger btn-sm" title="@Localizer["Close"]" type="button" onclick="clinical.CloseDSM4();" id="btnCloseDSM">@Localizer["Close"]</button>
                                     </div>
-
-                                    <!-- Selected List -->
-                                    <div>
-                                        <select id="selectedDSM" class="form-control" size="6" multiple></select>
-                                    </div>
-
-
-                                    <div style="text-align:center; margin-top:15px;">
-                                        <button class="btn btn-success btn-sm" title="@Localizer["Save"]" id="btnSaveDSM">@Localizer["Save"]</button>
-                                        <button class="btn btn-danger btn-sm" title="@Localizer["Close"]" id="btnCloseDSM">@Localizer["Close"]</button>
-                                    </div>
-
-                                </div>
-
+                                </div>                              
                             </div>
                             <div id="differential" class="tab-pane fade assessment-section">
                                 <div class="button-header">
@@ -1633,10 +1548,10 @@
                                             <tr>
                                                 <td class="srno">1</td>
                                                 <td><input type="text" class="form-control formulation" autocomplete="off" /></td>
-                                                <td><input type="text" class="form-control medicine" autocomplete="off"/></td>
+                                                <td><input type="text" class="form-control medicine" autocomplete="off" /></td>
                                                 <td><input type="text" class="form-control dosage" autocomplete="off" /></td>
                                                 <td><input type="text" class="form-control route" autocomplete="off" /></td>
-                                                <td><input type="text" class="form-control frequency" autocomplete="off"/></td>
+                                                <td><input type="text" class="form-control frequency" autocomplete="off" /></td>
                                                 <td><input type="text" class="form-control others" autocomplete="off" /></td>
                                             </tr>
                                         </tbody>
@@ -1667,97 +1582,73 @@
                             <div id="inpatients" class="tab-pane fade assessment-section">
 
                                 <!-- TOP BUTTON -->
-                                <div class="ipTopButtons" style="margin-bottom:10px;">
-                                    <button class="btn btn-secondary btn-sm" id="btnAddIP" title="@Localizer["Add"]">
+                                <div style="margin-bottom:10px;">
+                                    <button class="btn btn-secondary btn-sm" type="button" onclick="clinical.AddInPatient();" id="btnAddIP" title="@Localizer["Add"]">
                                         @Localizer["Add"]
                                     </button>
                                 </div>
+                                <div id="divtblInPatients" class="kt-portlet__body table-responsive">
+                                    <table id="tblInPatients" class="table table-striped table-hover table-checkable" style="width:100%;">
+                                        <template>
+                                            @Localizer["OP_List"]
+                                        </template>
+                                        <thead>
+                                            <tr>
+                                                <th>@Localizer["Date_of_Admission"]</th>
+                                                <th>@Localizer["Date_of_Discharge"]</th>
+                                                <th>@Localizer["Diagnosis"]</th>
+                                                <th>@Localizer["Notes"]</th>
+                                            </tr>
+                                        </thead>
 
+                                        <tbody></tbody>
+
+                                    </table>
+                                    <script id="Grid_Data_Template_tblInPatients" type="text/x-jquery-tmpl">
+                                        <tr data-id="${paT_INPATIENT_ID}">
+                                        <td>${inpT_ADM_DATECustom}</td>
+                                        <td>${inpT_DISCH_DATECustom}</td>
+                                        <td>${inpT_DIAGNOSIS}</td>
+                                        <td>${inpT_NOTES}</td>
+
+                                        </tr>
+                                    </script>
+                                </div>
                                 <!-- INPATIENT FORM -->
-                                <div class="addPanel ipPanel" style="display:none; border:1px solid #ccc; padding:15px; background:#f5f7fa; border-radius:6px;">
-
+                                @*  <div class="ipPanel" style="display:none; border:1px solid #ccc; padding:15px; background:#f5f7fa; border-radius:6px;"> *@
+                                <div id="ipPanel" style="display:none; border:1px solid #ddd; padding:12px; background:#f9f9f9;">
                                     <div class="container-fluid">
-
                                         <!-- Date of Admission -->
-                                        <div class="form-group row">
-
-                                            <label class="col-md-2 col-form-label">
-                                                Date of Admission:
-                                            </label>
-
-                                            <div class="col-md-3">
-                                                <div class="input-group date">
-                                                    <input type="text"
-                                                           class="form-control date-picker"
-                                                           id="ipAdmissionDate"
-                                                           placeholder="DD-MMM-YYYY"
-                                                           maxlength="11" />
-
-                                                    <span class="input-group-addon">
-                                                        <span class="fa fa-calendar"></span>
-                                                    </span>
-                                                </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <label>@Localizer["Date_of_Admission"] </label><asterisk></asterisk>
+                                                <input type="date" id="txtDateofAdmission" class="form-control" placeholder="@Localizer["Date"]" autocomplete="off" />
                                             </div>
-
+                                            <div class="col-md-4">
+                                                <label>@Localizer["Date_of_Discharge"] </label><asterisk></asterisk>
+                                                <input type="date" id="txtDateofDischarge" class="form-control" placeholder="@Localizer["Date"]" autocomplete="off" />
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label>@Localizer["Diagnosis"]</label>
+                                                <textarea type="text" id="txtDiagnosis" placeholder="@Localizer["Diagnosis"]" class="form-control small-box"></textarea>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label>@Localizer["Notes"]</label>
+                                                <textarea type="text" id="txtNotes" placeholder="@Localizer["Notes"]" class="form-control small-box"></textarea>
+                                            </div>
                                         </div>
 
-                                        <!-- Date of Discharge -->
-                                        <div class="form-group row">
-
-                                            <label class="col-md-2 col-form-label">
-                                                Date of Discharge:
-                                            </label>
-
-                                            <div class="col-md-3">
-                                                <div class="input-group date">
-                                                    <input type="text"
-                                                           class="form-control date-picker"
-                                                           id="ipDischargeDate"
-                                                           placeholder="DD-MMM-YYYY"
-                                                           maxlength="11" />
-
-                                                    <span class="input-group-addon">
-                                                        <span class="fa fa-calendar"></span>
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                        </div>
-
-                                        <!-- Diagnosis -->
-                                        <div class="form-group row">
-
-                                            <label class="col-md-2 col-form-label">
-                                                Diagnosis:
-                                            </label>
-
-                                            <div class="col-md-10">
-                                                <textarea class="form-control" rows="3" id="txtDiagnosis"></textarea>
-                                            </div>
-
-                                        </div>
-
-                                        <!-- Notes -->
-                                        <div class="form-group row">
-
-                                            <label class="col-md-2 col-form-label">
-                                                Notes:
-                                            </label>
-
-                                            <div class="col-md-10">
-                                                <textarea class="form-control" rows="3" id="txtNotes"></textarea>
-                                            </div>
-
-                                        </div>
 
                                         <!-- Buttons -->
                                         <div style="margin-top:10px;">
 
-                                            <button class="btn btn-success btn-sm" id="btnSaveIP" title="@Localizer["Save"]">
+                                            <button class="btn btn-success btn-sm" type="button" onclick="clinical.SaveInPatients();" id="btnSaveIP" title="@Localizer["Save"]">
                                                 @Localizer["Save"]
                                             </button>
 
-                                            <button class="btn btn-danger btn-sm" id="btnCloseIP" title="@Localizer["Close"]">
+                                            <button class="btn btn-danger btn-sm" id="btnCloseIP" type="button" onclick="clinical.CloseInPatients();" title="@Localizer["Close"]">
                                                 @Localizer["Close"]
                                             </button>
 

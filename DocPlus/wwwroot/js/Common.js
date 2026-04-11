@@ -2616,40 +2616,28 @@ function DeleteData(xhr, Ajaxurl, AjaxData, ItemInfo, callback) {
                         action: function () {
                             if (xhr && xhr.readystate != 4)
                                 xhr.abort();
-
                             xhr = $.ajax({
                                 /*url: Ajaxurl, cache: false, data: AjaxData,*/
                                 type: "POST", cache: false, url: Ajaxurl, data: AjaxData,
                                 success: function (data) {
-                                    debugger;
-
                                     var result = data.data;
 
-                                    if (result["status"] === true) {
+                                    if (data.status === true || data.status === 1 || data.status === "Success") {
+                                        showSweetAlert("Success!", data.message, "success", null);
 
-                                        if (data != null && data.status.toLowerCase() == "success") {
-                                            showSweetAlert("Success!", data.message, "success", null);
+                                        if (callback && typeof (callback) === "function")
+                                            callback();
+                                    }
+                                    else if (data != null && data.status == "error") {
 
-                                            if (callback && typeof (callback) === "function")
-                                                callback();
-
-                                        } else if (data != null && data.status.toLowerCase() == "error") {
-
-                                            if ((data.message.indexOf("_FK_") !== -1))
-                                                showSweetAlert("Warning!", "Used In Another Entity", "warning", null);
-                                            else
-                                                showSweetAlert("Error!", data.message, "error", null);
-                                        }
-                                        else showSweetAlert("Error!", data.message, "error", null);
-
+                                        if ((data.message.indexOf("_FK_") !== -1))
+                                            showSweetAlert("Warning!", "Used In Another Entity", "warning", null);
+                                        else
+                                            showSweetAlert("Error!", data.message, "error", null);
                                     }
                                     else {
-                                        showSweetAlert("Failed", result.message, "error", null);
+                                        showSweetAlert("Error!", data.message, "error", null);
                                     }
-
-
-
-
                                 }
                             });
                         },
